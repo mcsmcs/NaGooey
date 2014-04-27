@@ -5,10 +5,14 @@ var mongoose = require('mongoose');
 module.exports = function(){
 
 	var serviceSchema = new mongoose.Schema({
+		service_description: {
+			type: String,
+			unique: true,
+			required: true
+		},
+		servicegroups: Array,
 		host_name: Array,
 		hostgroup_name: Array,
-		service_description: String,
-		servicegroups: Array,
 		check_command: String,
 		check_interval: Number,
 		retry_interval: Number,

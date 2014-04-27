@@ -1,0 +1,12 @@
+extends layout
+
+block content
+	h1 HOSTGROUPs
+
+	p
+		a(href="/hostgroup/add") Add
+
+	ul
+		each hostgroup in hostgroups
+			li= hostgroup['hostgroup_name']
+				a(href="/hostgroup/edit/" + hostgroup['hostgroup_name']) Edit

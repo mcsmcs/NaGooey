@@ -4,9 +4,9 @@ block content
 	h1 HOSTs
 
 	p
-		a(href="/add") Add
+		a(href="/host/add") Add
 
 	ul
 		each host in hosts
 			li= host['host_name']
-				a(href="/edit/" + host['host_name']) Edit
+				a(href="/host/edit/" + host['host_name']) Edit

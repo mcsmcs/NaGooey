@@ -1,0 +1,12 @@
+extends layout
+
+block content
+	h1 SERVICEGROUPs
+
+	p
+		a(href="/servicegroup/add") Add
+
+	ul
+		each servicegroup in servicegroups
+			li= servicegroup['servicegroup_name']
+				a(href="/servicegroup/edit/" + servicegroup['servicegroup_name']) Edit

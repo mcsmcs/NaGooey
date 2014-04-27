@@ -5,42 +5,103 @@ block content
 
 	p= host
 
-	- var action = (host ? '/edit/' + host.host_name : '/add')
-	form(name="host_options" action=action method="post")
-		p Host Name
-			if host && host['host_name']
-				input(type="text" name="host_name" value=host['host_name'])
-			else
+	//- Set the form action based on edit or add
+	- var action = (host ? '/host/edit/' + host.host_name : '/host/add')
+
+	if host
+		//- EDIT existing host (prefill fields)
+		form(name="host_options" action=action method="post")
+			p Host Name
+				if host['host_name']
+					input(type="text" name="host_name" value=host['host_name'])
+				
+			p Alias
+				if host['alias']
+					input(type="text" name="alias" value=host['alias'])
+							
+			//- p Host Groups
+			//- 	input(type="text" name="host_groups")
+
+			//- p Check Command
+			//- 	input(type="text" name="check_command")
+			
+			//- p Check Interval
+			//- 	input(type="text" name="check_interval")
+			
+			//- p Retry Interval
+			//- 	input(type="text" name="retry_interval")
+			
+			//- p Max Check Attempts
+			//- 	input(type="text" name="max_check_attempts")
+			
+			//- p Check Period
+			//- 	input(type="text" name="check_period")
+			
+			//- p Contact Groups
+			//- 	input(type="text" name="contact_groups")
+			
+			//- p Notification Interval
+			//- 	input(type="text" name="notification_interval")
+			
+			//- p Notification Period
+			//- 	input(type="text" name="notification_period")
+			
+			//- p Notification Options
+			//- 	input(type="checkbox" name="notification_options" value="down")
+			//- 	input(type="checkbox" name="notification_options" value="unreachable")
+			//- 	input(type="checkbox" name="notification_options" value="recovery")
+			//- 	input(type="checkbox" name="notification_options" value="flapping")
+			//- 	input(type="checkbox" name="notification_options" value="scheduled")
+			
+			//- p Parents/Dependencies
+			//- 	input(type="text" name="parents")
+
+			input(type="submit")
+
+	else
+		//- ADD new host
+		form(name="host_options" action=action method="post")
+			p Host Name
 				input(type="text" name="host_name")
-		//- p Host Groups
-		//- 	input(type="text" name="host_groups")
-		p Alias
-			if host && host['alias']
-				input(type="text" name="alias" value=host['alias'])
-			else 	
+			
+			p Alias
 				input(type="text" name="alias")
-		//- p Check Command
-		//- 	input(type="text" name="check_command")
-		//- p Check Interval
-		//- 	input(type="text" name="check_interval")
-		//- p Retry Interval
-		//- 	input(type="text" name="retry_interval")
-		//- p Max Check Attempts
-		//- 	input(type="text" name="max_check_attempts")
-		//- p Check Period
-		//- 	input(type="text" name="check_period")
-		//- p Contact Groups
-		//- 	input(type="text" name="contact_groups")
-		//- p Notification Interval
-		//- 	input(type="text" name="notification_interval")
-		//- p Notification Period
-		//- 	input(type="text" name="notification_period")
-		//- p Notification Options
-		//- 	input(type="checkbox" name="notification_options" value="down")
-		//- 	input(type="checkbox" name="notification_options" value="unreachable")
-		//- 	input(type="checkbox" name="notification_options" value="recovery")
-		//- 	input(type="checkbox" name="notification_options" value="flapping")
-		//- 	input(type="checkbox" name="notification_options" value="scheduled")
-		//- p Parents/Dependencies
-		//- 	input(type="text" name="parents")
-		input(type="submit")
+			
+			//- p Host Groups
+			//- 	input(type="text" name="host_groups")
+
+			//- p Check Command
+			//- 	input(type="text" name="check_command")
+			
+			//- p Check Interval
+			//- 	input(type="text" name="check_interval")
+			
+			//- p Retry Interval
+			//- 	input(type="text" name="retry_interval")
+			
+			//- p Max Check Attempts
+			//- 	input(type="text" name="max_check_attempts")
+			
+			//- p Check Period
+			//- 	input(type="text" name="check_period")
+			
+			//- p Contact Groups
+			//- 	input(type="text" name="contact_groups")
+			
+			//- p Notification Interval
+			//- 	input(type="text" name="notification_interval")
+			
+			//- p Notification Period
+			//- 	input(type="text" name="notification_period")
+			
+			//- p Notification Options
+			//- 	input(type="checkbox" name="notification_options" value="down")
+			//- 	input(type="checkbox" name="notification_options" value="unreachable")
+			//- 	input(type="checkbox" name="notification_options" value="recovery")
+			//- 	input(type="checkbox" name="notification_options" value="flapping")
+			//- 	input(type="checkbox" name="notification_options" value="scheduled")
+			
+			//- p Parents/Dependencies
+			//- 	input(type="text" name="parents")
+		
+			input(type="submit")

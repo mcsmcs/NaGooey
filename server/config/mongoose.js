@@ -1,5 +1,11 @@
 'use strict';
 
+/*
+ *	Setup MongoDB and Register Models
+ *	Register Format:  require('../models/<model>')();
+ *	Register Example: require('../models/user')();
+ */
+
 var mongoose = require('mongoose');
 
 module.exports= function(){

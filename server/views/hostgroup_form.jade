@@ -1,0 +1,33 @@
+extends layout
+
+block content
+	h1 HOSTGROUPs
+
+	p= hostgroup
+
+	//- Set the form action based on edit or add
+	- var action = (hostgroup ? '/hostgroup/edit/' + hostgroup.hostgroup_name : '/hostgroup/add')
+
+	if hostgroup
+		//- EDIT existing hostgroup (prefill fields)
+		form(name="hostgroup_options" action=action method="post")
+			p Host Name
+				if hostgroup['hostgroup_name']
+					input(type="text" name="hostgroup_name" value=hostgroup['hostgroup_name'])
+				
+			p Alias
+				if hostgroup['alias']
+					input(type="text" name="alias" value=hostgroup['alias'])
+
+			input(type="submit")
+
+	else
+		//- ADD new hostgroup
+		form(name="hostgroup_options" action=action method="post")
+			p Host Name
+				input(type="text" name="hostgroup_name")
+			
+			p Alias
+				input(type="text" name="alias")
+			
+			input(type="submit")
