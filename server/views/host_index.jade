@@ -1,0 +1,12 @@
+extends layout
+
+block content
+	h1 HOSTs
+
+	p
+		a(href="/add") Add
+
+	ul
+		each host in hosts
+			li= host['host_name']
+				a(href="/edit/" + host['host_name']) Edit
