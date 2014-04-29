@@ -4,9 +4,22 @@ block content
 	h1 HOSTs
 
 	p
-		a(href="/host/add") Add
+		a(href="/host/add") Add a New Host
 
-	ul
+	table
+		tr
+			th Host Name
+			th Alias
+			th IP Address
+			th Edit
+			th Delete
+
 		each host in hosts
-			li= host['host_name']
-				a(href="/host/edit/" + host['host_name']) Edit
+			tr
+				td= host['host_name']
+				td= host['alias']
+				td= host['address']
+				td
+					a(href="/host/edit/" + host['host_name']) Edit 
+				td
+					a(href="/host/delete/" + host['host_name']) Delete

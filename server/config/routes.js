@@ -8,6 +8,10 @@
 
 module.exports = function(app){
 
+	app.get('/', function(req,res){
+		res.render('index');
+	});
+
 	require('../routes/host')(app);
 	require('../routes/hostgroup')(app);
 	require('../routes/service')(app);

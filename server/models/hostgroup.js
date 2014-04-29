@@ -15,5 +15,16 @@ module.exports = function(){
 		hostgroup_members: Array
 	});
 
+
+	hostGroupSchema.methods.addMember = function(host){
+		this.members.addToSet(host);
+		this.save();
+	}
+
+	hostGroupSchema.methods.addHostgroupMember = function(hostgroup){
+		this.hostgroup_members.addToSet(hostgroup);
+		this.save();
+	}
+
 	return mongoose.model('HostGroup', hostGroupSchema);
 };

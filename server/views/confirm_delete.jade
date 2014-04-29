@@ -1,0 +1,8 @@
+extends layout
+
+block content
+	h1 Confirm Deletion
+
+	form(action=action method="post")
+		p= question
+		input(type="submit" value="Delete it.")

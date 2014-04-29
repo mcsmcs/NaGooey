@@ -6,18 +6,18 @@ block content
 	p= service
 
 	//- Set the form action based on edit or add
-	- var action = (service ? '/service/edit/' + service.service_name : '/service/add')
+	- var action = (service ? '/service/edit/' + service.service_description : '/service/add')
 
 	if service
 		//- EDIT existing service (prefill fields)
 		form(name="service_options" action=action method="post")
-			p Host Name
-				if service['service_name']
-					input(type="text" name="service_name" value=service['service_description'])
+			p Service Description
+				if service['service_description']
+					input(type="text" name="service_description" value=service['service_description'])
 				
-			p Alias
-				if service['alias']
-					input(type="text" name="alias" value=service['alias'])
+			if service['alias']
+				p Alias
+				input(type="text" name="alias" value=service['alias'])
 
 			input(type="submit")
 
@@ -26,8 +26,5 @@ block content
 		form(name="service_options" action=action method="post")
 			p Host Name
 				input(type="text" name="service_description")
-			
-			p Alias
-				input(type="text" name="alias")
 			
 			input(type="submit")

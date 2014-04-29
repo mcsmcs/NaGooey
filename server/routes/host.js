@@ -7,7 +7,7 @@
 
 var mongoose = require('mongoose');
 var Host = mongoose.model("Host");
-
+var HostGroup = mongoose.model("HostGroup");
 
 module.exports = function(app){
 
@@ -35,9 +35,11 @@ module.exports = function(app){
 			if (err){ console.log('error finding hosts'); }
 			else { console.log(hostDocs); }
 
-			res.render('host_form');
+			HostGroup.find(function(err, hostgroupDocs){
+				if(err){console.log(err);}
+				res.render('host_form', {hostgroups: hostgroupDocs});
+			});
 		});
-		
 	});
 	
 	app.post('/host/add', function(req,res){
@@ -45,7 +47,8 @@ module.exports = function(app){
 		
 		var newHost = new Host({
 			host_name: req.body['host_name'],
-			alias: req.body['alias']
+			alias: req.body['alias'],
+			address: req.body['address']
 		});
 
 		newHost.save(function(err, host){
@@ -74,10 +77,35 @@ module.exports = function(app){
 			
 			hostDoc.host_name = req.body.host_name;
 			hostDoc.alias = req.body.alias;
+			hostDoc.addres = req.body.address;
 			hostDoc.save(function(err, savedDoc){
 
 				console.log('record saved!');
 				res.redirect('/host');
+			});
+		});
+	});
+
+	app.get('/host/delete/:host_name', function(req,res){
+
+		var question = "Are you sure you want to delete host: " + req.params.host_name + "?";
+		var action = '/host/delete/' + req.params.host_name + '/confirm';
+		
+		res.render('confirm_delete', {question:question, action:action});
+	});
+
+	app.post('/host/delete/:host_name/confirm', function(req,res){
+
+		Host.findOne({host_name: req.params.host_name}, function(err, hostDoc){
+			
+			if(err){ console.log(err); }
+			console.log(hostDoc);
+
+			hostDoc.remove(function(err, removedDoc){
+				
+				if(err){ console.log(err); }
+				res.redirect('/host');	
+
 			});
 		});
 	});
