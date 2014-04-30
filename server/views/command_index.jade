@@ -1,0 +1,12 @@
+extends layout
+
+block content
+	h1 COMMANDs
+
+	p
+		a(href="/command/add") Add
+
+	ul
+		each command in commands
+			li= command['command_name']
+				a(href="/command/edit/" + command['command_name']) Edit

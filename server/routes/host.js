@@ -77,7 +77,7 @@ module.exports = function(app){
 			
 			hostDoc.host_name = req.body.host_name;
 			hostDoc.alias = req.body.alias;
-			hostDoc.addres = req.body.address;
+			hostDoc.address = req.body.address;
 			hostDoc.save(function(err, savedDoc){
 
 				console.log('record saved!');

@@ -6,10 +6,18 @@ module.exports = function(){
 
 	var hostSchema = new mongoose.Schema({
 		
+		// Host Directives
+		// http://nagios.sourceforge.net/docs/nagioscore/3/en/objectdefinitions.html#host
+
 		host_name: {
 			type: String,
 			required: true,
 			unique: true
+		},
+
+		alias: {
+			type: String,
+			required: true
 		},
 		
 		address: {
@@ -18,19 +26,47 @@ module.exports = function(){
 			unique: true
 		},
 		
-		alias: String,
-		host_groups: Array,
-		check_command: String,
+		display_name: String,				
+		parents: Array,						// host_names
+		hostgroups: Array,					// hostgroup_names
+		check_command: String,				// command_name
+		initial_state: String,				// [o,d,u]
+		check_period: String,				// timeperiod_name
+		event_handler: String,				// command_name
+		flap_detection_options: String,		// [o,d,u]
+		contacts: Array,					// contacts
+		contact_groups: Array,				// contact_groups
+		notification_period: String,		// timeperiod_name
+		notification_options: String,		// [d,u,r,f,s]
+		stalking_options: String,			// [o,d,u]
+		notes: String,						
+		notes_url: String,					// url
+		action_url: String,					// url
+		icon_image: String,					// image_file
+		icon_image_alt: String,				
+		vrml_image: String,					// image_file
+		statusmap_image: String,			// image_file
+		twoD_coords: String,				// x_coord,y_coord
+		threeD_coords: String,				// x_coord,y_coord,z_coord
+		max_check_attempts: Number,
 		check_interval: Number,
 		retry_interval: Number,
-		max_check_attempts: Number,
-		check_period: String,
-		contact_groups: Array,
+		active_checks_enabled: Boolean,
+		passive_checks_enabled: Boolean,
+		obsess_over_host: Boolean,
+		check_freshness: Boolean,
+		freshness_threshold: Number,
+		event_handler_enabled: Boolean,
+		low_flap_threshold: Number,
+		high_flap_threshold: Number,
+		flap_detection_enabled: Boolean,
+		process_perf_data: Boolean,
+		retain_status_information: Boolean,
+		retain_nonstatus_information: Boolean,
 		notification_interval: Number,
-		notification_period: Number,
-		notification_options: Array,
-		parents: Array,
-		use: Array
+		first_notification_delay: Number,
+		notifications_enabled: Boolean,
+
 	});
 
 	

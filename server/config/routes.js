@@ -16,5 +16,6 @@ module.exports = function(app){
 	require('../routes/hostgroup')(app);
 	require('../routes/service')(app);
 	require('../routes/servicegroup')(app);
+	require('../routes/command')(app);
 
 }

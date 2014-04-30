@@ -7,14 +7,23 @@ module.exports = function(){
 	var hostGroupSchema = new mongoose.Schema({
 		hostgroup_name: {
 			type: String,
-			reqired: true,
-			unique: true
+			unique: true,
+			required: true
 		},
-		alias: String,
-		members: Array,
-		hostgroup_members: Array
-	});
 
+		alias: {
+			type: String,
+			unique: true,
+			required: true
+		},
+
+		members: Array,				// hosts
+		hostgroup_members: Array,	// hostgroups
+		
+		notes: String,				// note_string
+		notes_url: String,			// url
+		action_url: String,			// url
+	});
 
 	hostGroupSchema.methods.addMember = function(host){
 		this.members.addToSet(host);
