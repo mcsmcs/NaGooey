@@ -15,7 +15,11 @@ module.exports = function(app){
 		Command.find(function(err, commandDocs){
 
 			if (err){ console.log('error finding commands'); }
-			else { console.log(commandDocs); }
+
+			Command.getCheckCommands(function(err, docs){
+				if(err){ console.log(err); }
+				else{ console.log(docs); }
+			})
 
 			res.render('command_index', {commands: commandDocs});
 		});
@@ -44,6 +48,7 @@ module.exports = function(app){
 		var newCommand = new Command({
 			command_name: req.body['command_name'],
 			command_line: req.body['command_line'],
+			check_command: (req.body.check_command == 'on' ? true : false)
 		});
 
 		newCommand.save(function(err, command){
@@ -66,12 +71,16 @@ module.exports = function(app){
 	});
 
 	app.post('/command/edit/:command_name', function(req,res){
-		
+		console.log('**************');
+		console.log(req.body);
+		console.log('**************');
+
 		Command.findOne({command_name: req.params.command_name}, function(err, commandDoc){
 			if(err){ console.log(err); res.redirect('/'); }
 			
 			commandDoc.command_name = req.body.command_name;
 			commandDoc.command_line = req.body.command_line;
+			commandDoc.check_command = (req.body.check_command == 'on' ? true : false);
 			commandDoc.save(function(err, savedDoc){
 
 				console.log('record saved!');

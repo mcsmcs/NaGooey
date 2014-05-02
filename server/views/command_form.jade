@@ -19,6 +19,13 @@ block content
 				- var value = (command['command_line'] ? command['command_line'] : '');
 				input(type="text" name="command_line" value=value)
 
+			p Check Command
+				- var value = (command['check_command'] == true ? 'checked' : '');
+				if value == "checked"
+					input(type="checkbox" name="check_command" checked)
+				else
+					input(type="checkbox" name="check_command")
+
 			input(type="submit")
 
 	else
@@ -29,5 +36,8 @@ block content
 			
 			p Command Line
 				input(type="text" name="command_line")
-			
+
+			p Check Command
+				input(type="checkbox" name="check_command")
+
 			input(type="submit")
