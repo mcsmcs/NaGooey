@@ -8,6 +8,8 @@
 var mongoose = require('mongoose');
 var Host = mongoose.model("Host");
 var HostGroup = mongoose.model("HostGroup");
+var Command = mongoose.model("Command");
+
 
 module.exports = function(app){
 
@@ -37,7 +39,12 @@ module.exports = function(app){
 
 			HostGroup.find(function(err, hostgroupDocs){
 				if(err){console.log(err);}
-				res.render('host_form', {hostgroups: hostgroupDocs});
+
+				Command.getCheckCommands(function(err, commandDocs){
+					if(err){ console.log(err); }
+					res.render('host_form', {hostgroups: hostgroupDocs, check_commands: commandDocs});	
+				})
+				
 			});
 		});
 	});
@@ -48,7 +55,8 @@ module.exports = function(app){
 		var newHost = new Host({
 			host_name: req.body['host_name'],
 			alias: req.body['alias'],
-			address: req.body['address']
+			address: req.body['address'],
+			check_command: req.body['check_command']
 		});
 
 		newHost.save(function(err, host){
@@ -62,11 +70,12 @@ module.exports = function(app){
 	app.get('/host/edit/:host_name', function(req,res){
 
 		Host.findOne({host_name: req.params.host_name}, function(err,hostDoc){
-
 			if(err){console.log(err);}
-			else {console.log(hostDoc);}
-
-			res.render('host_form', {host: hostDoc});
+			
+			Command.getCheckCommands(function(err, commandDocs){
+				if(err){ console.log(err); }
+				res.render('host_form', {host: hostDoc, check_commands: commandDocs});
+			});
 		});
 	});
 
@@ -78,6 +87,7 @@ module.exports = function(app){
 			hostDoc.host_name = req.body.host_name;
 			hostDoc.alias = req.body.alias;
 			hostDoc.address = req.body.address;
+			hostDoc.check_command = req.body['check_command'];
 			hostDoc.save(function(err, savedDoc){
 
 				console.log('record saved!');

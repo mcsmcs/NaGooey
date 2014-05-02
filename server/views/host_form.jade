@@ -26,8 +26,13 @@ block content
 			//- p Host Groups
 			//- 	input(type="text" name="host_groups")
 
-			//- p Check Command
-			//- 	input(type="text" name="check_command")
+			p Check Command
+				select(name="check_command")
+					each command in check_commands
+						if command['command_name'] == host['check_command']
+							option(value=command['command_name'] selected)= command['command_name']
+						else
+							option(value=command['command_name'])= command['command_name']
 			
 			//- p Check Interval
 			//- 	input(type="text" name="check_interval")
@@ -83,8 +88,10 @@ block content
 			//- 	br
 
 
-			//- p Check Command
-			//- 	input(type="text" name="check_command")
+			p Check Command
+				select(name="check_command")
+					each command in check_commands
+						option(value=command.command_name)= command.command_name
 			
 			//- p Check Interval
 			//- 	input(type="text" name="check_interval")

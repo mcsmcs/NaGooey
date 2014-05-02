@@ -26,10 +26,14 @@ module.exports = function(){
 			unique: true
 		},
 		
+		check_command: {
+			type: String,					// command_name
+			required: true,
+		},
+
 		display_name: String,				
 		parents: Array,						// host_names
 		hostgroups: Array,					// hostgroup_names
-		check_command: String,				// command_name
 		initial_state: String,				// [o,d,u]
 		check_period: String,				// timeperiod_name
 		event_handler: String,				// command_name
