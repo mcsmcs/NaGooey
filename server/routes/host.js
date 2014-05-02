@@ -5,6 +5,7 @@
  *	Basic CRUD
  */
 
+var async = require('async');
 var mongoose = require('mongoose');
 var Host = mongoose.model("Host");
 var HostGroup = mongoose.model("HostGroup");
@@ -32,21 +33,19 @@ module.exports = function(app){
 
 	app.get('/host/add', function(req,res){
 		
-		Host.find(function(err, hostDocs){
+		async.parallel(
+			{	// Run these in parallel
+				// callback = function(err, result){}
+				hostgroups: function(callback){ HostGroup.find(callback); },
+				check_commands: function(callback){	Command.getCheckCommands(callback); },
+			}, 
 
-			if (err){ console.log('error finding hosts'); }
-			else { console.log(hostDocs); }
-
-			HostGroup.find(function(err, hostgroupDocs){
+			// Do this after completion
+			function(err, results){
 				if(err){console.log(err);}
-
-				Command.getCheckCommands(function(err, commandDocs){
-					if(err){ console.log(err); }
-					res.render('host_form', {hostgroups: hostgroupDocs, check_commands: commandDocs});	
-				})
-				
-			});
-		});
+				res.render('host_form', {hostgroups: results.hostgroups, check_commands: results.check_commands});
+			}
+		);
 	});
 	
 	app.post('/host/add', function(req,res){
@@ -61,22 +60,23 @@ module.exports = function(app){
 
 		newHost.save(function(err, host){
 			if(err){ console.log(err); }
-			else {
-				res.redirect('/host');
-			}
+			res.redirect('/host');
 		});
 	});
 
 	app.get('/host/edit/:host_name', function(req,res){
 
-		Host.findOne({host_name: req.params.host_name}, function(err,hostDoc){
-			if(err){console.log(err);}
-			
-			Command.getCheckCommands(function(err, commandDocs){
+		async.parallel(
+			{
+				host: function(callback){ Host.findOne({host_name: req.params.host_name}, callback); },
+				check_commands: function(callback){ Command.getCheckCommands(callback); }
+			},
+
+			function(err, results){
 				if(err){ console.log(err); }
-				res.render('host_form', {host: hostDoc, check_commands: commandDocs});
-			});
-		});
+				res.render('host_form', {host: results.host, check_commands: results.check_commands});
+			}
+		);
 	});
 
 	app.post('/host/edit/:host_name', function(req,res){
