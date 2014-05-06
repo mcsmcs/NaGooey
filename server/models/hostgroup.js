@@ -1,6 +1,7 @@
 'use strict';
 
 var mongoose = require('mongoose');
+var async = require('async');
 
 module.exports = function(){
 
@@ -25,6 +26,43 @@ module.exports = function(){
 		action_url: String,			// url
 	});
 
+
+	/***
+	 *	Collection Methods
+	 ***/
+	hostGroupSchema.statics.isMember = function(host, callback){
+		this.find({members: {$elemMatch: {$in: [host]}}}, {hostgroup_name: 1, alias: 1}, callback);
+	}
+
+	hostGroupSchema.statics.isNotMember = function(host, callback){
+		this.find({members: {$not: {$elemMatch: {$in: [host]}}}}, {hostgroup_name: 1, alias: 1}, callback);
+	}
+
+	hostGroupSchema.statics.getHostMembership = function(host){
+
+		//  TODO: clean this up apply/call/bind?
+		var caller = this; // mongoose.Model("HostGroup");
+
+		async.parallel({
+			isMember: function(callback){
+				caller.find({members: {$elemMatch: {$in: [host]}}}, {hostgroup_name: 1, alias: 1}, callback);
+			},
+
+			isNotMember: function(callback){
+				caller.find({members: {$not: {$elemMatch: {$in: [host]}}}}, {hostgroup_name: 1, alias: 1}, callback);
+			}
+		},
+
+		function(err, results){
+			if(err){ console.log(err); }
+			console.log(results);
+		})
+	}
+
+
+	/***
+	 *	Document Methods
+	 ***/
 	hostGroupSchema.methods.addMember = function(host){
 		this.members.addToSet(host);
 		this.save();
@@ -34,6 +72,8 @@ module.exports = function(){
 		this.hostgroup_members.addToSet(hostgroup);
 		this.save();
 	}
+
+
 
 	return mongoose.model('HostGroup', hostGroupSchema);
 };

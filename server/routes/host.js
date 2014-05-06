@@ -15,12 +15,12 @@ var Command = mongoose.model("Command");
 module.exports = function(app){
 
 	app.get('/host', function(req,res){
-		
+
+
+		HostGroup.getHostMembership("boomboom");
+
 		Host.find(function(err, hostDocs){
-
 			if (err){ console.log('error finding hosts'); }
-			else { console.log(hostDocs); }
-
 			res.render('host_index', {hosts: hostDocs});
 		});
 
