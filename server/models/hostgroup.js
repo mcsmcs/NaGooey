@@ -38,7 +38,7 @@ module.exports = function(){
 		this.find({members: {$not: {$elemMatch: {$in: [host]}}}}, {hostgroup_name: 1, alias: 1}, callback);
 	}
 
-	hostGroupSchema.statics.getHostMembership = function(host){
+	hostGroupSchema.statics.getHostMembership = function(host, cb){
 
 		//  TODO: clean this up apply/call/bind?
 		var caller = this; // mongoose.Model("HostGroup");
@@ -55,7 +55,7 @@ module.exports = function(){
 
 		function(err, results){
 			if(err){ console.log(err); }
-			console.log(results);
+			cb(err, results);
 		})
 	}
 

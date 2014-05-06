@@ -23,9 +23,6 @@ block content
 				if host['alias']
 					input(type="text" name="alias" value=host['alias'])
 							
-			//- p Host Groups
-			//- 	input(type="text" name="host_groups")
-
 			p Check Command
 				select(name="check_command")
 					each command in check_commands
@@ -33,7 +30,24 @@ block content
 							option(value=command['command_name'] selected)= command['command_name']
 						else
 							option(value=command['command_name'])= command['command_name']
-			
+
+			table
+				tr
+					td
+						select(multiple size="5" name="isNotMember")
+							each hostgroup in hostgroups.isNotMember
+								option(value=hostgroup.hostgroup_name)= hostgroup.hostgroup_name
+
+					td
+						input(type="button" onclick="toggleHostGroup(this.form.isNotMember, this.form.isMember)" value="->")
+						br
+						input(type="button" onclick="toggleHostGroup(this.form.isMember, this.form.isNotMember)" value="<-")
+
+					td
+						select(multiple size="5" name="isMember")
+							each hostgroup in hostgroups.isMember
+								option(value=hostgroup.hostgroup_name)= hostgroup_name
+
 			//- p Check Interval
 			//- 	input(type="text" name="check_interval")
 			

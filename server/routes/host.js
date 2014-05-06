@@ -16,9 +16,6 @@ module.exports = function(app){
 
 	app.get('/host', function(req,res){
 
-
-		HostGroup.getHostMembership("boomboom");
-
 		Host.find(function(err, hostDocs){
 			if (err){ console.log('error finding hosts'); }
 			res.render('host_index', {hosts: hostDocs});
@@ -43,6 +40,7 @@ module.exports = function(app){
 			// Do this after completion
 			function(err, results){
 				if(err){console.log(err);}
+				console.log(results)
 				res.render('host_form', {hostgroups: results.hostgroups, check_commands: results.check_commands});
 			}
 		);
@@ -69,18 +67,23 @@ module.exports = function(app){
 		async.parallel(
 			{
 				host: function(callback){ Host.findOne({host_name: req.params.host_name}, callback); },
+				hostgroups: function(callback){ HostGroup.getHostMembership(req.params.host_name, callback); },
 				check_commands: function(callback){ Command.getCheckCommands(callback); }
 			},
 
 			function(err, results){
 				if(err){ console.log(err); }
-				res.render('host_form', {host: results.host, check_commands: results.check_commands});
+				res.render('host_form', {host: results.host, hostgroups: results.hostgroups, check_commands: results.check_commands});
 			}
 		);
 	});
 
 	app.post('/host/edit/:host_name', function(req,res){
 		
+		console.log("--------------------------------------");
+		console.log(req.body);
+		console.log("--------------------------------------");
+
 		Host.findOne({host_name: req.params.host_name}, function(err, hostDoc){
 			if(err){ console.log(err); res.redirect('/'); }
 			
