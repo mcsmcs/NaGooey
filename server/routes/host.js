@@ -84,6 +84,7 @@ module.exports = function(app){
 		console.log(req.body);
 		console.log("--------------------------------------");
 
+
 		Host.findOne({host_name: req.params.host_name}, function(err, hostDoc){
 			if(err){ console.log(err); res.redirect('/'); }
 			
