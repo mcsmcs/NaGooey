@@ -84,20 +84,34 @@ module.exports = function(app){
 		console.log(req.body);
 		console.log("--------------------------------------");
 
+		var hostname = req.params.host_name;
+		var membership = {
+			isMember: req.body.isMember,
+			isNotMember: req.body.isNotMember
+		};
 
-		Host.findOne({host_name: req.params.host_name}, function(err, hostDoc){
-			if(err){ console.log(err); res.redirect('/'); }
-			
-			hostDoc.host_name = req.body.host_name;
-			hostDoc.alias = req.body.alias;
-			hostDoc.address = req.body.address;
-			hostDoc.check_command = req.body['check_command'];
-			hostDoc.save(function(err, savedDoc){
+		async.parallel(
+			{
+				host: function(callback){
+					Host.findOne({host_name: hostname}, function(err, hostDoc){
+						if(err){ console.log(err); res.redirect('/'); }
+				
+						hostDoc.host_name = req.body.host_name;
+						hostDoc.alias = req.body.alias;
+						hostDoc.address = req.body.address;
+						hostDoc.check_command = req.body['check_command'];
+						hostDoc.save(callback);
+					});
+				},
 
-				console.log('record saved!');
-				res.redirect('/host');
-			});
-		});
+				hostgroups: function(callback){	HostGroup.updateHostMembership(hostname, membership, callback); }
+			},
+
+			function(err,results){
+				if(err){ console.log(err); res.redirect('/'); }
+				else { res.redirect('/host'); }
+			}
+		); // End async.parallel
 	});
 
 	app.get('/host/delete/:host_name', function(req,res){

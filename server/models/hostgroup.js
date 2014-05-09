@@ -59,6 +59,24 @@ module.exports = function(){
 		})
 	}
 
+	hostGroupSchema.statics.updateHostMembership = function(hostname, membership, cb){
+
+		var caller = this;
+		var property = null;
+		var isMember = (membership.isMember instanceof Array ? membership.isMember : Array(membership.isMember));
+		var isNotMember = (membership.isNotMember instanceof Array ? membership.isNotMember : Array(membership.isNotMember));
+
+		async.parallel(
+			{	
+				add: function(callback){ caller.update({hostgroup_name: {$in: isMember}}, {$addToSet: {members: hostname}}, {multi: true}, callback); },
+				remove: function(callback){ caller.update({hostgroup_name: {$in: isNotMember}}, {$pull: {members: hostname}}, {multi: true}, callback); }
+			},
+			function(err,results){
+				cb(err,results);
+			}
+		);
+	}
+
 
 	/***
 	 *	Document Methods
