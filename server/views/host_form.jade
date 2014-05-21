@@ -31,7 +31,6 @@ block content
 
 
 	h1 HOST
-
 	p= host
 
 	//- Set the form action based on edit or add
@@ -76,7 +75,7 @@ block content
 					td
 						select(id="isMember" multiple size="5" name="isMember")
 							each hostgroup in hostgroups.isMember
-								option(value=hostgroup.hostgroup_name)= hostgroup_name
+								option(value=hostgroup.hostgroup_name)= hostgroup.hostgroup_name
 
 			//- p Check Interval
 			//- 	input(type="text" name="check_interval")

@@ -73,6 +73,7 @@ module.exports = function(app){
 
 			function(err, results){
 				if(err){ console.log(err); }
+				console.log(results.hostgroups);
 				res.render('host_form', {host: results.host, hostgroups: results.hostgroups, check_commands: results.check_commands});
 			}
 		);
