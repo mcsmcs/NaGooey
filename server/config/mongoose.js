@@ -31,20 +31,8 @@ module.exports= function(){
 	require('../models/timeperiod')();
 
 
-	// Add some default docs
-	var Command = mongoose.model("Command");
-	var check_icmp_command = new Command({
-		command_name: "check-host-alive-icmp",
-		command_line: "$USER1$/check_icmp -s 216.38.158.8 -H $HOSTADDRESS$ -w 1000.0,60% -c 5000.0,100% -p 5",
-		check_command: true
-	});
-	check_icmp_command.save();
+	// Load Defaults
+	require('./mongo-defaults');
 
-	var check_ping_command = new Command({
-		command_name: "check-host-alive-ping",
-		command_line: "$USER1$/check_ping -s 216.38.158.8 -H $HOSTADDRESS$ -w 1000.0,60% -c 5000.0,100% -p 5",
-		check_command: true
-	});
-	check_ping_command.save();
 
 }

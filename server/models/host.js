@@ -76,7 +76,7 @@ module.exports = function(){
 	
 	// Find hosts that are not members
 	hostSchema.statics.getNonHostgroupMembers = function(hostgroup, cb){
-		this.find({hostgroups: {$not: {$elemMatch: {$in: [hostgroup]}}}}, {host_name:1}, cb);
+		this.find({hostgroups: {$not: {$elemMatch: {$regex: hostgroup}}}}, {host_name:1}, cb);
 	}
 
 	hostSchema.methods.addHostGroup = function(hostgroup){
