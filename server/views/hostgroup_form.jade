@@ -1,9 +1,39 @@
 extends layout
 
 block content
+	script.
+
+		// Move select options between two different select boxes
+		var toggleListbox = function(source,destination){
+			for (index in source.selectedOptions){
+				var option = source.selectedOptions[index];
+				source.removeChild(option);
+				destination.appendChild(option);
+			}
+		}
+
+		// Select all select options before submitting
+		var selectAllOptions = function(){
+			// http://stackoverflow.com/questions/15190464/how-do-i-post-all-options-in-a-select-list
+			var form = document.getElementById("hostform");
+			var selectBoxIDs = ['isMember', 'isNotMember'];
+			var selectBoxes = document.getElementsByTagName('select');
+			var i = null;
+
+			for (index in selectBoxes){
+				var selectBox = selectBoxes[index];
+
+				for (i=0; i<selectBox.options.length; i++){
+					selectBox.options[i].selected = true;
+				}
+			}
+		}
+
+
 	h1 HOSTGROUPs
 
 	p= hostgroup
+	p= nonMemberHosts
 
 	//- Set the form action based on edit or add
 	- var action = (hostgroup ? '/hostgroup/edit/' + hostgroup.hostgroup_name : '/hostgroup/add')
@@ -18,6 +48,22 @@ block content
 			p Alias
 				if hostgroup['alias']
 					input(type="text" name="alias" value=hostgroup['alias'])
+
+			table
+				tr
+					td
+						select(id="isNotMember" multiple size="10" name="isNotMember")
+							each host in nonMemberHosts
+								option(value=host.host_name)= host.host_name
+					td
+						input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
+						br
+						input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+
+					td
+						select(id="isMember" multiple size="10" name="isMember")
+							each host in hostgroup.members
+								option(value=host)= host
 
 			input(type="submit")
 

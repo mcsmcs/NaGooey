@@ -5,7 +5,9 @@
  *	Basic CRUD
  */
 
+var async = require('async');
 var mongoose = require('mongoose');
+var Host = mongoose.model("Host");
 var HostGroup = mongoose.model("HostGroup");
 
 
@@ -58,13 +60,28 @@ module.exports = function(app){
 
 	app.get('/hostgroup/edit/:hostgroup_name', function(req,res){
 
-		HostGroup.findOne({hostgroup_name: req.params.hostgroup_name}, function(err,hostgroupDoc){
+		console.log("***********")
+		console.log(req.params.hostgroup_name);
+		console.log('*************');
+		
+		async.parallel(
+			{
+				hostgroup: function(callback){
+					HostGroup.findOne({hostgroup_name: req.params.hostgroup_name}, callback);
+				},
 
-			if(err){console.log(err);}
-			else {console.log(hostgroupDoc);}
+				nonMemberHosts: function(callback){
+					Host.getNonHostgroupMembers(req.params.hostgroup_name, callback);
+				}
+			},
 
-			res.render('hostgroup_form', {hostgroup: hostgroupDoc});
-		});
+			function(err,results){
+				if(err){console.log(err);}
+				else{console.log(results);}
+
+				res.render('hostgroup_form', {hostgroup: results.hostgroup, nonMemberHosts: results.nonMemberHosts});
+			}
+		);
 	});
 
 	app.post('/hostgroup/edit/:hostgroup_name', function(req,res){
@@ -75,7 +92,6 @@ module.exports = function(app){
 			hostgroupDoc.hostgroup_name = req.body.hostgroup_name;
 			hostgroupDoc.alias = req.body.alias;
 			hostgroupDoc.save(function(err, savedDoc){
-
 				console.log('record saved!');
 				res.redirect('/hostgroup');
 			});

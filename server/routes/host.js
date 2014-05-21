@@ -37,7 +37,7 @@ module.exports = function(app){
 				check_commands: function(callback){	Command.getCheckCommands(callback); },
 			}, 
 
-			// Do this after completion
+			// Do this after completionk
 			function(err, results){
 				if(err){console.log(err);}
 				console.log(results)
@@ -101,6 +101,7 @@ module.exports = function(app){
 						hostDoc.alias = req.body.alias;
 						hostDoc.address = req.body.address;
 						hostDoc.check_command = req.body['check_command'];
+						hostDoc.hostgroups = req.body.isMember;
 						hostDoc.save(callback);
 					});
 				},
