@@ -65,7 +65,7 @@ block content
 							each host in hostgroup.members
 								option(value=host)= host
 
-			input(type="submit")
+			input(type="submit" onclick="selectAllOptions();")
 
 	else
 		//- ADD new hostgroup
@@ -76,4 +76,4 @@ block content
 			p Alias
 				input(type="text" name="alias")
 			
-			input(type="submit")
+			input(type="submit" onclick="selectAllOptions();")

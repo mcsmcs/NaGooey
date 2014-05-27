@@ -1,5 +1,6 @@
 'use strict';
 
+var async = require('async');
 var mongoose = require('mongoose');
 
 module.exports = function(){
@@ -78,6 +79,26 @@ module.exports = function(){
 	hostSchema.statics.getNonHostgroupMembers = function(hostgroup, cb){
 		this.find({hostgroups: {$not: {$elemMatch: {$regex: hostgroup}}}}, {host_name:1}, cb);
 	}
+
+	hostSchema.statics.updateHostgroupMembership = function(hostgroup, members, cb){
+
+		var caller = this;
+		async.series(
+			[
+				function(callback){
+					// Remove membership for all members in hostgroup
+					caller.update({hostgroups: {$elemMatch: {$regex: hostgroup}}}, {$pull: {hostgroups: hostgroup}}, {multi: true}, callback);
+				},
+
+				function(callback){
+					caller.update({host_name: {$in: members}}, {$addToSet: {hostgroups: hostgroup}}, {multi: true}, callback);
+				}
+			],
+		
+			cb
+		);
+	}
+
 
 	hostSchema.methods.addHostGroup = function(hostgroup){
 		this.host_groups.addToSet(hostgroup);

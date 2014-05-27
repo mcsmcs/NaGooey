@@ -86,15 +86,35 @@ module.exports = function(app){
 
 	app.post('/hostgroup/edit/:hostgroup_name', function(req,res){
 		
-		HostGroup.findOne({hostgroup_name: req.params.hostgroup_name}, function(err, hostgroupDoc){
-			if(err){ console.log(err); res.redirect('/'); }
-			
-			hostgroupDoc.hostgroup_name = req.body.hostgroup_name;
-			hostgroupDoc.alias = req.body.alias;
-			hostgroupDoc.save(function(err, savedDoc){
+		console.log("+++++++++++++++++++++++++++++++++++++");
+		console.log(req.body);
+		console.log("+++++++++++++++++++++++++++++++++++++");
+
+		async.parallel(
+			{
+				saveHostgroup: function(callback){
+					HostGroup.findOne({hostgroup_name: req.params.hostgroup_name}, function(err, hostgroupDoc){
+						if(err){ console.log(err); res.redirect('/'); }
+						
+						hostgroupDoc.hostgroup_name = req.body.hostgroup_name;
+						hostgroupDoc.alias = req.body.alias;
+						hostgroupDoc.members = req.body.isMember;
+						hostgroupDoc.save(callback);
+					});
+				},
+
+				updateHostsMembership: function(callback){
+					Host.updateHostgroupMembership(req.params.hostgroup_name, req.body.isMember, callback)
+				}
+			},
+
+			function(err,results){
+				if(err){console.log(err);}
+
 				console.log('record saved!');
 				res.redirect('/hostgroup');
-			});
-		});
+			}
+		);
+
 	});
 }
