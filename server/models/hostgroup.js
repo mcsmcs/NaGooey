@@ -32,11 +32,11 @@ module.exports = function(){
 	 ***/
 	hostGroupSchema.statics.isMember = function(host, callback){
 		this.find({members: {$elemMatch: {$in: [host]}}}, {hostgroup_name: 1, alias: 1}, callback);
-	}
+	};
 
 	hostGroupSchema.statics.isNotMember = function(host, callback){
 		this.find({members: {$not: {$elemMatch: {$in: [host]}}}}, {hostgroup_name: 1, alias: 1}, callback);
-	}
+	};
 
 	hostGroupSchema.statics.getHostMembership = function(host, cb){
 
@@ -56,13 +56,12 @@ module.exports = function(){
 		function(err, results){
 			if(err){ console.log(err); }
 			cb(err, results);
-		})
-	}
+		});
+	};
 
 	hostGroupSchema.statics.updateHostMembership = function(hostname, membership, cb){
 
 		var caller = this;
-		var property = null;
 		var isMember = (membership.isMember instanceof Array ? membership.isMember : Array(membership.isMember));
 		var isNotMember = (membership.isNotMember instanceof Array ? membership.isNotMember : Array(membership.isNotMember));
 
@@ -75,7 +74,7 @@ module.exports = function(){
 				cb(err,results);
 			}
 		);
-	}
+	};
 
 
 	/***
@@ -84,12 +83,12 @@ module.exports = function(){
 	hostGroupSchema.methods.addMember = function(host){
 		this.members.addToSet(host);
 		this.save();
-	}
+	};
 
 	hostGroupSchema.methods.addHostgroupMember = function(hostgroup){
 		this.hostgroup_members.addToSet(hostgroup);
 		this.save();
-	}
+	};
 
 
 

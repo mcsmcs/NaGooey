@@ -16,10 +16,7 @@ module.exports = function(app){
 	app.get('/hostgroup', function(req,res){
 		
 		HostGroup.find(function(err, hostgroupDocs){
-
 			if (err){ console.log('error finding hostgroups'); }
-			else { console.log(hostgroupDocs); }
-
 			res.render('hostgroup_index', {hostgroups: hostgroupDocs});
 		});
 
@@ -32,22 +29,43 @@ module.exports = function(app){
 
 	app.get('/hostgroup/add', function(req,res){
 		
-		HostGroup.find(function(err, hostgroupDocs){
-
-			if (err){ console.log('error finding hostgroups'); }
-			else { console.log(hostgroupDocs); }
-
-			res.render('hostgroup_form');
+		Host.find({}, {host_name: 1, _id:0}, function(err,hosts){
+			if(err){console.log(err);}
+			res.render('hostgroup_form', {hosts: hosts});
 		});
-		
 	});
 	
 	app.post('/hostgroup/add', function(req,res){
 		console.log(req.body);
+
+		async.parallel(
+			{
+				createHostGroup: function(callback){
+					HostGroup.create(
+					{
+						hostgroup_name: req.body.hostgroup_name,
+						alias: req.body.alias,
+						members: req.body.isMember
+					},
+					
+					callback);
+				},
+
+				updateHostMembership: function(callback){
+					Host.updateHostgroupMembership(req.body.hostgroup_name, req.body.isMember, callback);
+				}
+			},
+
+			function(err,results){
+				if(err){console.log(err);}
+				res.redirect('/hostgroup');
+			}
+		);
 		
 		var newhostgroup = new HostGroup({
-			hostgroup_name: req.body['hostgroup_name'],
-			alias: req.body['alias']
+			hostgroup_name: req.body.hostgroup_name,
+			alias: req.body.alias,
+			members: req.body.isMember
 		});
 
 		newhostgroup.save(function(err, hostgroup){
@@ -59,10 +77,6 @@ module.exports = function(app){
 	});
 
 	app.get('/hostgroup/edit/:hostgroup_name', function(req,res){
-
-		console.log("***********")
-		console.log(req.params.hostgroup_name);
-		console.log('*************');
 		
 		async.parallel(
 			{
@@ -70,25 +84,20 @@ module.exports = function(app){
 					HostGroup.findOne({hostgroup_name: req.params.hostgroup_name}, callback);
 				},
 
-				nonMemberHosts: function(callback){
-					Host.getNonHostgroupMembers(req.params.hostgroup_name, callback);
+				hostMembership: function(callback){
+					Host.getHostsByHostGroup(req.params.hostgroup_name, callback);
 				}
 			},
 
 			function(err,results){
 				if(err){console.log(err);}
 				else{console.log(results);}
-
-				res.render('hostgroup_form', {hostgroup: results.hostgroup, nonMemberHosts: results.nonMemberHosts});
+				res.render('hostgroup_form', {hostgroup: results.hostgroup, nonMemberHosts: results.hostMembership.nonmembers});
 			}
 		);
 	});
 
 	app.post('/hostgroup/edit/:hostgroup_name', function(req,res){
-		
-		console.log("+++++++++++++++++++++++++++++++++++++");
-		console.log(req.body);
-		console.log("+++++++++++++++++++++++++++++++++++++");
 
 		async.parallel(
 			{
@@ -98,13 +107,14 @@ module.exports = function(app){
 						
 						hostgroupDoc.hostgroup_name = req.body.hostgroup_name;
 						hostgroupDoc.alias = req.body.alias;
-						hostgroupDoc.members = req.body.isMember;
+						hostgroupDoc.members = (req.body.isMember instanceof Array ? req.body.isMember : Array(req.body.isMember));
 						hostgroupDoc.save(callback);
 					});
 				},
 
 				updateHostsMembership: function(callback){
-					Host.updateHostgroupMembership(req.params.hostgroup_name, req.body.isMember, callback)
+					var isMember = (req.body.isMember instanceof Array ? req.body.isMember : Array(req.body.isMember));
+					Host.updateHostgroupMembership(req.params.hostgroup_name, isMember, callback);
 				}
 			},
 
@@ -115,6 +125,6 @@ module.exports = function(app){
 				res.redirect('/hostgroup');
 			}
 		);
-
 	});
-}
+
+};

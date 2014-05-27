@@ -78,16 +78,38 @@ module.exports = function(){
 	// Find hosts that are not members
 	hostSchema.statics.getNonHostgroupMembers = function(hostgroup, cb){
 		this.find({hostgroups: {$not: {$elemMatch: {$regex: hostgroup}}}}, {host_name:1}, cb);
-	}
+	};
+
+	hostSchema.statics.getHostsByHostGroup = function(hostgroup, cb){
+		
+		var caller = this;
+		var reMatch = "^" + hostgroup + "$";
+
+		// TODO: clean this up using aggregation
+		async.parallel(
+			{
+				members: function(callback){
+					caller.find({hostgroups: {$elemMatch: {$regex: reMatch}}}, {host_name:1, _id:0}, callback);
+				},
+				nonmembers: function(callback){
+					caller.find({hostgroups: {$not: {$elemMatch: {$regex: reMatch}}}}, {host_name:1, _id:0}, callback);
+				}
+			},
+			
+			cb
+		);
+	};
 
 	hostSchema.statics.updateHostgroupMembership = function(hostgroup, members, cb){
 
 		var caller = this;
+		var reMatch = "^" + hostgroup + "$";
+
 		async.series(
 			[
 				function(callback){
 					// Remove membership for all members in hostgroup
-					caller.update({hostgroups: {$elemMatch: {$regex: hostgroup}}}, {$pull: {hostgroups: hostgroup}}, {multi: true}, callback);
+					caller.update({hostgroups: {$elemMatch: {$regex: reMatch}}}, {$pull: {hostgroups: hostgroup}}, {multi: true}, callback);
 				},
 
 				function(callback){
@@ -97,32 +119,32 @@ module.exports = function(){
 		
 			cb
 		);
-	}
+	};
 
 
 	hostSchema.methods.addHostGroup = function(hostgroup){
 		this.host_groups.addToSet(hostgroup);
 		this.save();
-	}
+	};
 
 	hostSchema.methods.addParent = function(parent){
 		this.parents.addToSet(parent);
 		this.save();
-	}
+	};
 
 	hostSchema.methods.addContactGroup = function(contactgroup){
 		this.contact_groups.addToSet(contactgroup);
 		this.save();
-	}
+	};
 
 	hostSchema.methods.addNotificationOptions = function(notificationoptions){
 		this.notification_options.addToSet(notificationoptions);
 		this.save();
-	}
+	};
 
-	hostSchema.methods.addTemplate = function(template){
-		// needs to be an ordered set (no duplicates, and order matters)
-	}
+	// hostSchema.methods.addTemplate = function(template){
+	// 	// needs to be an ordered set (no duplicates, and order matters)
+	// };
 
 	return mongoose.model('Host', hostSchema);
 };
