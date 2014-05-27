@@ -15,16 +15,73 @@ block content
 				if service['service_description']
 					input(type="text" name="service_description" value=service['service_description'])
 				
-			if service['alias']
-				p Alias
-				input(type="text" name="alias" value=service['alias'])
+			p Hosts
+			table
+				tr
+					td
+						select(id="isNotMember" multiple size="5" name="isNotMember")
+							each host in hosts.nonMember
+								option(value=host.host_name)= host.host_name
+
+					td
+						input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
+						br
+						input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+
+					td
+						select(id="isMember" multiple size="5" name="isMember")
+							each host in hosts.member
+								option(value=host.host_name)= host.host_name
+
 
 			input(type="submit")
 
 	else
 		//- ADD new service
 		form(name="service_options" action=action method="post")
-			p Host Name
+			p Service Description
 				input(type="text" name="service_description")
 			
+			p Check Command
+				select
+					each command in commands
+						option(value="command.command_name")= command.command_name
+
+			//- p Hosts
+			//- table
+			//- 	tr
+			//- 		td
+			//- 			select(id="isNotMember" multiple size="5" name="isNotMember")
+			//- 				each host in hosts.nonMember
+			//- 					option(value=host.host_name)= host.host_name
+
+			//- 		td
+			//- 			input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
+			//- 			br
+			//- 			input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+
+			//- 		td
+			//- 			select(id="isMember" multiple size="5" name="isMember")
+			//- 				each host in hosts.member
+			//- 					option(value=host.host_name)= host.host_name
+
+
+			//- p Host Groups
+			//- table
+			//- 	tr
+			//- 		td
+			//- 			select(id="isNotMember" multiple size="5" name="isNotMember")
+			//- 				each hostgroup in hostgroups.nonMember
+			//- 					option(value=hostgroup.hostgroup_name)= hostgroup.hostgroup_name
+
+			//- 		td
+			//- 			input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
+			//- 			br
+			//- 			input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+
+			//- 		td
+			//- 			select(id="isMember" multiple size="5" name="isMember")
+			//- 				each hostgroup in hostgroups.member
+			//- 					option(value=hostgroup.hostgroup_name)= hostgroup.hostgroup_name
+
 			input(type="submit")

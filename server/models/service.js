@@ -13,7 +13,11 @@ module.exports = function(){
 		servicegroups: Array,
 		host_name: Array,
 		hostgroup_name: Array,
-		check_command: String,
+		check_command: {
+			type: String,
+			unique: true,
+			required: true
+		},
 		check_interval: Number,
 		retry_interval: Number,
 		max_check_attempts: Number,
@@ -27,5 +31,5 @@ module.exports = function(){
 		use: Array
 	});
 
-	return mongoose.model('Service', serviceSchema)
-;};
+	return mongoose.model('Service', serviceSchema);
+};

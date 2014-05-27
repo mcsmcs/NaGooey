@@ -1,1 +1,13 @@
 TODO
+
+Services
++ Add and Edit
+	-- populate hosts
+		-- add services array on host doc?
+	
+	-- populate hostgroups
+		-- add services array on hostgroups doc?
+
+
+Output a config
++ Take mongo docs and dump a nagios configuration

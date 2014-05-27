@@ -5,9 +5,12 @@
  *	Basic CRUD
  */
 
+var async = require('async');
 var mongoose = require('mongoose');
 var Service = mongoose.model("Service");
-
+var Command = mongoose.model("Command");
+var Host = mongoose.model("Host");
+var HostGroup = mongoose.model("HostGroup");
 
 module.exports = function(app){
 
@@ -20,7 +23,6 @@ module.exports = function(app){
 
 			res.render('service_index', {services: serviceDocs});
 		});
-
 	});
 
 	// Convenience Route
@@ -30,14 +32,31 @@ module.exports = function(app){
 
 	app.get('/service/add', function(req,res){
 		
-		Service.find(function(err, serviceDocs){
+		async.parallel(
+			{
+				commands: function(callback){
+					Command.find({}, {_id:0, command_name:1}, callback);
+				},
+				hosts: function(callback){
+					//Host.find({}, {_id:0, host_name:1}, callback);
+				},
+				hostgroups: function(callback){
+					//HostGroup.find({}, {_id:0, hostgroup_name:1}, callback);
+				}
+			},
 
-			if (err){ console.log('error finding services'); }
-			else { console.log(serviceDocs); }
-
-			res.render('service_form');
-		});
-		
+			function(err,results){
+				if(err){console.log(err);}
+				
+				console.log(results);
+				res.render('service_form',
+				{
+					commands: results.commands,
+					hosts: results.hosts,
+					hostgroups: results.hostgroups
+				});
+			}
+		);
 	});
 	
 	app.post('/service/add', function(req,res){
@@ -45,7 +64,7 @@ module.exports = function(app){
 		
 		var newService = new Service({
 			service_description: req.body['service_description'],
-			alias: req.body['alias']
+			alias: req.body.alias
 		});
 
 		newService.save(function(err, service){
