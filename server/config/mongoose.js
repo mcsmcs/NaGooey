@@ -8,15 +8,16 @@
 
 var mongoose = require('mongoose');
 
-module.exports= function(){
+module.exports = function(mongo_url){
 	
 	// Connection String
-	mongoose.connect('mongodb://localhost/nagui');
+	if (mongo_url === null){ mongo_url = 'mongodb://localhost/nagui'; }
+	mongoose.connect(mongo_url);
 	
 	// Open DB Connection
 	var db = mongoose.connection;
 	db.on('error', console.error.bind(console, 'connection error:'));
-	db.once('open', function(){ console.log('mean db opened'); });
+	db.once('open', function(){ console.log('mongodb opened'); });
 
 	// Register models
 	require('../models/command')();
@@ -32,7 +33,7 @@ module.exports= function(){
 
 
 	// Load Defaults
-	require('./mongo-defaults');
+	require('./mongo-seed');
 
-
-}
+	return mongoose;
+};
