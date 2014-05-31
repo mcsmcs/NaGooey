@@ -11,6 +11,15 @@ var Host = mongoose.model("Host");
 var HostGroup = mongoose.model("HostGroup");
 
 
+function membersToArray(members){
+	// Forces formdata posted to app to an array if no values (undefined) or single value (String) is sent
+	var returnArray = [];
+	if(members instanceof String || typeof(members) === 'string'){ returnArray = Array(members); }
+	else if(members instanceof Array){ returnArray = members; }
+	return returnArray;
+}
+
+
 module.exports = function(app){
 
 	app.get('/hostgroup', function(req,res){
@@ -19,7 +28,6 @@ module.exports = function(app){
 			if (err){ console.log('error finding hostgroups'); }
 			res.render('hostgroup_index', {hostgroups: hostgroupDocs});
 		});
-
 	});
 
 	// Convenience Route
@@ -28,7 +36,7 @@ module.exports = function(app){
 	});
 
 	app.get('/hostgroup/add', function(req,res){
-		
+
 		Host.find({}, {host_name: 1, _id:0}, function(err,hosts){
 			if(err){console.log(err);}
 			res.render('hostgroup_form', {hosts: hosts});
@@ -37,7 +45,6 @@ module.exports = function(app){
 	
 	app.post('/hostgroup/add', function(req,res){
 		//console.log(req.body);
-
 		async.parallel(
 			{
 				createHostGroup: function(callback){
@@ -52,11 +59,7 @@ module.exports = function(app){
 				},
 
 				updateHostMembership: function(callback){
-					var isMember = [];
-					if(req.body.isMember instanceof String || typeof(req.body.isMember) === 'string'){ isMember = Array(req.body.isMember); }
-					else if(req.body.isMember instanceof Array){ isMember = req.body.isMember; }
-							
-					Host.updateHostgroupMembership(req.body.hostgroup_name, isMember, callback);
+					Host.updateHostgroupMembership(req.body.hostgroup_name, membersToArray(req.body.isMember), callback);
 				}
 			},
 
@@ -81,8 +84,7 @@ module.exports = function(app){
 			},
 
 			function(err,results){
-				if(err){console.log(err);}
-				//else{console.log(results);}
+				if(err){ console.log(err); }
 				res.render('hostgroup_form', {hostgroup: results.hostgroup, nonMemberHosts: results.hostMembership.nonmembers});
 			}
 		);
@@ -98,27 +100,20 @@ module.exports = function(app){
 						
 						hostgroupDoc.hostgroup_name = req.body.hostgroup_name;
 						hostgroupDoc.alias = req.body.alias;
-						hostgroupDoc.members = (req.body.isMember instanceof Array ? req.body.isMember : Array(req.body.isMember));
+						hostgroupDoc.members = membersToArray(req.body.isMember);
 						hostgroupDoc.save(callback);
 					});
 				},
 
 				updateHostsMembership: function(callback){
-					var isMember = [];
-					if(req.body.isMember instanceof String){ isMember = Array(req.body.isMember); }
-					else if(req.body.isMember instanceof Array){ isMember = req.body.isMember; }
-
-					Host.updateHostgroupMembership(req.params.hostgroup_name, isMember, callback);
+					Host.updateHostgroupMembership(req.params.hostgroup_name, membersToArray(req.body.isMember), callback);
 				}
 			},
 
 			function(err,results){
 				if(err){console.log(err);}
-
-				//console.log('record saved!');
 				res.redirect('/hostgroup');
 			}
 		);
 	});
-
 };
