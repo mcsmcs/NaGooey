@@ -11,7 +11,7 @@ var mongoose = require('mongoose');
 module.exports = function(mongo_url){
 	
 	// Connection String
-	if (mongo_url === null){ mongo_url = 'mongodb://localhost/nagui'; }
+	if (mongo_url === undefined){ mongo_url = 'mongodb://localhost/nagui'; }
 	mongoose.connect(mongo_url);
 	
 	// Open DB Connection

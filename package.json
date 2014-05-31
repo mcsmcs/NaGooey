@@ -10,5 +10,9 @@
     "jade": "*",
     "mongoose": "*",
     "async": "*"
+  },
+  "devDependencies": {
+    "supertest": "~0.13.0",
+    "chai": "~1.9.1"
   }
 }
