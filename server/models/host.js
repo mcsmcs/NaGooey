@@ -109,11 +109,17 @@ module.exports = function(){
 			[
 				function(callback){
 					// Remove membership for all members in hostgroup
-					caller.update({hostgroups: {$elemMatch: {$regex: reMatch}}}, {$pull: {hostgroups: hostgroup}}, {multi: true}, callback);
+					caller.update({hostgroups: {$elemMatch: {$regex: reMatch}}}, {$pull: {hostgroups: hostgroup}}, {multi: true}, function(err, num){
+						if(err){ console.log(err); }
+						callback();
+					});
 				},
 
 				function(callback){
-					caller.update({host_name: {$in: members}}, {$addToSet: {hostgroups: hostgroup}}, {multi: true}, callback);
+					caller.update({host_name: {$in: members}}, {$addToSet: {hostgroups: hostgroup}}, {multi: true}, function(err,num){
+						if(err){console.log(err); }
+						callback();
+					});
 				}
 			],
 		

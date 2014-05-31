@@ -36,7 +36,7 @@ module.exports = function(app){
 	});
 	
 	app.post('/hostgroup/add', function(req,res){
-		console.log(req.body);
+		//console.log(req.body);
 
 		async.parallel(
 			{
@@ -52,7 +52,11 @@ module.exports = function(app){
 				},
 
 				updateHostMembership: function(callback){
-					Host.updateHostgroupMembership(req.body.hostgroup_name, req.body.isMember, callback);
+					var isMember = [];
+					if(req.body.isMember instanceof String || typeof(req.body.isMember) === 'string'){ isMember = Array(req.body.isMember); }
+					else if(req.body.isMember instanceof Array){ isMember = req.body.isMember; }
+							
+					Host.updateHostgroupMembership(req.body.hostgroup_name, isMember, callback);
 				}
 			},
 
@@ -61,19 +65,6 @@ module.exports = function(app){
 				res.redirect('/hostgroup');
 			}
 		);
-		
-		var newhostgroup = new HostGroup({
-			hostgroup_name: req.body.hostgroup_name,
-			alias: req.body.alias,
-			members: req.body.isMember
-		});
-
-		newhostgroup.save(function(err, hostgroup){
-			if(err){ console.log(err); }
-			else {
-				res.redirect('/hostgroup');
-			}
-		});
 	});
 
 	app.get('/hostgroup/edit/:hostgroup_name', function(req,res){
@@ -91,7 +82,7 @@ module.exports = function(app){
 
 			function(err,results){
 				if(err){console.log(err);}
-				else{console.log(results);}
+				//else{console.log(results);}
 				res.render('hostgroup_form', {hostgroup: results.hostgroup, nonMemberHosts: results.hostMembership.nonmembers});
 			}
 		);
@@ -113,7 +104,10 @@ module.exports = function(app){
 				},
 
 				updateHostsMembership: function(callback){
-					var isMember = (req.body.isMember instanceof Array ? req.body.isMember : Array(req.body.isMember));
+					var isMember = [];
+					if(req.body.isMember instanceof String){ isMember = Array(req.body.isMember); }
+					else if(req.body.isMember instanceof Array){ isMember = req.body.isMember; }
+
 					Host.updateHostgroupMembership(req.params.hostgroup_name, isMember, callback);
 				}
 			},
@@ -121,7 +115,7 @@ module.exports = function(app){
 			function(err,results){
 				if(err){console.log(err);}
 
-				console.log('record saved!');
+				//console.log('record saved!');
 				res.redirect('/hostgroup');
 			}
 		);

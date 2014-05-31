@@ -17,7 +17,7 @@ module.exports = function(mongo_url){
 	// Open DB Connection
 	var db = mongoose.connection;
 	db.on('error', console.error.bind(console, 'connection error:'));
-	db.once('open', function(){ console.log('mongodb opened'); });
+	db.once('open', function(){});
 
 	// Register models
 	require('../models/command')();
