@@ -17,67 +17,69 @@ var Host = mongoose.model("Host");
 var HostGroup = mongoose.model("HostGroup");
 
 
-var seedData = {}
-seedData.hosts = {
+var seedData = {};
+
+// Seeded to the database
+seedData.inDB = {};
+seedData.inDB.hosts = {
 	host1: {host_name: 'host1', alias: 'Host One', check_command: 'check_one', address: '111.111.111.111', hostgroups: ['hg1', 'hgALL']},
 	host2: {host_name: 'host2', alias: 'Host Two', check_command: 'check_two', address: '222.222.222.222', hostgroups: ['hg2', 'hgALL']},
 	host3: {host_name: 'host3', alias: 'Host Three', check_command: 'check_three', address: '333.333.333.333', hostgroups: ['hg3', 'hgALL']},
 	hostNoHG: {host_name: 'hostNoHG', alias: 'Host Not in Hunt Groups', check_command: 'check_me', address: '444.333.444.333', hostgroups: []},
 };
-seedData.hostgroups = {
+seedData.inDB.hostgroups = {
 	hg1: {hostgroup_name: 'hg1', alias: 'Host Group One', members: ['host1']},
 	hg2: {hostgroup_name: 'hg2', alias: 'Host Group Two', members: ['host2']},
 	hg3: {hostgroup_name: 'hg3', alias: 'Host Group Three', members: ['host3']},
 	hgALL: {hostgroup_name: 'hgALL', alias: 'ALL HOSTS', members: ['host1','host2','host3']},
 	hgNONE: {hostgroup_name: 'hgNONE', alias: 'NO HOSTS'},
-	
+};
+
+// These are not seeded to the database
+seedData.other = {};
+seedData.other.hostgroups = {
 	// Created in tests
 	noMembers: {hostgroup_name: 'noMembers', alias: 'No Members', members: []},
 	singleMember: {hostgroup_name: 'singleMember', alias: 'Single Member', members: ['host1']},
-	multiMember: {hostgroup_name: 'multiMember', alias: 'Multiple Members', members: ['host1', 'host2', 'host3']},
-};
+	multiMember: {hostgroup_name: 'multiMember', alias: 'Multiple Members', members: ['host1', 'host2', 'host3']},	
+}
 
+function dropModel(Model, callback){ Model.remove({}, callback); }
+function seedModel(Model, instances, callback){
 
+	var documents = [], key;
+	function getCreateFn(Model, data){ 	return function(callback){ 	Model.create(data, callback); }; }
 
-function seedMongo(cb){
+	for(key in instances){
+		if(instances.hasOwnProperty(key)){ 
+			documents.push(getCreateFn(Model, instances[key])); 
+		}
+	}
 
-	async.series(
-		{
-			dropHosts: function(callback){ Host.remove({}, callback); },
-			dropHostGroups: function(callback){ HostGroup.remove({}, callback); },
-			seedHosts: function(callback){
-				async.parallel([
-					function(callback){ Host.create(seedData.hosts.host1, callback); },
-					function(callback){ Host.create(seedData.hosts.host2, callback); },
-					function(callback){ Host.create(seedData.hosts.host3, callback); },
-					function(callback){ Host.create(seedData.hosts.hostNoHG, callback); },
-				], 
-				function(err,results){
-					if(err){ console.log(err); callback(err); }
-					else { callback(); }
-				});
-			},
-			seedHostGroups: function(callback){
-				async.parallel([
-					function(callback){ HostGroup.create(seedData.hostgroups.hg1, callback); },
-					function(callback){ HostGroup.create(seedData.hostgroups.hg2, callback); },
-					function(callback){ HostGroup.create(seedData.hostgroups.hg3, callback); },
-					function(callback){ HostGroup.create(seedData.hostgroups.hgALL, callback); },
-					function(callback){ HostGroup.create(seedData.hostgroups.hgNONE, callback); },
-				], 
-				function(err,results){
-					if(err){ console.log(err); callback(err); }
-					else { callback(); }
-				});
-			},
-		},
-
-		function(err,results){
-			if(err){ console.log(err); cb(err); }
-			else { cb(); }
+	async.parallel(documents, 
+		function(err){ 
+			if(err){ console.log(err); callback(err); }
+			else{ callback(); }
 		}
 	);
-};
+}
+
+function seedMongo(callback){
+
+	async.parallel(
+		[
+			function(callback){ dropModel(Host, callback); },
+			function(callback){ seedModel(Host, seedData.inDB.hosts, callback); },
+			function(callback){ dropModel(HostGroup, callback); },
+			function(callback){ seedModel(HostGroup, seedData.inDB.hostgroups, callback); }
+		],
+		
+		function(err){
+			if(err){ console.log(err); callback(err); }
+			else{ callback(); }
+		}
+	);
+}
 
 
 describe("The hostgroup resource", function(){
@@ -118,7 +120,7 @@ describe("The hostgroup resource", function(){
 
 			it('should create a new hostgroup given a unique name', function(done){
 
-				var testHG = seedData.hostgroups.noMembers;
+				var testHG = seedData.other.hostgroups.noMembers;
 
 				request(app).post('/hostgroup/add')
 					.send('hostgroup_name=' + testHG.hostgroup_name)
@@ -146,7 +148,7 @@ describe("The hostgroup resource", function(){
 
 			it('should create a new hostgroup with a SINGLE member', function(done){
 
-				var testData = seedData.hostgroups.singleMember;
+				var testData = seedData.other.hostgroups.singleMember;
 
 				request(app).post('/hostgroup/add')
 					.send('hostgroup_name=' + testData.hostgroup_name)
@@ -173,7 +175,7 @@ describe("The hostgroup resource", function(){
 
 			it('should create a new hostgroup with MULTIPLE members', function(done){
 
-				var testData = seedData.hostgroups.multiMember;
+				var testData = seedData.other.hostgroups.multiMember;
 
 				request(app).post('/hostgroup/add')
 					.send('hostgroup_name=' + testData.hostgroup_name)
@@ -203,8 +205,8 @@ describe("The hostgroup resource", function(){
 
 			it('should keep the hostgroup.members consistent with host.hostgroups document -- Single Member', function(done){
 				
-				var testGroup = seedData.hostgroups.noMembers;
-				var testHost = seedData.hosts.host1;
+				var testGroup = seedData.other.hostgroups.noMembers;
+				var testHost = seedData.inDB.hosts.host1;
 
 				request(app).post('/hostgroup/add')
 					.send('hostgroup_name=' + testGroup.hostgroup_name)
@@ -232,9 +234,9 @@ describe("The hostgroup resource", function(){
 
 			it('should keep the hostgroup.members consistent with host.hostgroups document -- Multi Member', function(done){
 				
-				var testGroup = seedData.hostgroups.noMembers;
-				var testHost = seedData.hosts.host1;
-				var testHost2 = seedData.hosts.host2;
+				var testGroup = seedData.other.hostgroups.noMembers;
+				var testHost = seedData.inDB.hosts.host1;
+				var testHost2 = seedData.inDB.hosts.host2;
 
 				request(app).post('/hostgroup/add')
 					.send('hostgroup_name=' + testGroup.hostgroup_name)
@@ -294,7 +296,7 @@ describe("The hostgroup resource", function(){
 			
 			it('should update the hostgroup_name and alias', function(done){
 
-				var testGroup = seedData.hostgroups.hgNONE;
+				var testGroup = seedData.inDB.hostgroups.hgNONE;
 				var newAlias = 'Updated Alias';
 				var newName = 'Updated Host Group Name';
 
@@ -322,9 +324,9 @@ describe("The hostgroup resource", function(){
 
 			it('should keep hostgroup.members consistent with host.hostgroups document', function(done){
 
-				var testGroup = seedData.hostgroups.hg1;
-				var host2 = seedData.hosts.host2;
-				var hostNoHG = seedData.hosts.hostNoHG;
+				var testGroup = seedData.inDB.hostgroups.hg1;
+				var host2 = seedData.inDB.hosts.host2;
+				var hostNoHG = seedData.inDB.hosts.hostNoHG;
 
 				// Remove 'host1' from hg1, add host2, and hostNoHG
 				request(app).post('/hostgroup/edit/' + testGroup.hostgroup_name)
@@ -362,7 +364,7 @@ describe("The hostgroup resource", function(){
 		describe('hostGroupSchema.statics.getHostMembership', function(){
 
 			it('should return and object containing 2 arrays: isMember and isNotMember', function(done){
-				HostGroup.getHostMembership(seedData.hosts.hostNoHG.host_name, function(err,membership){
+				HostGroup.getHostMembership(seedData.inDB.hosts.hostNoHG.host_name, function(err,membership){
 					should.not.exist(err);
 					should.exist(membership);
 					should.exist(membership.isMember);
@@ -383,9 +385,9 @@ describe("The hostgroup resource", function(){
 			it('should update membership of the hostgroup correctly', function(done){
 
 				// Remove host1 from everything, add to hg3
-				var host1 = seedData.hosts.host1;
-				var hg2 = seedData.hostgroups.hg2;
-				var hg3 = seedData.hostgroups.hg3;
+				var host1 = seedData.inDB.hosts.host1;
+				var hg2 = seedData.inDB.hostgroups.hg2;
+				var hg3 = seedData.inDB.hostgroups.hg3;
 
 				var membership = {};
 				membership.isMember = [hg2.hostgroup_name, hg3.hostgroup_name];
@@ -400,8 +402,8 @@ describe("The hostgroup resource", function(){
 						membership.isMember.length.should.equal(2);
 						membership.isMember.should.include.an.item.with.property('hostgroup_name', hg2.hostgroup_name);
 						membership.isMember.should.include.an.item.with.property('hostgroup_name', hg3.hostgroup_name);
-						membership.isMember.should.not.include.an.item.with.property('hostgroup_name', seedData.hostgroups.hg1.hostgroup_name);
-						membership.isNotMember.should.include.an.item.with.property('hostgroup_name', seedData.hostgroups.hg1.hostgroup_name);
+						membership.isMember.should.not.include.an.item.with.property('hostgroup_name', seedData.inDB.hostgroups.hg1.hostgroup_name);
+						membership.isNotMember.should.include.an.item.with.property('hostgroup_name', seedData.inDB.hostgroups.hg1.hostgroup_name);
 						done();
 					});
 
