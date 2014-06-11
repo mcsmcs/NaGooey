@@ -24,7 +24,7 @@ var HostGroup = mongoose.model("HostGroup");
 var seedData = {};
 seedData.db = {
 	hosts: {
-
+		host1: {host_name: 'host1', alias: 'Host1', address:'1.1.1.2', check_command: 'check'},
 	},
 
 	hostgroups: {
@@ -116,23 +116,51 @@ describe("The host resource", function(){
 	
 			it('should produce an error if the host_name is already in use');
 			it('should produce an error if the required fields are sent blank');
-			it('should create a new host with a SINGLE hostgroup');
-			it('should create a new hostgroup with MULTIPLE hostgroups');
-			it('should keep the hostgroup.members consistent with host.hostgroups document -- Single Member');
-			it('should keep the hostgroup.members consistent with host.hostgroups document -- Multi Member');
+			
+			// it('should create a new host with a SINGLE hostgroup');
+			// it('should create a new hostgroup with MULTIPLE hostgroups');
+			// it('should keep the hostgroup.members consistent with host.hostgroups document -- Single Member');
+			// it('should keep the hostgroup.members consistent with host.hostgroups document -- Multi Member');
 		});
 
 
 		// ############# EDIT #############
-		describe('GET /hostgroup/edit/testhostgroup1', function(){
-			it('should return response code 200');
+		describe('GET /host/edit/host1', function(){
+			it('should return response code 200', function(done){
+				request(app).get('/host/edit/host1').expect(200, done);
+			});
 		});
 
 		describe('POST /host/edit/:hostname', function(){
-			it('should update the hostgroup_name and alias');
+			it('should update the host_name, alias, and check_command', function(done){
+
+				var updates = {
+					host_name: 'updatedhostname',
+					alias: 'updatedalias',
+					check_command: 'updated_checkcommand'
+				};
+
+				request(app).post('/host/edit/host1')
+					.send('host_name=' + updates.host_name)
+					.send('alias=' + updates.alias)
+					.send('address=1.1.1.1')
+					.send('check_command=' + updates.check_command)
+					.end(function(err,res){
+						should.not.exist(err);
+
+						Host.findOne({host_name: updates.host_name}, function(err,doc){
+							should.not.exist(err);
+							doc.host_name.should.equal(updates.host_name);
+							doc.alias.should.equal(updates.alias);
+							doc.check_command.should.equal(updates.check_command);
+							done();	
+						});
+					});
+			});
+
 			it('should produce an error if the hostgroup_name is blank');
 			it('should produce an error if the alias is blank');
-			it('should keep hostgroup.members consistent with host.hostgroups document');
+			// it('should keep hostgroup.members consistent with host.hostgroups document');
 		});
 	});
 

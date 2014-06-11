@@ -1,4 +1,5 @@
 'use strict';
+/*jslint unparam: true, node: true */
 
 /*
  *	Routing for the Host resource
@@ -50,10 +51,10 @@ module.exports = function(app){
 		//console.log(req.body);
 		
 		var newHost = new Host({
-			host_name: req.body['host_name'],
-			alias: req.body['alias'],
-			address: req.body['address'],
-			check_command: req.body['check_command']
+			host_name: req.body.host_name,
+			alias: req.body.alias,
+			address: req.body.address,
+			check_command: req.body.check_command
 		});
 
 		newHost.save(function(err, host){
@@ -73,7 +74,7 @@ module.exports = function(app){
 
 			function(err, results){
 				if(err){ console.log(err); }
-				console.log(results.hostgroups);
+				//console.log(results.hostgroups);
 				res.render('host_form', {host: results.host, hostgroups: results.hostgroups, check_commands: results.check_commands});
 			}
 		);
@@ -86,10 +87,10 @@ module.exports = function(app){
 		// console.log("--------------------------------------");
 
 		var hostname = req.params.host_name;
-		var membership = {
+		/*var membership = {
 			isMember: req.body.isMember,
 			isNotMember: req.body.isNotMember
-		};
+		};*/
 
 		async.parallel(
 			{
@@ -100,13 +101,13 @@ module.exports = function(app){
 						hostDoc.host_name = req.body.host_name;
 						hostDoc.alias = req.body.alias;
 						hostDoc.address = req.body.address;
-						hostDoc.check_command = req.body['check_command'];
-						hostDoc.hostgroups = req.body.isMember;
+						hostDoc.check_command = req.body.check_command;
+						// hostDoc.hostgroups = req.body.isMember; (not implementing... yet)
 						hostDoc.save(callback);
 					});
 				},
 
-				hostgroups: function(callback){	HostGroup.updateHostMembership(hostname, membership, callback); }
+				//hostgroups: function(callback){	HostGroup.updateHostMembership(hostname, membership, callback); }
 			},
 
 			function(err,results){
@@ -139,4 +140,4 @@ module.exports = function(app){
 			});
 		});
 	});
-}
+};
