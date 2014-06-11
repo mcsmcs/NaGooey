@@ -37,17 +37,17 @@ module.exports = function(app){
 				check_commands: function(callback){	Command.getCheckCommands(callback); },
 			}, 
 
-			// Do this after completionk
+			// Do this after completion
 			function(err, results){
 				if(err){console.log(err);}
-				console.log(results)
+				//console.log(results)
 				res.render('host_form', {hostgroups: results.hostgroups, check_commands: results.check_commands});
 			}
 		);
 	});
 	
 	app.post('/host/add', function(req,res){
-		console.log(req.body);
+		//console.log(req.body);
 		
 		var newHost = new Host({
 			host_name: req.body['host_name'],
@@ -81,9 +81,9 @@ module.exports = function(app){
 
 	app.post('/host/edit/:host_name', function(req,res){
 		
-		console.log("--------------------------------------");
-		console.log(req.body);
-		console.log("--------------------------------------");
+		// console.log("--------------------------------------");
+		// console.log(req.body);
+		// console.log("--------------------------------------");
 
 		var hostname = req.params.host_name;
 		var membership = {
@@ -129,7 +129,7 @@ module.exports = function(app){
 		Host.findOne({host_name: req.params.host_name}, function(err, hostDoc){
 			
 			if(err){ console.log(err); }
-			console.log(hostDoc);
+			//console.log(hostDoc);
 
 			hostDoc.remove(function(err, removedDoc){
 				

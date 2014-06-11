@@ -33,7 +33,7 @@ seedData.db = {
 };
 seedData.other = {
 	hosts: {
-
+		newHost1: {host_name:'newHost1', alias: 'New Host 1', address: '1.1.1.1', check_command: 'check_one'},
 	},
 
 	hostgroups: {
@@ -84,7 +84,36 @@ describe("The host resource", function(){
 		});
 
 		describe('POST /host/add', function(){
-			it('should create a new host given a unique name');
+			it('should create a new host given a unique name', function(done){
+
+				var host = seedData.other.hosts.newHost1;
+
+				request(app).post('/host/add')
+					.send('host_name=' + host.host_name)
+					.send('alias=' + host.alias)
+					.send('check_command=' + host.check_command)
+					.send('address=' + host.address)
+					.end(function(err,res){
+
+						should.not.exist(err);
+
+						Host.findOne({host_name: host.host_name}, function(err,doc){
+							if(err){ 
+								should.not.exist(err); 
+								done(err); 
+							}
+							else {
+								should.exist(doc);
+								doc.host_name.should.equal(host.host_name);
+								doc.alias.should.equal(host.alias);
+								doc.address.should.equal(host.address);
+								doc.check_command.should.equal(host.check_command);
+								done();
+							}
+						});
+					});
+			});
+	
 			it('should produce an error if the host_name is already in use');
 			it('should produce an error if the required fields are sent blank');
 			it('should create a new host with a SINGLE hostgroup');
