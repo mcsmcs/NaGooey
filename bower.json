@@ -1,0 +1,20 @@
+{
+  "name": "nagui",
+  "version": "0.0.0",
+  "authors": [
+    "Matt Smith <mcsmith86@mail.com>"
+  ],
+  "description": "Nagios Configuration GUI",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.1.1"
+  }
+}
