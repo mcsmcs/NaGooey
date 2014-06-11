@@ -1,43 +1,60 @@
 extends layout
 
 block content
-	h1 COMMANDs
+	.commands
+		h1 Commands
 
-	p= command
+		if command
+			h4= "Editing: " + command.command_name
 
-	//- Set the form action based on edit or add
-	- var action = (command ? '/command/edit/' + command.command_name : '/command/add')
+		//- Set the form action based on edit or add
+		- var action = (command ? '/command/edit/' + command.command_name : '/command/add')
 
-	if command
-		//- EDIT existing command (prefill fields)
-		form(name="command_options" action=action method="post")
-			p Command Name
-				- var value = (command['command_name'] ? command['command_name'] : '');
-				input(type="text" name="command_name" value=value)
+		if command
+			//- EDIT existing command (prefill fields)
+			form(name="command_options" action=action method="post")
+				table
+					tr
+						td Command Name
+						td
+							- var value = (command['command_name'] ? command['command_name'] : '');
+							input.width300(type="text" name="command_name" value=value)
+					tr				
+						td Command Line
+						td
+							- var value = (command['command_line'] ? command['command_line'] : '');
+							input.width300(type="text" name="command_line" value=value)
+
+					tr
+						td Check Command
+						td
+							- var value = (command['check_command'] == true ? 'checked' : '');
+							if value == "checked"
+								input(type="checkbox" name="check_command" checked)
+							else
+								input(type="checkbox" name="check_command")
+
+					tr
+						td
+							input(type="submit")
+
+		else
+			//- ADD new command
+			form(name="command_options" action=action method="post")
+				table
+					tr
+						td Command Name
+						td 
+							input(type="text" name="command_name")
 				
-			p Command Line
-				- var value = (command['command_line'] ? command['command_line'] : '');
-				input(type="text" name="command_line" value=value)
+					tr
+						td Command Line
+						td
+							input(type="text" name="command_line")
 
-			p Check Command
-				- var value = (command['check_command'] == true ? 'checked' : '');
-				if value == "checked"
-					input(type="checkbox" name="check_command" checked)
-				else
-					input(type="checkbox" name="check_command")
+					tr
+						td Check Command
+						td
+							input(type="checkbox" name="check_command")
 
-			input(type="submit")
-
-	else
-		//- ADD new command
-		form(name="command_options" action=action method="post")
-			p Command Name
-				input(type="text" name="command_name")
-			
-			p Command Line
-				input(type="text" name="command_line")
-
-			p Check Command
-				input(type="checkbox" name="check_command")
-
-			input(type="submit")
+				input(type="submit")

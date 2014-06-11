@@ -1,12 +1,18 @@
 extends layout
 
 block content
-	h1 COMMANDs
-
+	h2 Commands
+	
 	p
-		a(href="/command/add") Add
+		a(href="/command/add") Add a Command
 
-	ul
+	table
+		tr
+			th Command Name
+			th Edit
+
 		each command in commands
-			li= command['command_name']
-				a(href="/command/edit/" + command['command_name']) Edit
+			tr
+				td.first= command['command_name']
+				td.last
+					a(href="/command/edit/" + command['command_name']) Edit

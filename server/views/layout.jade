@@ -4,8 +4,18 @@ html
 		title= title
 		include includes/css
 	body
-		a(href="/") Home
-		block content
 
+		.container-fluid
+			.row
+				.col-md-12.header
+					include includes/header
+		
+		.container-fluid
+			.row
+				.col-md-2.sidenav
+					include includes/sidenav
+					
+				.col-md-10.content
+					block content
 
 	include includes/scripts

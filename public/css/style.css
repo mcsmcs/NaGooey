@@ -1,8 +1,46 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+.sidenav {
+	background-color: #7D7D7D;
+	height: 100%;
+	padding-bottom: 20px;
 }
 
-a {
-  color: #00B7FF;
+.sidenav a {
+	color: #fff;
+	font-style: bold;
+	margin-bottom: 20px;
 }
+
+
+/*** Misc Universal ***/
+.width100 {
+	width: 300px;
+}
+
+.width150 {
+	width: 300px;
+}
+
+.width200 {
+	width: 300px;
+}
+
+.width250 {
+	width: 300px;
+}
+
+.width300 {
+	width: 300px;
+}
+
+
+/*** Tables ***/
+td {
+	padding-right: 20px;
+}
+
+form td {
+	padding-bottom: 3px;
+}
+
+form td 
+
