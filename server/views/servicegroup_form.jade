@@ -1,9 +1,10 @@
 extends layout
 
 block content
-	h1 SERVICEGROUPs
+	h1 Servicegroups
 
-	p= servicegroup
+	if servicegroup
+		h4="Editing: " + servicegroup.servicegroup_name
 
 	//- Set the form action based on edit or add
 	- var action = (servicegroup ? '/servicegroup/edit/' + servicegroup.servicegroup_name : '/servicegroup/add')
@@ -11,23 +12,33 @@ block content
 	if servicegroup
 		//- EDIT existing servicegroup (prefill fields)
 		form(name="servicegroup_options" action=action method="post")
-			p Host Name
-				if servicegroup['servicegroup_name']
-					input(type="text" name="servicegroup_name" value=servicegroup['servicegroup_name'])
+			table
+				tr
+					td Host Name
+					td
+						if servicegroup['servicegroup_name']
+							input(type="text" name="servicegroup_name" value=servicegroup['servicegroup_name'])
 				
-			p Alias
-				if servicegroup['alias']
-					input(type="text" name="alias" value=servicegroup['alias'])
+				tr
+					td Alias
+					td
+						if servicegroup['alias']
+							input(type="text" name="alias" value=servicegroup['alias'])
 
 			input(type="submit")
 
 	else
 		//- ADD new servicegroup
 		form(name="servicegroup_options" action=action method="post")
-			p Host Name
-				input(type="text" name="servicegroup_name")
-			
-			p Alias
-				input(type="text" name="alias")
+			table
+				tr
+					td Host Name
+					td
+						input(type="text" name="servicegroup_name")
+				
+				tr
+					td Alias
+					td
+						input(type="text" name="alias")
 			
 			input(type="submit")

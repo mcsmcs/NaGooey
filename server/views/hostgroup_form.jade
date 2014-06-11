@@ -30,10 +30,13 @@ block content
 		}
 
 
-	h1 HOSTGROUPs
+	h1 Hostgroups
 
-	p= hostgroup
-	p= hosts
+	//- p= hostgroup
+	//- p= hosts
+
+	if hostgroup
+		h4= "Editing: " + hostgroup.hostgroup_name
 
 	//- Set the form action based on edit or add
 	- var action = (hostgroup ? '/hostgroup/edit/' + hostgroup.hostgroup_name : '/hostgroup/add')
@@ -41,53 +44,65 @@ block content
 	if hostgroup
 		//- EDIT existing hostgroup (prefill fields)
 		form(name="hostgroup_options" action=action method="post")
-			p Host Name
-				if hostgroup['hostgroup_name']
-					input(type="text" name="hostgroup_name" value=hostgroup['hostgroup_name'])
-				
-			p Alias
-				if hostgroup['alias']
-					input(type="text" name="alias" value=hostgroup['alias'])
+				table
+					tr
+						td Host Name
+						td
+							if hostgroup['hostgroup_name']
+								input.width200(type="text" name="hostgroup_name" value=hostgroup['hostgroup_name'])
+					
+					tr
+						td Alias
+						td
+							if hostgroup['alias']
+								input.width200(type="text" name="alias" value=hostgroup['alias'])
 
-			table
-				tr
-					td
-						select(id="isNotMember" multiple size="10" name="isNotMember")
-							each host in nonMemberHosts
-								option(value=host.host_name)= host.host_name
-					td
-						input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
-						br
-						input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+					tr
+						table.membershipControl
+							tr
+								td
+									select(id="isNotMember" multiple size="10" name="isNotMember")
+										each host in nonMemberHosts
+											option(value=host.host_name)= host.host_name
+								td
+									input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
+									br
+									input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
 
-					td
-						select(id="isMember" multiple size="10" name="isMember")
-							each host in hostgroup.members
-								option(value=host)= host
+								td
+									select(id="isMember" multiple size="10" name="isMember")
+										each host in hostgroup.members
+											option(value=host)= host
 
 			input(type="submit" onclick="selectAllOptions();")
 
 	else
 		//- ADD new hostgroup
 		form(name="hostgroup_options" action=action method="post")
-			p Host Name
-				input(type="text" name="hostgroup_name")
-			
-			p Alias
-				input(type="text" name="alias")
-
 			table
 				tr
+					td Host Name
 					td
-						select(id="isNotMember" multiple size="10" name="isNotMember")
-							each host in hosts
-								option(value=host.host_name)= host.host_name
+						input.width200(type="text" name="hostgroup_name")
+			
+				tr
+					td Alias
 					td
-						input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
-						br
-						input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+						input.width200(type="text" name="alias")
 
-					td
-						select(id="isMember" multiple size="10" name="isMember")
+				tr
+					table.membershipControl
+						tr
+							td
+								select(id="isNotMember" multiple size="10" name="isNotMember")
+									each host in hosts
+										option(value=host.host_name)= host.host_name
+							td
+								input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
+								br
+								input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+
+							td
+								select(id="isMember" multiple size="10" name="isMember")
 
 			input(type="submit" onclick="selectAllOptions();")

@@ -1,7 +1,7 @@
 extends layout
 
 block content
-	h1 HOSTs
+	h2 Hosts
 
 	p
 		a(href="/host/add") Add a New Host
@@ -16,10 +16,10 @@ block content
 
 		each host in hosts
 			tr
-				td= host['host_name']
-				td= host['alias']
-				td= host['address']
+				td= host.host_name
+				td= host.alias
+				td= host.address
 				td
-					a(href="/host/edit/" + host['host_name']) Edit 
+					a(href="/host/edit/" + host.host_name) Edit 
 				td
-					a(href="/host/delete/" + host['host_name']) Delete
+					a(href="/host/delete/" + host.host_name) Delete

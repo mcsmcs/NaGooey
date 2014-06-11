@@ -1,12 +1,18 @@
 extends layout
 
 block content
-	h1 SERVICEs
+	h2 Services
 
 	p
-		a(href="/service/add") Add
+		a(href="/service/add") Add a new Service
 
-	ul
+	table
+		tr
+			th Service Name
+			th Edit
+			
 		each service in services
-			li= service['service_description']
-				a(href="/service/edit/" + service['service_description']) Edit
+			tr
+				td= service.service_description
+				td
+					a(href="/service/edit/" + service.service_description) Edit

@@ -1,12 +1,18 @@
 extends layout
 
 block content
-	h1 SERVICEGROUPs
+	h2 Servicegroups
 
 	p
-		a(href="/servicegroup/add") Add
+		a(href="/servicegroup/add") Add a Servicegroup
 
-	ul
+	table
+		tr
+			th Servicegroup Name
+			th Edit
+
 		each servicegroup in servicegroups
-			li= servicegroup['servicegroup_name']
-				a(href="/servicegroup/edit/" + servicegroup['servicegroup_name']) Edit
+			tr
+				td= servicegroup.servicegroup_name
+				td
+					a(href="/servicegroup/edit/" + servicegroup.servicegroup_name) Edit

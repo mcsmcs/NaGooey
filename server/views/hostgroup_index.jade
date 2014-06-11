@@ -1,12 +1,18 @@
 extends layout
 
 block content
-	h1 HOSTGROUPs
+	h2 Hostgroups
 
 	p
-		a(href="/hostgroup/add") Add
+		a(href="/hostgroup/add") Add a Hostgroup
 
-	ul
+	table
+		tr
+			th Hostgroup Name
+			th Edit
+
 		each hostgroup in hostgroups
-			li= hostgroup['hostgroup_name']
-				a(href="/hostgroup/edit/" + hostgroup['hostgroup_name']) Edit
+			tr
+				td= hostgroup.hostgroup_name
+				td
+					a(href="/hostgroup/edit/" + hostgroup.hostgroup_name) Edit

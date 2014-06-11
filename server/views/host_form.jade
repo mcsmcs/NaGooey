@@ -30,8 +30,10 @@ block content
 		}
 
 
-	h1 HOST
-	p= host
+	h1 Hosts
+	
+	if host
+		h4= "Editing: " + host.host_name
 
 	//- Set the form action based on edit or add
 	- var action = (host ? '/host/edit/' + host.host_name : '/host/add')
@@ -39,43 +41,52 @@ block content
 	if host
 		//- EDIT existing host (prefill fields)
 		form(id="hostform" name="host_options" action=action method="post")
-
-			p Host Name
-				if host['host_name']
-					input(type="text" name="host_name" value=host['host_name'])
-
-			p IP Address
-				if host['address']
-					input(type="text" name="address" value=host['address'])
-				
-			p Alias
-				if host['alias']
-					input(type="text" name="alias" value=host['alias'])
-							
-			p Check Command
-				select(name="check_command")
-					each command in check_commands
-						if command['command_name'] == host['check_command']
-							option(value=command['command_name'] selected)= command['command_name']
-						else
-							option(value=command['command_name'])= command['command_name']
-
 			table
 				tr
+					td Host Name
 					td
-						select(id="isNotMember" multiple size="5" name="isNotMember")
-							each hostgroup in hostgroups.isNotMember
-								option(value=hostgroup.hostgroup_name)= hostgroup.hostgroup_name
+						if host['host_name']
+							input.width200(type="text" name="host_name" value=host['host_name'])
 
+				tr
+					td IP Address
 					td
-						input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
-						br
-						input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+						if host['address']
+							input.width200(type="text" name="address" value=host['address'])
+				
+				tr
+					td Alias
+					td
+						if host['alias']
+							input.width200(type="text" name="alias" value=host['alias'])
+							
+				tr
+					td Check Command
+					td
+						select.width200(name="check_command")
+						each command in check_commands
+							if command['command_name'] == host['check_command']
+								option(value=command['command_name'] selected)= command['command_name']
+							else
+								option(value=command['command_name'])= command['command_name']
 
-					td
-						select(id="isMember" multiple size="5" name="isMember")
-							each hostgroup in hostgroups.isMember
-								option(value=hostgroup.hostgroup_name)= hostgroup.hostgroup_name
+				tr
+					table.membershipControl
+						tr
+							td
+								select(id="isNotMember" multiple size="5" name="isNotMember")
+									each hostgroup in hostgroups.isNotMember
+										option(value=hostgroup.hostgroup_name)= hostgroup.hostgroup_name
+
+							td
+								input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
+								br
+								input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+
+							td
+								select(id="isMember" multiple size="5" name="isMember")
+									each hostgroup in hostgroups.isMember
+										option(value=hostgroup.hostgroup_name)= hostgroup.hostgroup_name
 
 			//- p Check Interval
 			//- 	input(type="text" name="check_interval")
@@ -113,16 +124,30 @@ block content
 	else
 		//- ADD new host
 		form(name="host_options" action=action method="post")
-			p Host Name
-				input(type="text" name="host_name")
+			table
+				tr
+					td Host Name
+					td 
+						input.width200(type="text" name="host_name")
 
-			p IP Address
-				input(type="text" name="address")
+				tr
+					td IP Address
+					td
+						input.width200(type="text" name="address")
 
-			p Alias
-				input(type="text" name="alias")
-			
-			
+				tr
+					td Alias
+					td
+						input.width200(type="text" name="alias")
+
+				tr
+					td Check Command
+					td
+						select.width200(name="check_command")
+						each command in check_commands
+							option(value=command.command_name)= command.command_name
+
+
 			//- label Host Groups
 			//- br
 			//- each hostgroup in hostgroups
@@ -130,12 +155,6 @@ block content
 			//- 	span= hostgroup.hostgroup_name
 			//- 	br
 
-
-			p Check Command
-				select(name="check_command")
-					each command in check_commands
-						option(value=command.command_name)= command.command_name
-			
 			//- p Check Interval
 			//- 	input(type="text" name="check_interval")
 			

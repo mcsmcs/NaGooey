@@ -1,9 +1,10 @@
 extends layout
 
 block content
-	h1 SERVICEs
+	h1 Services
 
-	p= service
+	if service
+		h4="Editing: " + service.service_name
 
 	//- Set the form action based on edit or add
 	- var action = (service ? '/service/edit/' + service.service_description : '/service/add')
@@ -11,27 +12,32 @@ block content
 	if service
 		//- EDIT existing service (prefill fields)
 		form(name="service_options" action=action method="post")
-			p Service Description
-				if service['service_description']
-					input(type="text" name="service_description" value=service['service_description'])
-				
-			p Hosts
 			table
 				tr
+					td Service Description
 					td
-						select(id="isNotMember" multiple size="5" name="isNotMember")
-							each host in hosts.nonMember
-								option(value=host.host_name)= host.host_name
+						if service['service_description']
+							input.width200(type="text" name="service_description" value=service['service_description'])
+				
+				//- tr
 
-					td
-						input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
-						br
-						input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+				//- 	p Hosts
+				//- 	table.membershipControl
+				//- 		tr
+				//- 			td
+				//- 				select(id="isNotMember" multiple size="5" name="isNotMember")
+				//- 					each host in hosts.nonMember
+				//- 						option(value=host.host_name)= host.host_name
 
-					td
-						select(id="isMember" multiple size="5" name="isMember")
-							each host in hosts.member
-								option(value=host.host_name)= host.host_name
+				//- 			td
+				//- 				input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
+				//- 				br
+				//- 				input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+
+				//- 			td
+				//- 				select(id="isMember" multiple size="5" name="isMember")
+				//- 					each host in hosts.member
+				//- 						option(value=host.host_name)= host.host_name
 
 
 			input(type="submit")
@@ -39,13 +45,18 @@ block content
 	else
 		//- ADD new service
 		form(name="service_options" action=action method="post")
-			p Service Description
-				input(type="text" name="service_description")
+			table
+				tr
+					td Service Description
+					td
+						input.width200(type="text" name="service_description")
 			
-			p Check Command
-				select
-					each command in commands
-						option(value="command.command_name")= command.command_name
+				tr
+					td Check Command
+					td
+						select.width200
+						each command in commands
+							option(value="command.command_name")= command.command_name
 
 			//- p Hosts
 			//- table

@@ -11,3 +11,9 @@ Services
 
 Output a config
 + Take mongo docs and dump a nagios configuration
+
+
+
+Bugs
++ GET /service -> Add a new service -> spins forever
++ check_command on hosts routes (add/edit) not populated
