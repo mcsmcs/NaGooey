@@ -26,9 +26,15 @@ block content
 							input.width300(type="text" name="command_line" value=value)
 
 					tr
+						td.valign-top Description
+						td
+							- var description = (command.description ? command.description : '');
+							textarea.width300(name="description" rows="4")= description
+
+					tr
 						td Check Command
 						td
-							- var value = (command['check_command'] == true ? 'checked' : '');
+							- var value = (command.check_command == true ? 'checked' : '');
 							if value == "checked"
 								input(type="checkbox" name="check_command" checked)
 							else
@@ -51,6 +57,11 @@ block content
 						td Command Line
 						td
 							input(type="text" name="command_line")
+
+					tr
+						td.valign-top Description
+						td
+							textarea.width300(name="description" rows="4")
 
 					tr
 						td Check Command

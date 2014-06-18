@@ -9,10 +9,15 @@ block content
 	table
 		tr
 			th Command Name
+			th Description
 			th Edit
+			th Delete
 
 		each command in commands
 			tr
-				td.first= command.command_name
-				td.last
+				td.valign-top.first= command.command_name
+				td.width300= command.description
+				td.valign-top
 					a(href="/command/edit/" + command.command_name) Edit
+				td.valign-top.last
+					a(href="/command/delete/" + command.command_name) Delete

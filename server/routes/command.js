@@ -44,12 +44,13 @@ module.exports = function(app){
 	});
 	
 	app.post('/command/add', function(req,res){
-		console.log(req.body);
+		// console.log(req.body);
 		
 		var newCommand = new Command({
 			command_name: req.body.command_name,
 			command_line: req.body.command_line,
-			check_command: (req.body.check_command == 'on' ? true : false)
+			check_command: (req.body.check_command === 'on' ? true : false),
+			description: req.body.description
 		});
 
 		newCommand.save(function(err, command){
@@ -72,16 +73,17 @@ module.exports = function(app){
 	});
 
 	app.post('/command/edit/:command_name', function(req,res){
-		console.log('**************');
-		console.log(req.body);
-		console.log('**************');
+		// console.log('**************');
+		// console.log(req.body);
+		// console.log('**************');
 
 		Command.findOne({command_name: req.params.command_name}, function(err, commandDoc){
 			if(err){ console.log(err); res.redirect('/'); }
 			
 			commandDoc.command_name = req.body.command_name;
 			commandDoc.command_line = req.body.command_line;
-			commandDoc.check_command = (req.body.check_command == 'on' ? true : false);
+			commandDoc.check_command = (req.body.check_command === 'on' ? true : false);
+			commandDoc.description = req.body.description;
 			commandDoc.save(function(err, savedDoc){
 
 				console.log('record saved!');

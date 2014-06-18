@@ -13,14 +13,16 @@ module.exports = (function(){
 	var check_icmp_command = new Command({
 		command_name: "check-host-alive-icmp",
 		command_line: "$USER1$/check_icmp -s 216.38.158.8 -H $HOSTADDRESS$ -w 1000.0,60% -c 5000.0,100% -p 5",
-		check_command: true
+		check_command: true,
+		description: "Checks the ping using source IP 216.38.158.8 with warning threshold 1second/60% loss, critical threshold 5seconds/100% loss, over 5 packets"
 	});
 	check_icmp_command.save();
 
 	var check_ping_command = new Command({
 		command_name: "check-host-alive-ping",
 		command_line: "$USER1$/check_ping -s 216.38.158.8 -H $HOSTADDRESS$ -w 1000.0,60% -c 5000.0,100% -p 5",
-		check_command: true
+		check_command: true,
+		description: "Checks the ping using source IP 216.38.158.8 with warning threshold 1second/60% loss, critical threshold 5seconds/100% loss, over 5 packets"
 	});
 	check_ping_command.save();
 

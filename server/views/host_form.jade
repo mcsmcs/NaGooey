@@ -64,11 +64,11 @@ block content
 					td Check Command
 					td
 						select.width200(name="check_command")
-						each command in check_commands
-							if command.command_name == host['check_command']
-								option(value=command.command_name selected)= command.command_name
-							else
-								option(value=command.command_name)= command.command_name
+							each command in check_commands
+								if command.command_name == host['check_command']
+									option(value=command.command_name selected)= command.command_name
+								else
+									option(value=command.command_name)= command.command_name
 
 				tr
 					table.membershipControl
