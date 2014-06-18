@@ -16,15 +16,8 @@ module.exports = function(app){
 		Command.find(function(err, commandDocs){
 
 			if (err){ console.log('error finding commands'); }
-
-			Command.getCheckCommands(function(err, docs){
-				if(err){ console.log(err); }
-				else{ console.log(docs); }
-			});
-
 			res.render('command_index', {commands: commandDocs});
 		});
-
 	});
 
 	// Convenience Route
