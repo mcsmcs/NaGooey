@@ -13,6 +13,6 @@ block content
 
 		each command in commands
 			tr
-				td.first= command['command_name']
+				td.first= command.command_name
 				td.last
-					a(href="/command/edit/" + command['command_name']) Edit
+					a(href="/command/edit/" + command.command_name) Edit

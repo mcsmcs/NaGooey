@@ -1,4 +1,5 @@
 'use strict';
+/*jslint unparam: true, node: true */
 
 var mongoose = require('mongoose');
 
@@ -8,14 +9,15 @@ var serviceSchema = new mongoose.Schema({
 		unique: true,
 		required: true
 	},
+
+	check_command: {
+		type: String,
+		required: true
+	},
+
 	servicegroups: Array,
 	host_name: Array,
 	hostgroup_name: Array,
-	check_command: {
-		type: String,
-		unique: true,
-		required: true
-	},
 	check_interval: Number,
 	retry_interval: Number,
 	max_check_attempts: Number,

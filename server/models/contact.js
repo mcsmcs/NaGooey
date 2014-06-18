@@ -1,4 +1,5 @@
 'use strict';
+/*jslint unparam: true, node: true */
 
 var mongoose = require('mongoose');
 

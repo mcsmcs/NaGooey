@@ -54,9 +54,9 @@ block content
 				tr
 					td Check Command
 					td
-						select.width200
-						each command in commands
-							option(value="command.command_name")= command.command_name
+						select(name="check_command").width200
+							each command in commands
+								option(value=command.command_name)= command.command_name
 
 			//- p Hosts
 			//- table

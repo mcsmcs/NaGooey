@@ -1,5 +1,5 @@
 'use strict';
-
+/*jslint unparam: true, node: true */
 
 var mongoose = require('mongoose');
 var Command = mongoose.model("Command");
@@ -82,4 +82,4 @@ module.exports = (function(){
 		members: ["host1", "host2", "host3"]
 	});
 	hgALL.save();
-})()
+}());

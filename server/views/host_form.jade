@@ -45,14 +45,14 @@ block content
 				tr
 					td Host Name
 					td
-						if host['host_name']
-							input.width200(type="text" name="host_name" value=host['host_name'])
+						if host.host_name
+							input.width200(type="text" name="host_name" value=host.host_name)
 
 				tr
 					td IP Address
 					td
-						if host['address']
-							input.width200(type="text" name="address" value=host['address'])
+						if host.address
+							input.width200(type="text" name="address" value=host.address)
 				
 				tr
 					td Alias
@@ -65,10 +65,10 @@ block content
 					td
 						select.width200(name="check_command")
 						each command in check_commands
-							if command['command_name'] == host['check_command']
-								option(value=command['command_name'] selected)= command['command_name']
+							if command.command_name == host['check_command']
+								option(value=command.command_name selected)= command.command_name
 							else
-								option(value=command['command_name'])= command['command_name']
+								option(value=command.command_name)= command.command_name
 
 				tr
 					table.membershipControl

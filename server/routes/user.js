@@ -1,3 +1,5 @@
+'use strict';
+/*jslint unparam: true, node: true */
 
 /*
  * GET users listing.

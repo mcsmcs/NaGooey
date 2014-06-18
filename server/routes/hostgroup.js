@@ -1,4 +1,6 @@
 'use strict';
+/*jslint unparam: true, node: true */
+
 
 /*
  *	Routing for the hostgroup resource

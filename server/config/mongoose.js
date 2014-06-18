@@ -1,4 +1,5 @@
 'use strict';
+/*jslint unparam: true, node: true */
 
 /*
  *	Setup MongoDB and Register Models

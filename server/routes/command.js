@@ -1,4 +1,5 @@
 'use strict';
+/*jslint unparam: true, node: true */
 
 /*
  *	Routing for the Command resource
@@ -19,7 +20,7 @@ module.exports = function(app){
 			Command.getCheckCommands(function(err, docs){
 				if(err){ console.log(err); }
 				else{ console.log(docs); }
-			})
+			});
 
 			res.render('command_index', {commands: commandDocs});
 		});
@@ -46,8 +47,8 @@ module.exports = function(app){
 		console.log(req.body);
 		
 		var newCommand = new Command({
-			command_name: req.body['command_name'],
-			command_line: req.body['command_line'],
+			command_name: req.body.command_name,
+			command_line: req.body.command_line,
 			check_command: (req.body.check_command == 'on' ? true : false)
 		});
 
@@ -112,4 +113,4 @@ module.exports = function(app){
 			});
 		});
 	});
-}
+};
