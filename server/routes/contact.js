@@ -9,6 +9,40 @@
 var mongoose = require('mongoose');
 var Contact = mongoose.model("Contact");
 
+var isPresent = function(formFieldData){
+	return (formFieldData ? true : false);
+};
+
+var parseRequestBody = function(requestBody){
+	return {
+
+			contact_name: requestBody.contact_name,
+			alias: requestBody.alias,
+			email: requestBody.email,
+			pager: requestBody.pager,
+			
+			host_notifications_enabled: isPresent(requestBody.host_notifications_enabled),
+			host_notification_period: requestBody.host_notification_period,
+			host_notification_options: {
+				up: 		isPresent(requestBody.host_notification_up),
+				flapping: 	isPresent(requestBody.host_notification_flapping),
+				down: 		isPresent(requestBody.host_notification_down),
+				scheduled: 	isPresent(requestBody.host_notification_scheduled),
+				recoveries: isPresent(requestBody.host_notification_recoveries),
+			},
+			
+			service_notifications_enabled: isPresent(requestBody.service_notifications_enabled),
+			service_notification_period: requestBody.service_notification_period,
+			service_notification_options: {
+				warning: 	isPresent(requestBody.service_notification_warning),
+				unknown: 	isPresent(requestBody.service_notification_unknown),
+				critical: 	isPresent(requestBody.service_notification_critical),
+				flapping: 	isPresent(requestBody.service_notification_flapping),
+				recoveries: isPresent(requestBody.service_notification_recoveries)
+			}
+	};
+};
+
 module.exports = function(app){
 
 	app.get('/contact', function(req,res){
@@ -28,51 +62,43 @@ module.exports = function(app){
 	app.get('/contact/add', function(req,res){
 		
 		Contact.find(function(err, contactDocs){
-
 			if (err){ console.log('error finding contacts'); }
-			else { console.log(contactDocs); }
-
-			res.render('contact_form', {time_periods: [{timeperiod_name: "timeperiod1"}]});
+			
+			res.render('contact_form', {
+				time_periods: [{timeperiod_name: "timeperiod1"}]
+			});
 		});
 	});
 	
 	app.post('/contact/add', function(req,res){
-		console.log('**************');
-		console.log(req.body);
-		console.log('**************');
-		
-		Contact.create(req.body, function(err){
+
+		Contact.create(parseRequestBody(req.body), function(err){
 			if(err){ console.log(err); }
 			res.redirect('/contact');
 		});
-
 	});
 
 	app.get('/contact/edit/:contact_name', function(req,res){
 
 		Contact.findOne({contact_name: req.params.contact_name}, function(err,contactDoc){
-
 			if(err){console.log(err);}
-			res.render('contact_form', {contact: contactDoc, time_periods: [{timeperiod_name: "timeperiod1"}]});
+			res.render('contact_form', {
+				contact: contactDoc,
+				time_periods: [{timeperiod_name: "timeperiod1"}]
+			});
 		});
 	});
 
 	app.post('/contact/edit/:contact_name', function(req,res){
-		// console.log('**************');
-		// console.log(req.body);
-		// console.log('**************');
 
-		Contact.findOne({contact_name: req.params.contact_name}, function(err, contactDoc){
-			if(err){ console.log(err); res.redirect('/'); }
-			
-			contactDoc.contact_name = req.body.contact_name;
-			contactDoc.contact_line = req.body.contact_line;
-			contactDoc.check_contact = (req.body.check_contact === 'on' ? true : false);
-			contactDoc.description = req.body.description;
-			contactDoc.save(function(err, savedDoc){
+		Contact.update(
+			{contact_name: req.params.contact_name},// query
+			parseRequestBody(req.body),				// update
+			function(err){							// callback
+				if(err){ console.log(err); }
 				res.redirect('/contact');
-			});
-		});
+			}
+		);
 	});
 
 	app.get('/contact/delete/:contact_name', function(req,res){

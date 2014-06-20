@@ -13,6 +13,7 @@ block content
 		- var action = (contact ? '/contact/edit/' + contact.contact_name : '/contact/add')
 
 		if contact
+
 			//- EDIT existing contact (prefill fields)
 			form(name="contact_options" action=action method="post")
 				table
@@ -24,6 +25,12 @@ block content
 
 					//-*********** HOSTS ***********//
 					tr
+						td
+							h4 Host Notifications
+
+					+checkboxTR('Host Notifications Enabled','host_notifications_enabled',contact.host_notifications_enabled)
+
+					tr
 						td Host Notification Period
 						td
 							select.width200(name="host_notification_period")
@@ -32,27 +39,34 @@ block content
 										option(value=timeperiod.timeperiod_name selected)= timeperiod.timeperiod_name
 									else
 										option(value=timeperiod.timeperiod_name)= timeperiod.timeperiod_name
-					//- +selectbox('Host Notification Period','host_notification_period',time_periods,timeperiod_name,contact.host_notification_period)
-
+							
+					tr 
+						td Send notifications on these events
+						td
+							table
+								tr
+									td
+										+checkbox('UP','host_notification_up',contact.host_notification_options.up)
+									td
+										+checkbox('FLAPPING','host_notification_flapping',contact.host_notification_options.up)
+								tr
+									td
+										+checkbox('DOWN','host_notification_down',contact.host_notification_options.down)
+									td
+										+checkbox('SCHEDULED','host_notification_scheduled',contact.host_notification_options.up)
+								tr
+									td
+										+checkbox('RECOVERY','host_notification_recoveries',contact.host_notification_options.up)
 					
-					+checkbox('Host Notifications Enabled','host_notifications_enabled',contact.host_notifications_enabled)
-					+checkbox('Notify on DOWN events?','host_notification_options.down',contact.host_notification_options.down)
-					+checkbox('Notify on UP events?','host_notification_options.up',contact.host_notification_options.up)
-					+checkbox('Notify on RECOVERY events?','host_notification_options.recoveries',contact.host_notification_options.up)
-					+checkbox('Notify on FLAPPING events?','host_notification_options.flapping',contact.host_notification_options.up)
-					+checkbox('Notify on SCHEDULED (scheduled down and up) events?','host_notification_options.scheduled',contact.host_notification_options.up)
 
 
 					//-*********** SERVICES ***********//
 					tr
-						td Service Notifications Enabled
 						td
-							- var value = (contact.service_notifications_enabled == true ? 'checked' : '');
-							if value == "checked"
-								input(type="checkbox" name="service_notifications_enabled" checked)
-							else
-								input(type="checkbox" name="service_notifications_enabled")
-
+							h4 Service Notifications
+					
+					+checkboxTR('Enable Service Notifications','service_notifications_enabled',contact.service_notifications_enabled)
+	
 					tr
 						td Service Notification Period
 						td
@@ -63,7 +77,23 @@ block content
 									else
 										option(value=timeperiod.timeperiod_name)= timeperiod.timeperiod_name
 
-
+					tr 
+						td Send notifications on these events
+						td
+							table
+								tr
+									td
+										+checkbox('WARNING','service_notification_warning',contact.service_notification_options.warning)
+									td
+										+checkbox('UNKNOWN','service_notification_unknown',contact.service_notification_options.unknown)
+								tr
+									td
+										+checkbox('CRITICAL','service_notification_critical',contact.service_notification_options.critical)
+									td
+										+checkbox('FLAPPING','service_notification_flapping',contact.service_notification_options.flapping)
+								tr
+									td
+										+checkbox('RECOVERY','service_notification_recoveries',contact.service_notification_options.recoveries)
 					tr
 						td
 							input(type="submit")
@@ -72,6 +102,10 @@ block content
 			//- ADD new contact
 			form(name="contact_options" action=action method="post")
 				table
+					tr
+						td 
+							h4 Contact Information
+
 					+textbox('Contact Name','contact_name')
 					+textbox('Alias','alias')
 					+textbox('Email','email')
@@ -79,27 +113,69 @@ block content
 
 					//-*********** HOSTS ***********//
 					tr
+						td
+							h4 Host Notifications
+					
+					+checkboxTR('Enable Host Notifications','host_notifications_enabled')
+					
+					tr
 						td Host Notification Period
 						td
 							select.width200(name="host_notification_period")
 								each timeperiod in time_periods
 									option(value=timeperiod.timeperiod_name)= timeperiod.timeperiod_name
 
-					+checkbox('Host Notifications Enabled','host_notifications_enabled')
-					+checkbox('Notify on DOWN events?','host_notification_options.down')
-					+checkbox('Notify on UP events?','host_notification_options.up')
-					+checkbox('Notify on RECOVERY events?','host_notification_options.recoveries')
-					+checkbox('Notify on FLAPPING events?','host_notification_options.flapping')
-					+checkbox('Notify on SCHEDULED (scheduled down and up) events?','host_notification_options.scheduled')
+					tr 
+						td Send notifications on these
+						td
+							table
+								tr
+									td
+										+checkbox('UP','host_notification_up')
+									td
+										+checkbox('FLAPPING','host_notification_flapping')
+								tr
+									td
+										+checkbox('DOWN','host_notification_down')
+
+									td
+										+checkbox('SCHEDULED','host_notification_scheduled')
+								tr
+									td
+										+checkbox('RECOVERY','host_notification_recoveries')
 
 
-					//-*********** Services ***********//
+					//-*********** SERVICES ***********//
 					tr
-						+checkbox('Service Notifications Enabled','service_notifications_enabled')
+						td
+							h4 Service Notifications
+					
+					+checkboxTR('Enable Service Notifications','service_notifications_enabled')
+					
+					tr
 						td Service Notification Period
 						td
 							select.width200(name="service_notification_period")
 								each timeperiod in time_periods
-										option(value=timeperiod.timeperiod_name)= timeperiod.timeperiod_name
-				
+									option(value=timeperiod.timeperiod_name)= timeperiod.timeperiod_name
+
+					tr 
+						td Send notifications on these
+						td
+							table
+								tr
+									td
+										+checkbox('WARNING','service_notification_warning')
+									td
+										+checkbox('UNKNOWN','service_notification_unknown')
+								tr
+									td
+										+checkbox('CRITICAL','service_notification_critical')
+
+									td
+										+checkbox('FLAPPING','service_notification_flapping')
+								tr
+									td
+										+checkbox('RECOVERY','service_notification_recoveries')
+
 				input(type="submit")

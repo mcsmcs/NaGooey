@@ -4,12 +4,12 @@ mixin textbox(label, inputName, value)
 			td= label
 			td
 				- var inputValue = (value ? value : '');
-				input.width300(type="text" name="contact_name" value=inputValue)
+				input.width200(type="text" name=inputName value=inputValue)
 	else
 		tr
 			td= label
 			td
-				input(type="text" name=inputName)
+				input.width200(type="text" name=inputName)
 
 
 mixin selectbox(label, inputName, dataArray, propertyName, selectedOption)
@@ -24,13 +24,13 @@ mixin selectbox(label, inputName, dataArray, propertyName, selectedOption)
 						option(value=element[propertyName])= element[propertyName]
 
 
-mixin checkbox(label, checkboxName, value)
-	if value
+mixin checkboxTR(label, checkboxName, value)
+	if value !== undefined
 		tr
 			td= label
 			td
-				- var value = (value == true ? 'checked' : '');
-				if value == "checked"
+				- var checked = (value === true ? 'checked' : '');
+				if checked === "checked"
 					input(type="checkbox" name=checkboxName checked)
 				else
 					input(type="checkbox" name=checkboxName)
@@ -39,3 +39,26 @@ mixin checkbox(label, checkboxName, value)
 			td= label
 			td
 				input(type="checkbox" name=checkboxName checked)
+
+
+mixin checkbox(label, checkboxName, value)
+	if value !== undefined
+			- var checked = (value === true ? 'checked' : '');
+			if checked === "checked"
+				label
+					input(type="checkbox" name=checkboxName checked)
+					span= label
+			else
+				label
+					input(type="checkbox" name=checkboxName)
+					span= label
+	else
+		label
+			input(type="checkbox" name=checkboxName checked)
+			span= label
+
+
+
+
+
+
