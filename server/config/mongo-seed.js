@@ -5,9 +5,41 @@ var mongoose = require('mongoose');
 var Command = mongoose.model("Command");
 var Host = mongoose.model("Host");
 var HostGroup = mongoose.model("HostGroup");
+var Contact = mongoose.model("Contact");
 
 module.exports = (function(){
 
+	//################### CONTACTS
+	Contact.create({
+		contact_name: "contact_one",
+		alias: 'alias',
+		email: 'user@example.com',
+		pager: '5556665555',
+		host_notification_period: '24x7',
+		service_notification_period: '24x7',
+		
+		host_notification_options: {
+			down: true,
+			up: true,
+			recoveries: true,
+			flapping: true,
+			scheduled: true
+		},
+
+		service_notification_options: {
+			warning: true,
+			unknown: true,
+			critical: true,
+			recoveries: true,
+			flapping: true
+		},
+
+		host_notification_commands: 'host_notification_command',
+		service_notification_commands: 'service_notification_commands',
+		can_submit_commands: 'can_submit_commands',
+	});
+
+	
 
 	//################### COMMANDS
 	var check_icmp_command = new Command({

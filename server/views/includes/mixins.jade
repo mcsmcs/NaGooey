@@ -1,0 +1,41 @@
+mixin textbox(label, inputName, value)
+	if value
+		tr
+			td= label
+			td
+				- var inputValue = (value ? value : '');
+				input.width300(type="text" name="contact_name" value=inputValue)
+	else
+		tr
+			td= label
+			td
+				input(type="text" name=inputName)
+
+
+mixin selectbox(label, inputName, dataArray, propertyName, selectedOption)
+	tr
+		td= label
+		td
+			select.width200(name=inputName)
+				each element in dataArray
+					if element[propertyName] == selectedOption
+						option(value=element[propertyName] selected)= element[propertyName]
+					else
+						option(value=element[propertyName])= element[propertyName]
+
+
+mixin checkbox(label, checkboxName, value)
+	if value
+		tr
+			td= label
+			td
+				- var value = (value == true ? 'checked' : '');
+				if value == "checked"
+					input(type="checkbox" name=checkboxName checked)
+				else
+					input(type="checkbox" name=checkboxName)
+	else
+		tr
+			td= label
+			td
+				input(type="checkbox" name=checkboxName checked)

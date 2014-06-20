@@ -1,0 +1,25 @@
+extends layout
+
+block content
+	h2 Contacts
+	
+	p
+		a(href="/contact/add") Add a Contact
+
+	table
+		tr
+			th Contact Name
+			th Alias
+			th Email
+			th Edit
+			th Delete
+
+		each contact in contacts
+			tr
+				td.first= contact.contact_name
+				td= contact.alias
+				td= contact.email
+				td
+					a(href="/contact/edit/" + contact.contact_name) Edit
+				td
+					a(href="/contact/delete/" + contact.contact_name) Delete

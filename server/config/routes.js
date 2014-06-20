@@ -18,5 +18,6 @@ module.exports = function(app){
 	require('../routes/service')(app);
 	require('../routes/servicegroup')(app);
 	require('../routes/command')(app);
+	require('../routes/contact')(app);
 
 }

@@ -31,9 +31,12 @@ module.exports = function(mongo_url){
 	require('../models/servicegroup');
 	require('../models/servicetemplate');
 	require('../models/timeperiod');
+	require('../models/nagios_object');
+
 
 
 	// Load Defaults
-	//require('./mongo-seed');
+	require('./mongo-seed');
+	require('./nagios3_definitions');
 
 };
