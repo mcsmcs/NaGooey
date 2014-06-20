@@ -4,12 +4,27 @@ mixin textbox(label, inputName, value)
 			td= label
 			td
 				- var inputValue = (value ? value : '');
-				input.width200(type="text" name=inputName value=inputValue)
+				input.width200(type="text" name=inputName value=inputValue )
 	else
 		tr
 			td= label
 			td
 				input.width200(type="text" name=inputName)
+
+
+mixin rulebox(rowId, inputName, value)
+	if value
+		tr(id=rowId)
+			td(colspan="2")
+				-var inputValue = (value ? value: '')
+				input.timePeriodRuleInput(type="text" name=inputName value=inputValue)
+				a(href="javascript:void(0);" onclick="removeById('" + rowId + "');") Remove
+	else
+		tr(id=rowId)
+			td(colspan="2")
+				input.timePeriodRuleInput(type="text" name=inputName)
+				a(href="javascript:void(0);" onclick="removeById('" + rowId + "');") Remove
+
 
 
 mixin selectbox(label, inputName, dataArray, propertyName, selectedOption)

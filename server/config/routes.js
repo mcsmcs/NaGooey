@@ -19,5 +19,6 @@ module.exports = function(app){
 	require('../routes/servicegroup')(app);
 	require('../routes/command')(app);
 	require('../routes/contact')(app);
+	require('../routes/timeperiod')(app);
 
 }

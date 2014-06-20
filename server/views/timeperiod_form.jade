@@ -1,0 +1,91 @@
+extends layout
+//- Mixins included in layout.jade
+block content
+
+	script.
+
+		var removeById = function(tableRowID){
+			document.getElementById(tableRowID).remove();
+		};
+
+		var addRuleRow = function(tableID){
+			var rowID = "rule_" + document.getElementsByName('rules').length;
+
+			var tr = document.createElement('tr');
+			tr.id = rowID;
+
+			var td = document.createElement('td');
+
+			var input = document.createElement('input');
+			input.type = "text";
+			input.name = "rules";
+			input.classList.add('timePeriodRuleInput')
+
+			var a = document.createElement('a');
+			a.href = "javascript:void(0);";
+			a.setAttribute("onclick","removeById('" + rowID + "');");
+			a.setAttribute("colspan", 2);
+			a.innerText = "Remove"
+
+			td.appendChild(input);
+			td.appendChild(a);
+			tr.appendChild(td);
+			document.getElementById(tableID).appendChild(tr);
+		};
+
+	.timeperiods
+
+		h1 Time Periods
+
+		if timeperiod
+			h4= "Editing: " + timeperiod.timeperiod_name
+
+		//- Set the form action based on edit or add
+		- var action = (timeperiod ? '/timeperiod/edit/' + timeperiod.timeperiod_name : '/timeperiod/add')
+
+		if timeperiod 
+			//- ROUTE: /timeperiod/edit/timeperiod_name
+			form(name="timeperiod_options" action=action method="post")
+				table(id="rulesTable")
+					tr
+						td(colspan=2)
+							h4 Time Period Information
+
+					+textbox('Time Period Name','timeperiod_name',timeperiod.timeperiod_name)
+					+textbox('Alias','alias',timeperiod.alias)
+
+					tr
+						td(colspan=2)
+							h4 Day and Time Rules
+
+					each rule, i in timeperiod.rules
+						+rulebox('rule_' + i, 'rules', rule)
+
+
+				a(href="javascript:void(0);" onclick="addRuleRow('rulesTable')") Add a rule
+				br
+				br
+				input(type="submit")
+
+		else	
+			//- ROUTE: /timeperiod/add
+			form(name="timeperiod_options" action=action method="post")
+				table(id="rulesTable")
+					tr
+						td(colspan=2)
+							h4 Time Period Information
+
+					+textbox('Time Period Name','timeperiod_name')
+					+textbox('Alias','alias')
+
+					tr
+						td(colspan=2)
+							h4 Day and Time Rules
+
+					+rulebox('rule_0', 'rules')
+
+
+				a(href="javascript:void(0);" onclick="addRuleRow('rulesTable')") Add a rule
+				br
+				br
+				input(type="submit")

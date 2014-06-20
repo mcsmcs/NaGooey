@@ -1,0 +1,23 @@
+extends layout
+
+block content
+	h2 Time Periods
+	
+	p
+		a(href="/timeperiod/add") Add a Time Period
+
+	table
+		tr
+			th Time Period Name
+			th Alias
+			th Edit
+			th Delete
+
+		each timeperiod in timeperiods
+			tr
+				td.first= timeperiod.timeperiod_name
+				td= timeperiod.alias
+				td
+					a(href="/timeperiod/edit/" + timeperiod.timeperiod_name) Edit
+				td
+					a(href="/timeperiod/delete/" + timeperiod.timeperiod_name) Delete

@@ -49,3 +49,13 @@ td, th {
 	padding-bottom: 10px;
 	vertical-align: top;
 }
+
+/*** Time Period ***/
+.timePeriodRuleInput {
+	margin-right: 5px;
+	width: 300px;
+}
+
+.addRule {
+	margin-bottom: 10px;
+}

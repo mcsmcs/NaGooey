@@ -1,19 +1,10 @@
 TODO
 
-Services
-+ Add and Edit
-	-- populate hosts
-		-- add services array on host doc?
-	
-	-- populate hostgroups
-		-- add services array on hostgroups doc?
+TimePeriod
++ implement exceptions
 
-
-Output a config
-+ Take mongo docs and dump a nagios configuration
-
-
+Config Output
++ write app to pull mongo info and generate configurations
 
 Bugs
-+ GET /service -> Add a new service -> spins forever
-+ check_command on hosts routes (add/edit) not populated
+fix weirdness when adding time period rules (inserting a row with colspan2)
