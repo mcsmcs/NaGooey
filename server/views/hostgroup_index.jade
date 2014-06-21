@@ -9,11 +9,14 @@ block content
 	table
 		tr
 			th Hostgroup Name
+			th Alias
 			th Edit
+			th Delete
 
 		each hostgroup in hostgroups
 			tr
 				td= hostgroup.hostgroup_name
+				td= hostgroup.alias
 				td
 					a(href="/hostgroup/edit/" + hostgroup.hostgroup_name) Edit
 				td

@@ -45,8 +45,8 @@ module.exports = function(app){
 		console.log(req.body);
 		
 		var newServiceGroup = new ServiceGroup({
-			servicegroup_name: req.body['servicegroup_name'],
-			alias: req.body['alias']
+			servicegroup_name: req.body.servicegroup_name,
+			alias: req.body.alias
 		});
 
 		newServiceGroup.save(function(err, servicegroup){
@@ -82,4 +82,25 @@ module.exports = function(app){
 			});
 		});
 	});
-}
+
+	app.get('/servicegroup/delete/:servicegroup_name', function(req,res){
+
+		var question = "Are you sure you want to delete servicegroup: " + req.params.servicegroup_name + "?";
+		var action = '/servicegroup/delete/' + req.params.servicegroup_name + '/confirm';
+		
+		res.render('confirm_delete', {question:question, action:action});
+	});
+
+	app.post('/servicegroup/delete/:servicegroup_name/confirm', function(req,res){
+
+		ServiceGroup.findOne({servicegroup_name: req.params.servicegroup_name}, function(err, servicegroupDoc){
+			
+			if(err){ console.log(err); }
+
+			servicegroupDoc.remove(function(err, removedDoc){
+				if(err){ console.log(err); }
+				res.redirect('/servicegroup');	
+			});
+		});
+	});
+};

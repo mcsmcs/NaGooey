@@ -10,9 +10,12 @@ block content
 		tr
 			th Service Name
 			th Edit
+			th Delete
 			
 		each service in services
 			tr
 				td= service.service_description
 				td
 					a(href="/service/edit/" + service.service_description) Edit
+				td
+					a(href="/service/delete/" + service.service_description) Delete

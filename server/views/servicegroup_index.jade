@@ -10,9 +10,12 @@ block content
 		tr
 			th Servicegroup Name
 			th Edit
+			th Delete
 
 		each servicegroup in servicegroups
 			tr
 				td= servicegroup.servicegroup_name
 				td
 					a(href="/servicegroup/edit/" + servicegroup.servicegroup_name) Edit
+				td
+					a(href="/servicegroup/delete/" + servicegroup.servicegroup_name) Delete

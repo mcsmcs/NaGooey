@@ -101,4 +101,25 @@ module.exports = function(app){
 			});
 		});
 	});
+
+	app.get('/service/delete/:service_name', function(req,res){
+
+		var question = "Are you sure you want to delete service: " + req.params.service_name + "?";
+		var action = '/service/delete/' + req.params.service_name + '/confirm';
+		
+		res.render('confirm_delete', {question:question, action:action});
+	});
+
+	app.post('/service/delete/:service_name/confirm', function(req,res){
+
+		Service.findOne({service_name: req.params.service_name}, function(err, serviceDoc){
+			
+			if(err){ console.log(err); }
+
+			serviceDoc.remove(function(err, removedDoc){
+				if(err){ console.log(err); }
+				res.redirect('/service');	
+			});
+		});
+	});
 };
