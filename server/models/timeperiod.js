@@ -30,20 +30,8 @@ july 10 - 15 			00:00-24:00 	July 10 through July 15 every year
 day 1 - 15				""				1st to 15th each month
 july 10 - 15 / 2 		""				Every other day between july10-july15
 
+http://nagios.sourceforge.net/docs/3_0/oncallrotation.html
 */
-
-var exceptionSchema = new mongoose.Schema({
-
-	exception: {
-		type: String,
-		required: true
-	},
-
-	time: {
-		type: Array,
-		default: ["00:00-24:00"]
-	}
-});
 
 var timePeriodSchema = new mongoose.Schema({
 	
@@ -59,9 +47,9 @@ var timePeriodSchema = new mongoose.Schema({
 		unique: true
 	},
 
-	rules: Array
-
-
+	rules: Array,
+	use: Array,
+	exclude: Array
 
 	// weekdays: {
 	// 	monday: Array,

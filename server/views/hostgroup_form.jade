@@ -18,11 +18,10 @@ block content
 			var form = document.getElementById("hostform");
 			var selectBoxIDs = ['isMember', 'isNotMember'];
 			var selectBoxes = document.getElementsByTagName('select');
-			var i = null;
+			var i,j;
 
-			for (index in selectBoxes){
-				var selectBox = selectBoxes[index];
-
+			for (j=0; j<selectBoxIDs.length; j++){
+				var selectBox = selectBoxes[j];
 				for (i=0; i<selectBox.options.length; i++){
 					selectBox.options[i].selected = true;
 				}
@@ -31,9 +30,6 @@ block content
 
 
 	h1 Hostgroups
-
-	//- p= hostgroup
-	//- p= hosts
 
 	if hostgroup
 		h4= "Editing: " + hostgroup.hostgroup_name
@@ -58,23 +54,11 @@ block content
 								input.width200(type="text" name="alias" value=hostgroup['alias'])
 
 					tr
-						table.membershipControl
-							tr
-								td
-									select(id="isNotMember" multiple size="10" name="isNotMember")
-										each host in nonMemberHosts
-											option(value=host.host_name)= host.host_name
-								td
-									input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
-									br
-									input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+						td(colspan=2)
+							+membershipControl(hgMembership.members, hgMembership.nonmembers, 'host_name', 'host_name')
 
-								td
-									select(id="isMember" multiple size="10" name="isMember")
-										each host in hostgroup.members
-											option(value=host)= host
 
-			input(type="submit" onclick="selectAllOptions();")
+				input(type="submit" onclick="selectAllOptions();")
 
 	else
 		//- ADD new hostgroup
@@ -91,18 +75,7 @@ block content
 						input.width200(type="text" name="alias")
 
 				tr
-					table.membershipControl
-						tr
-							td
-								select(id="isNotMember" multiple size="10" name="isNotMember")
-									each host in hosts
-										option(value=host.host_name)= host.host_name
-							td
-								input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
-								br
-								input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
-
-							td
-								select(id="isMember" multiple size="10" name="isMember")
+					td(colspan=2)
+						+membershipControl(hgMembership.members, hgMembership.nonmembers, 'host_name', 'host_name')
 
 			input(type="submit" onclick="selectAllOptions();")

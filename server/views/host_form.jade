@@ -70,23 +70,9 @@ block content
 								else
 									option(value=command.command_name)= command.command_name
 
-				tr
-					table.membershipControl
-						tr
-							td
-								select(id="isNotMember" multiple size="5" name="isNotMember")
-									each hostgroup in hostgroups.isNotMember
-										option(value=hostgroup.hostgroup_name)= hostgroup.hostgroup_name
-
-							td
-								input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
-								br
-								input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
-
-							td
-								select(id="isMember" multiple size="5" name="isMember")
-									each hostgroup in hostgroups.isMember
-										option(value=hostgroup.hostgroup_name)= hostgroup.hostgroup_name
+				//- tr
+				//- 	td(colspan=2)
+				//- 		+membershipControl(hostgroups.isMember,hostgroups.isNotMember,'hostgroup_name','hostgroup_name')
 
 			//- p Check Interval
 			//- 	input(type="text" name="check_interval")

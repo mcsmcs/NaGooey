@@ -82,9 +82,9 @@ module.exports = function(app){
 
 	app.post('/host/edit/:host_name', function(req,res){
 		
-		// console.log("--------------------------------------");
-		// console.log(req.body);
-		// console.log("--------------------------------------");
+		console.log("--------------------------------------");
+		console.log(req.body);
+		console.log("--------------------------------------");
 
 		var hostname = req.params.host_name;
 		/*var membership = {

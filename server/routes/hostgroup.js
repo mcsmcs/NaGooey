@@ -16,7 +16,7 @@ var HostGroup = mongoose.model("HostGroup");
 function membersToArray(members){
 	// Forces formdata posted to app to an array if no values (undefined) or single value (String) is sent
 	var returnArray = [];
-	if(members instanceof String || typeof(members) === 'string'){ returnArray = Array(members); }
+	if(members instanceof String || typeof members === 'string'){ returnArray = Array(members); }
 	else if(members instanceof Array){ returnArray = members; }
 	return returnArray;
 }
@@ -24,6 +24,9 @@ function membersToArray(members){
 
 module.exports = function(app){
 
+	// #################################################
+	// #                    INDEX
+	// #################################################
 	app.get('/hostgroup', function(req,res){
 		
 		HostGroup.find(function(err, hostgroupDocs){
@@ -37,11 +40,22 @@ module.exports = function(app){
 		res.redirect('/hostgroup');
 	});
 
+
+	// #################################################
+	// #                    ADD
+	// #################################################
 	app.get('/hostgroup/add', function(req,res){
 
 		Host.find({}, {host_name: 1, _id:0}, function(err,hosts){
 			if(err){console.log(err);}
-			res.render('hostgroup_form', {hosts: hosts});
+			
+			var membership = {
+				nonmembers: hosts,
+				members: []
+			};
+			console.log(membership);
+
+			res.render('hostgroup_form', {hgMembership: membership});
 		});
 	});
 	
@@ -72,6 +86,10 @@ module.exports = function(app){
 		);
 	});
 
+
+	// #################################################
+	// #                    EDIT
+	// #################################################
 	app.get('/hostgroup/edit/:hostgroup_name', function(req,res){
 		
 		async.parallel(
@@ -87,7 +105,12 @@ module.exports = function(app){
 
 			function(err,results){
 				if(err){ console.log(err); }
-				res.render('hostgroup_form', {hostgroup: results.hostgroup, nonMemberHosts: results.hostMembership.nonmembers});
+				
+				res.render('hostgroup_form', {
+					hostgroup: results.hostgroup, 
+					nonMemberHosts: results.hostMembership.nonmembers,
+					hgMembership: results.hostMembership
+				});
 			}
 		);
 	});
@@ -119,6 +142,10 @@ module.exports = function(app){
 		);
 	});
 
+
+	// #################################################
+	// #                    DELETE
+	// #################################################
 	app.get('/hostgroup/delete/:hostgroup_name', function(req,res){
 
 		var question = "Are you sure you want to delete hostgroup: " + req.params.hostgroup_name + "?";

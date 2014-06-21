@@ -92,7 +92,7 @@ hostSchema.statics.getHostsByHostGroup = function(hostgroup, cb){
 			},
 			nonmembers: function(callback){
 				caller.find({hostgroups: {$not: {$elemMatch: {$regex: reMatch}}}}, {host_name:1, _id:0}, callback);
-			}
+			},
 		},
 		
 		cb

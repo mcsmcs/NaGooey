@@ -36,7 +36,7 @@ module.exports = function(mongo_url){
 
 
 	// Load Defaults
-	require('./mongo-seed');
+	if (mongo_url === undefined){ require('./mongo-seed'); }
 	require('./nagios3_definitions');
 
 };
