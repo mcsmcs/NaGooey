@@ -34,13 +34,13 @@
 
 
 /*** Membership Control ***/
-.membershipControl {
-	margin-top: 20px;
-}
-
-#isMember, #isNotMember {
+.membershipControl select {
 	width: 150px;
 }
+
+/*table, th, td {
+   border: 1px solid black;
+}*/
 
 
 /*** Tables ***/

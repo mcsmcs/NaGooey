@@ -75,5 +75,25 @@ mixin checkbox(label, checkboxName, value)
 
 
 
+mixin membershipControl(isMember, isNotMember, labelAttr, valueAttr)
+	- var isMemberID = labelAttr + "_isMember";
+	- var isNotMemberID = labelAttr + "_isNotMember";
 
+	.membershipControl
+		p Something here
+		table
+			tr
+				td
+					select(id=isNotMemberID multiple size="5" name="isNotMember")
+						each nonMember in isNotMember
+							option(value=nonMember[valueAttr])= nonMember[labelAttr]
 
+				td
+					input(type="button" onclick="toggleListbox(this.form." + isNotMemberID + ", this.form." + isMemberID + ")" value="->")
+					br
+					input(type="button" onclick="toggleListbox(this.form." + isMemberID + ", this.form." + isNotMemberID + ")" value="<-")
+
+				td
+					select(id=isMemberID multiple size="5" name="isMember")
+						each member in isMember
+							option(value=member[valueAttr])= member[labelAttr]
