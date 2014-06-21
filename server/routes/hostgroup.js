@@ -118,4 +118,25 @@ module.exports = function(app){
 			}
 		);
 	});
+
+	app.get('/hostgroup/delete/:hostgroup_name', function(req,res){
+
+		var question = "Are you sure you want to delete hostgroup: " + req.params.hostgroup_name + "?";
+		var action = '/hostgroup/delete/' + req.params.hostgroup_name + '/confirm';
+		
+		res.render('confirm_delete', {question:question, action:action});
+	});
+
+	app.post('/hostgroup/delete/:hostgroup_name/confirm', function(req,res){
+
+		HostGroup.findOne({hostgroup_name: req.params.hostgroup_name}, function(err, hostgroupDoc){
+			
+			if(err){ console.log(err); }
+
+			hostgroupDoc.remove(function(err, removedDoc){
+				if(err){ console.log(err); }
+				res.redirect('/hostgroup');	
+			});
+		});
+	});
 };
