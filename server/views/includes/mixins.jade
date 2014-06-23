@@ -39,6 +39,7 @@ mixin selectbox(label, inputName, dataArray, propertyName, selectedOption)
 						option(value=element[propertyName])= element[propertyName]
 
 
+
 mixin checkboxTR(label, checkboxName, value)
 	if value !== undefined
 		tr
@@ -75,18 +76,17 @@ mixin checkbox(label, checkboxName, value)
 
 
 
-mixin membershipControl(isMember, isNotMember, labelAttr, valueAttr)
-	- var isMemberID = labelAttr + "_isMember";
-	- var isNotMemberID = labelAttr + "_isNotMember";
+mixin membershipControl(isMember, isNotMember, resourceName, valueAttr)
+	- var isMemberID = resourceName + "_isMember";
+	- var isNotMemberID = resourceName + "_isNotMember";
 
 	.membershipControl
-		p Something here
 		table
 			tr
 				td
-					select(id=isNotMemberID multiple size="5" name="isNotMember")
+					select(id=isNotMemberID multiple size="5" name=isNotMemberID)
 						each nonMember in isNotMember
-							option(value=nonMember[valueAttr])= nonMember[labelAttr]
+							option(value=nonMember[valueAttr])= nonMember[valueAttr]
 
 				td
 					input(type="button" onclick="toggleListbox(this.form." + isNotMemberID + ", this.form." + isMemberID + ")" value="->")
@@ -94,6 +94,6 @@ mixin membershipControl(isMember, isNotMember, labelAttr, valueAttr)
 					input(type="button" onclick="toggleListbox(this.form." + isMemberID + ", this.form." + isNotMemberID + ")" value="<-")
 
 				td
-					select(id=isMemberID multiple size="5" name="isMember")
+					select(id=isMemberID multiple size="5" name=isMemberID)
 						each member in isMember
-							option(value=member[valueAttr])= member[labelAttr]
+							option(value=member[valueAttr])= member[valueAttr]

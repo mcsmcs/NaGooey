@@ -1,0 +1,26 @@
+script.
+
+	// Move select options between two different select boxes
+	var toggleListbox = function(source,destination){
+		for (index in source.selectedOptions){
+			var option = source.selectedOptions[index];
+			source.removeChild(option);
+			destination.appendChild(option);
+		}
+	}
+
+	// Select all select options before submitting
+	var selectAllOptions = function(){
+		// http://stackoverflow.com/questions/15190464/how-do-i-post-all-options-in-a-select-list
+		var form = document.getElementById("hostform");
+		var selectBoxIDs = ['isMember', 'isNotMember'];
+		var selectBoxes = document.getElementsByTagName('select');
+		var i,j;
+
+		for (j=0; j<selectBoxIDs.length; j++){
+			var selectBox = selectBoxes[j];
+			for (i=0; i<selectBox.options.length; i++){
+				selectBox.options[i].selected = true;
+			}
+		}
+	}

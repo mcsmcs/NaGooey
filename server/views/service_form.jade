@@ -1,6 +1,8 @@
 extends layout
 
 block content
+	include includes/membershipControl
+
 	h1 Services
 
 	if service
@@ -13,44 +15,19 @@ block content
 		//- EDIT existing service (prefill fields)
 		form(name="service_options" action=action method="post")
 			table
-				tr
-					td Service Description
-					td
-						if service['service_description']
-							input.width200(type="text" name="service_description" value=service['service_description'])
-				
-				//- tr
-
-				//- 	p Hosts
-				//- 	table.membershipControl
-				//- 		tr
-				//- 			td
-				//- 				select(id="isNotMember" multiple size="5" name="isNotMember")
-				//- 					each host in hosts.nonMember
-				//- 						option(value=host.host_name)= host.host_name
-
-				//- 			td
-				//- 				input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
-				//- 				br
-				//- 				input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
-
-				//- 			td
-				//- 				select(id="isMember" multiple size="5" name="isMember")
-				//- 					each host in hosts.member
-				//- 						option(value=host.host_name)= host.host_name
+				+textbox('Service Description', 'service_description', service.service_description)
 
 
 			input(type="submit")
 
 	else
 		//- ADD new service
+		- var emptyArray = [];
+
 		form(name="service_options" action=action method="post")
 			table
-				tr
-					td Service Description
-					td
-						input.width200(type="text" name="service_description")
-			
+				+textbox('Service Description', 'service_description')
+
 				tr
 					td Check Command
 					td
@@ -58,41 +35,49 @@ block content
 							each command in commands
 								option(value=command.command_name)= command.command_name
 
-			//- p Hosts
-			//- table
-			//- 	tr
-			//- 		td
-			//- 			select(id="isNotMember" multiple size="5" name="isNotMember")
-			//- 				each host in hosts.nonMember
-			//- 					option(value=host.host_name)= host.host_name
+				//- TODO Service Groups
+				tr
+					td(colspan=2) Contacts
+						+membershipControl([], contacts, 'contact', 'contact_name')
+				tr
+					td(colspan=2) Hosts
+						+membershipControl([], hosts, 'host', 'host_name')
+				tr
+					td(colspan=2) Host Groups
+						+membershipControl([], hostgroups, 'hostgroup', 'hostgroup_name')
+				
+				+textbox('Check Interval','check_interval')
+				+textbox('Retry Inverval','retry_interval')
+				+textbox('Max Check Attempts','max_check_attempts')
+				+textbox('Check Period', 'check_period')
 
-			//- 		td
-			//- 			input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
-			//- 			br
-			//- 			input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
+				//- +membershipControl(contactgroupMembership.members, contactgroupMembership.nonmembers,'contact_name', 'contactgroup')
 
-			//- 		td
-			//- 			select(id="isMember" multiple size="5" name="isMember")
-			//- 				each host in hosts.member
-			//- 					option(value=host.host_name)= host.host_name
+				+textbox('First Notification Delay', 'first_notification_delay')
+				+textbox('Notification Interval', 'notification_interval')
 
+				//- notification_options
+				tr
+					td Send notifications on:
+					td
+						table
+							tr
+								td
+									+checkbox('Warning', 'notification_options_warning')
+								td
+									+checkbox('Recovery', 'notification_options_recovery')
+							tr
+								td
+									+checkbox('Unknown', 'notification_options_unknown')
+								td
+									+checkbox('Flapping', 'notification_options_flapping')
+							tr
+								td
+									+checkbox('Critical', 'notification_options_critical')
+								td
+									+checkbox('Scheduled', 'notification_options_scheduled')
+	
+				//- use
 
-			//- p Host Groups
-			//- table
-			//- 	tr
-			//- 		td
-			//- 			select(id="isNotMember" multiple size="5" name="isNotMember")
-			//- 				each hostgroup in hostgroups.nonMember
-			//- 					option(value=hostgroup.hostgroup_name)= hostgroup.hostgroup_name
-
-			//- 		td
-			//- 			input(type="button" onclick="toggleListbox(this.form.isNotMember, this.form.isMember)" value="->")
-			//- 			br
-			//- 			input(type="button" onclick="toggleListbox(this.form.isMember, this.form.isNotMember)" value="<-")
-
-			//- 		td
-			//- 			select(id="isMember" multiple size="5" name="isMember")
-			//- 				each hostgroup in hostgroups.member
-			//- 					option(value=hostgroup.hostgroup_name)= hostgroup.hostgroup_name
 
 			input(type="submit")
