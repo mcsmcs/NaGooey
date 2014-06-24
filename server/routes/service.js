@@ -193,17 +193,13 @@ module.exports = function(app){
 	});
 
 	app.post('/service/edit/:service_description', function(req,res){
+		console.log('***********************');
+		console.log(req.body);
+		console.log('***********************');
 		
-		Service.findOne({service_description: req.params.service_description}, function(err, serviceDoc){
-			if(err){ console.log(err); res.redirect('/'); }
-			
-			serviceDoc.service_description = req.body.service_description;
-			serviceDoc.alias = req.body.alias;
-			serviceDoc.save(function(err, savedDoc){
-
-				//console.log('record saved!');
-				res.redirect('/service');
-			});
+		Service.update({service_description: req.params.service_description}, parseRequestBody(req.body), function(err, serviceDoc){
+			if(err){ console.log(err);  }
+			res.redirect('/service');
 		});
 	});
 

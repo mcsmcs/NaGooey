@@ -3,7 +3,6 @@ extends layout
 block content
 	include includes/membershipControl
 
-	p= JSON.stringify(hostgroups)	
 	h1 Services
 
 	if service
@@ -69,7 +68,7 @@ block content
 								td
 									+checkbox('Scheduled', 'notification_options_scheduled', service.notification_options.scheduled)
 
-			input(type="submit")
+			input(type="submit" onclick="selectAllOptions();")
 
 	else
 		//- ADD new service
@@ -130,4 +129,4 @@ block content
 				//- use
 
 
-			input(type="submit")
+			input(type="submit" onclick="selectAllOptions();")
