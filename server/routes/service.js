@@ -19,6 +19,14 @@ var isPresent = function(formFieldData){
 	return (formFieldData ? true : false);
 };
 
+function membersToArray(members){
+	// Forces formdata posted to app to an array if no values (undefined) or single value (String) is sent
+	var returnArray = [];
+	if(members instanceof String || typeof members === 'string'){ returnArray = Array(members); }
+	else if(members instanceof Array){ returnArray = members; }
+	return returnArray;
+}
+
 var parseRequestBody = function(requestBody){
 	return {
 
@@ -26,10 +34,11 @@ var parseRequestBody = function(requestBody){
 		check_command: requestBody.check_command,
 
 		// Membership stuff
-		// contacts
 		// contactgroups
-		// hosts
-		// hostgroups
+		// servicegroups
+		contacts: membersToArray(requestBody.contact_isMember),
+		host_name: membersToArray(requestBody.host_isMember),
+		hostgroup_name: membersToArray(requestBody.hostgroup_isMember),
 
 		check_interval: requestBody.check_interval,
 		retry_interval: requestBody.retry_interval,
@@ -125,18 +134,15 @@ module.exports = function(app){
 		console.log('**********************');
 		
 		var reqBody = parseRequestBody(req.body);
-		console.log(reqBody);
-		res.redirect('/service');
+		// console.log(reqBody);
+		//res.redirect('/service');
 		
-		// var newService = new Service({
-		// 	service_description: req.body.service_description,
-		// 	check_command: req.body.check_command
-		// });
+		var newService = new Service(reqBody);
 
-		// newService.save(function(err, service){
-		// 	if(err){ console.log(err); }
-		// 	res.redirect('/service');
-		// });
+		newService.save(function(err, service){
+			if(err){ console.log(err); }
+			res.redirect('/service');
+		});
 	});
 
 
