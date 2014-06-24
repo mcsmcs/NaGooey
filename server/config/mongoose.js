@@ -7,10 +7,11 @@
 
 var mongoose = require('mongoose');
 
-module.exports = function(mongo_url){
+module.exports = function(url){
 	
 	// Connection String
-	if (mongo_url === undefined){ mongo_url = 'mongodb://localhost/nagui'; }
+	var mongo_url = url;
+	if (url === undefined){ mongo_url = 'mongodb://localhost/nagui'; }
 	
 	// Don't open another connection if already opened.
 	if (!mongoose.connection.db){ mongoose.connect(mongo_url); }
@@ -36,7 +37,7 @@ module.exports = function(mongo_url){
 
 
 	// Load Defaults
-	if (mongo_url === undefined){ require('./mongo-seed'); }
+	if (url === undefined){ require('./mongo-seed'); }
 	require('./nagios3_definitions');
 
 };
