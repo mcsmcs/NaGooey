@@ -96,4 +96,5 @@ mixin membershipControl(isMember, isNotMember, resourceName, valueAttr)
 				td
 					select(id=isMemberID multiple size="5" name=isMemberID)
 						each member in isMember
+							if member
 							option(value=member[valueAttr])= member[valueAttr]

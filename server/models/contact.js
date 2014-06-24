@@ -1,6 +1,7 @@
 'use strict';
 /*jslint unparam: true, node: true */
 
+var async = require('async');
 var mongoose = require('mongoose');
 
 var contactSchema = new mongoose.Schema({
@@ -125,5 +126,28 @@ var contactSchema = new mongoose.Schema({
 	retain_nonstatus_information: Boolean
 
 });
+
+
+contactSchema.statics.getContactsExcept = function(contacts, cb){
+	this.find({contact_name: {$not: {$in: contacts}}}, {_id:0, contact_name:1}, cb);
+};
+
+contactSchema.statics.getContactsByMembers = function(members, cb){
+	
+	var caller = this;
+	async.parallel({
+		members: function(callback){
+			caller.find({contact_name: {$in: members}}, {_id:0, contact_name:1}, callback);
+		},
+		nonmembers: function(callback){
+			caller.find({contact_name: {$not: {$in: members}}}, {_id:0, contact_name:1}, callback);
+		}
+	},
+		function(err,results){
+			if(err){ console.log(err); }
+			cb(err,results);
+		}
+	);
+};
 
 mongoose.model('Contact', contactSchema);

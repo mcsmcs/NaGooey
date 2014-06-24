@@ -37,6 +37,23 @@ hostGroupSchema.statics.isNotMember = function(host, callback){
 	this.find({members: {$not: {$elemMatch: {$in: [host]}}}}, {hostgroup_name:1, alias:1, _id:0}, callback);
 };
 
+hostGroupSchema.statics.getHostGroupsByMembers = function(members, cb){
+	
+	var caller = this;
+	async.parallel({
+		members: function(callback){
+			caller.find({hostgroup_name: {$in: members}}, {_id:0, hostgroup_name:1}, callback);
+		},
+		nonmembers: function(callback){
+			caller.find({hostgroup_name: {$not: {$in: members}}}, {_id:0, hostgroup_name:1}, callback);
+		}
+	},
+		function(err,results){
+			if(err){ console.log(err); }
+			cb(err,results);
+		}
+	);
+};
 
 /***
 *	Given a host, returns 2 lists: a list of hostgroups it is a member of,
