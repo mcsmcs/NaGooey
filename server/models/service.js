@@ -72,7 +72,7 @@ var serviceSchema = new mongoose.Schema({
 	contacts: Array,
 	contact_groups: Array,
 	first_notification_delay: Number,
-	notification_intveral: Number,
+	notification_interval: Number,
 	notification_period: String,
 	notification_options: {
 

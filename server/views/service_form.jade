@@ -6,7 +6,7 @@ block content
 	h1 Services
 
 	if service
-		h4="Editing: " + service.service_name
+		h4="Editing: " + service.service_description
 
 	//- Set the form action based on edit or add
 	- var action = (service ? '/service/edit/' + service.service_description : '/service/add')
@@ -17,8 +17,58 @@ block content
 			table
 				+textbox('Service Description', 'service_description', service.service_description)
 
+				tr
+					td Check Command
+					td
+						select(name="check_command").width200
+							each command in commands
+								if (command.command_name === service.check_command)
+									option(value=command.command_name selected)= command.command_name
+								else
+									option(value=command.command_name)= command.command_name
 
-			input(type="submit")
+				//- TODO Service Groups
+				tr
+					td(colspan=2) Contacts
+						+membershipControl(contacts.members, contacts.nonmembers, 'contact', 'contact_name')
+				tr
+					td(colspan=2) Hosts
+						+membershipControl(hosts.members, hosts.nonmembers, 'host', 'host_name')
+				tr
+					td(colspan=2) Host Groups
+						+membershipControl(hostgroups.members, hostgroups.nonmembers, 'hostgroup', 'hostgroup_name')
+
+				//- +membershipControl(contactgroupMembership.members, contactgroupMembership.nonmembers,'contact_name', 'contactgroup')
+				
+				+textbox('Check Interval','check_interval', service.check_interval)
+				+textbox('Retry Inverval','retry_interval', service.retry_interval)
+				+textbox('Max Check Attempts','max_check_attempts', service.max_check_attempts)
+				+textbox('Check Period', 'check_period', service.check_period)
+				+textbox('First Notification Delay', 'first_notification_delay', service.first_notification_delay)
+				+textbox('Notification Interval', 'notification_interval', service.notification_interval)
+
+				//- notification_options
+				tr
+					td Send notifications on:
+					td
+						table
+							tr
+								td
+									+checkbox('Warning', 'notification_options_warning', service.notification_options.warning)
+								td
+									+checkbox('Recovery', 'notification_options_recovery', service.notification_options.recovery)
+							tr
+								td
+									+checkbox('Unknown', 'notification_options_unknown', service.notification_options.unknown)
+								td
+									+checkbox('Flapping', 'notification_options_flapping', service.notification_options.flapping)
+							tr
+								td
+									+checkbox('Critical', 'notification_options_critical', service.notification_options.critical)
+								td
+									+checkbox('Scheduled', 'notification_options_scheduled', service.notification_options.scheduled)
+
+			input(type="submit" onclick="selectAllOptions();")
 
 	else
 		//- ADD new service
@@ -46,13 +96,12 @@ block content
 					td(colspan=2) Host Groups
 						+membershipControl([], hostgroups, 'hostgroup', 'hostgroup_name')
 				
+				//- +membershipControl(contactgroupMembership.members, contactgroupMembership.nonmembers,'contact_name', 'contactgroup')
+				
 				+textbox('Check Interval','check_interval')
 				+textbox('Retry Inverval','retry_interval')
 				+textbox('Max Check Attempts','max_check_attempts')
 				+textbox('Check Period', 'check_period')
-
-				//- +membershipControl(contactgroupMembership.members, contactgroupMembership.nonmembers,'contact_name', 'contactgroup')
-
 				+textbox('First Notification Delay', 'first_notification_delay')
 				+textbox('Notification Interval', 'notification_interval')
 
@@ -80,4 +129,4 @@ block content
 				//- use
 
 
-			input(type="submit")
+			input(type="submit" onclick="selectAllOptions();")

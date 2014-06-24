@@ -74,6 +74,24 @@ var hostSchema = new mongoose.Schema({
 });
 
 
+hostSchema.statics.getHostsByMembers = function(members, cb){
+	
+	var caller = this;
+	async.parallel({
+		members: function(callback){
+			caller.find({host_name: {$in: members}}, {_id:0, host_name:1}, callback);
+		},
+		nonmembers: function(callback){
+			caller.find({host_name: {$not: {$in: members}}}, {_id:0, host_name:1}, callback);
+		}
+	},
+		function(err,results){
+			if(err){ console.log(err); }
+			cb(err,results);
+		}
+	);
+};
+
 // Find hosts that are not members
 hostSchema.statics.getNonHostgroupMembers = function(hostgroup, cb){
 	this.find({hostgroups: {$not: {$elemMatch: {$regex: hostgroup}}}}, {host_name:1}, cb);

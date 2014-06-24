@@ -45,7 +45,7 @@ var parseRequestBody = function(requestBody){
 		max_check_attempts: requestBody.max_check_attempts,
 		check_period: requestBody.check_period,
 		first_notification_delay: requestBody.first_notification_delay,
-		notifcation_interval: requestBody.notification_interval,
+		notification_interval: requestBody.notification_interval,
 
 		notification_options: {
 			warning: isPresent(requestBody.notification_options_warning),
@@ -70,7 +70,6 @@ module.exports = function(app){
 		Service.find(function(err, serviceDocs){
 
 			if (err){ console.log('error finding services'); }
-			// else { console.log(serviceDocs); }
 
 			res.render('service_index', {services: serviceDocs});
 		});
@@ -129,16 +128,10 @@ module.exports = function(app){
 	});
 	
 	app.post('/service/add', function(req,res){
-		console.log('**********************');
-		console.log(req.body);
-		console.log('**********************');
-		
-		var reqBody = parseRequestBody(req.body);
-		// console.log(reqBody);
-		//res.redirect('/service');
-		
-		var newService = new Service(reqBody);
 
+		var reqBody = parseRequestBody(req.body);
+
+		var newService = new Service(reqBody);
 		newService.save(function(err, service){
 			if(err){ console.log(err); }
 			res.redirect('/service');
@@ -151,27 +144,62 @@ module.exports = function(app){
 	// #################################################
 	app.get('/service/edit/:service_description', function(req,res){
 
-		Service.findOne({service_description: req.params.service_description}, function(err,serviceDoc){
+		Service.findOne({service_description: req.params.service_description}, function(err,service){
+			if(err){ console.log(err); }
 
-			if(err){console.log(err);}
-			else {console.log(serviceDoc);}
+			async.parallel(
+				{
+					contacts: function(callback){
+					 	Contact.getContactsByMembers(service.contacts, callback);
+					},
 
-			res.render('service_form', {service: serviceDoc});
-		});
+					// contactgroups: function(callback){
+					//  	ContactGroup.find({}, {_id:0, contactgroup_name:1}, callback);
+					// },
+
+					commands: function(callback){
+						Command.find({}, {_id:0, command_name:1}, callback);
+					},
+					
+					hosts: function(callback){
+					 	Host.getHostsByMembers(service.host_name, callback);
+					},
+					
+					hostgroups: function(callback){
+					 	HostGroup.getHostGroupsByMembers(service.hostgroup_name, callback);
+					},
+
+					// servicegroups: function(callback){
+					//  	ServiceGroup.find({}, {_id:0, servicegroup_name:1}, callback);
+					// }
+				},
+
+				function(err,results){
+					if(err){console.log(err);}
+					
+					console.log(results.service);
+					res.render('service_form',
+					{
+						service: service,
+						commands: results.commands,
+						contacts: results.contacts,
+						hosts: results.hosts,
+						hostgroups: results.hostgroups,
+					});
+				}	// End async callback
+			);	// End async
+		
+		});	// End Service.findOne
 	});
 
 	app.post('/service/edit/:service_description', function(req,res){
+		console.log('***********************');
+		console.log(req.body);
+		console.log('***********************');
 		
-		Service.findOne({service_description: req.params.service_description}, function(err, serviceDoc){
-			if(err){ console.log(err); res.redirect('/'); }
-			
-			serviceDoc.service_description = req.body.service_description;
-			serviceDoc.alias = req.body.alias;
-			serviceDoc.save(function(err, savedDoc){
-
-				//console.log('record saved!');
-				res.redirect('/service');
-			});
+		Service.update({service_description: req.params.service_description}, parseRequestBody(req.body), function(err, serviceDoc){
+			if(err){ console.log(err);  }
+			res.redirect('/service');
 		});
 	});
 
@@ -179,17 +207,17 @@ module.exports = function(app){
 	// #################################################
 	// #                    DELETE
 	// #################################################
-	app.get('/service/delete/:service_name', function(req,res){
+	app.get('/service/delete/:service_description', function(req,res){
 
-		var question = "Are you sure you want to delete service: " + req.params.service_name + "?";
-		var action = '/service/delete/' + req.params.service_name + '/confirm';
+		var question = "Are you sure you want to delete service: " + req.params.service_description + "?";
+		var action = '/service/delete/' + req.params.service_description + '/confirm';
 		
 		res.render('confirm_delete', {question:question, action:action});
 	});
 
-	app.post('/service/delete/:service_name/confirm', function(req,res){
+	app.post('/service/delete/:service_description/confirm', function(req,res){
 
-		Service.findOne({service_name: req.params.service_name}, function(err, serviceDoc){
+		Service.findOne({service_description: req.params.service_description}, function(err, serviceDoc){
 			
 			if(err){ console.log(err); }
 

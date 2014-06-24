@@ -84,16 +84,17 @@ mixin membershipControl(isMember, isNotMember, resourceName, valueAttr)
 		table
 			tr
 				td
-					select(id=isNotMemberID multiple size="5" name=isNotMemberID)
+					select.membershipSelect(id=isNotMemberID multiple size="5" name=isNotMemberID)
 						each nonMember in isNotMember
 							option(value=nonMember[valueAttr])= nonMember[valueAttr]
 
 				td
-					input(type="button" onclick="toggleListbox(this.form." + isNotMemberID + ", this.form." + isMemberID + ")" value="->")
+					input(type="button" onclick="toggleListbox(" + isNotMemberID + "," + isMemberID + ")" value="->")
 					br
-					input(type="button" onclick="toggleListbox(this.form." + isMemberID + ", this.form." + isNotMemberID + ")" value="<-")
+					input(type="button" onclick="toggleListbox(" + isMemberID + "," + isNotMemberID + ")" value="<-")
 
 				td
-					select(id=isMemberID multiple size="5" name=isMemberID)
+					select.membershipSelect(id=isMemberID multiple size="5" name=isMemberID)
 						each member in isMember
+							if member
 							option(value=member[valueAttr])= member[valueAttr]
