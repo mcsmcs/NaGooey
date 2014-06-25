@@ -6,9 +6,50 @@ var Command = mongoose.model("Command");
 var Host = mongoose.model("Host");
 var HostGroup = mongoose.model("HostGroup");
 var Contact = mongoose.model("Contact");
+var Service = mongoose.model("Service");
+var ServiceGroup = mongoose.model("ServiceGroup");
 var TimePeriod = mongoose.model("TimePeriod");
 
 module.exports = (function(){
+
+	//################### SERVICES
+	Service.create({
+  		service_description: "serviceONE",
+        check_command: "check-host-alive-ping",
+        check_interval: 1,
+        retry_interval: 1,
+        max_check_attempts: 1,
+        check_period: "1",
+        first_notification_delay: 1,
+        notification_interval: 1,
+        use: [],
+        notification_options: {
+                scheduled : true,
+                critical : true,
+                flapping : true,
+                unknown : true,
+                recovery : true,
+                warning : true
+        },
+        contact_groups: [],
+        contacts: ["contact_one"],
+        hostgroup_name: ["hostgroup1"],
+        host_name: ['host1'],
+        servicegroups : [],
+	});
+
+	//################### SERVICEGROUPS
+	ServiceGroup.create({
+        servicegroup_name: "sg1",
+        alias: "Service Group 1",
+        notes: "notes n notes n notes",
+        notes_url: "notes URL",
+        action_url: "action URL",
+        servicegroup_members: [],
+        members: ["serviceONE"],
+	});
+
+
 
 	//################### TIMEPERIODS
 	TimePeriod.create({

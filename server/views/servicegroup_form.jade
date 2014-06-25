@@ -1,6 +1,7 @@
 extends layout
 
 block content
+	include includes/membershipControl
 	h1 Servicegroups
 
 	if servicegroup
@@ -13,32 +14,37 @@ block content
 		//- EDIT existing servicegroup (prefill fields)
 		form(name="servicegroup_options" action=action method="post")
 			table
-				tr
-					td Host Name
-					td
-						if servicegroup['servicegroup_name']
-							input(type="text" name="servicegroup_name" value=servicegroup['servicegroup_name'])
+				+textbox('Servicegroup Name', 'servicegroup_name', servicegroup.servicegroup_name)
+				+textbox('Alias', 'alias', servicegroup.alias)
 				
 				tr
-					td Alias
-					td
-						if servicegroup['alias']
-							input(type="text" name="alias" value=servicegroup['alias'])
+					td(colspan=2) Services
+						+membershipControl(services.members, services.nonmembers, 'service', 'service_description')
+				tr
+					td(colspan=2) Servicegroups
+						+membershipControl(servicegroups.members, servicegroups.nonmembers, 'servicegroup', 'servicegroup_name')
 
-			input(type="submit")
+				+textbox('Notes', 'notes', servicegroup.notes)
+				+textbox('Notes URL', 'notes_url', servicegroup.notes_url)
+				+textbox('Action URL', 'action_url', servicegroup.action_url)
+
+			input(type="submit" onclick="selectAllOptions();")
 
 	else
 		//- ADD new servicegroup
 		form(name="servicegroup_options" action=action method="post")
 			table
+				+textbox('Servicegroup Name', 'servicegroup_name')
+				+textbox('Alias', 'alias')
 				tr
-					td Host Name
-					td
-						input(type="text" name="servicegroup_name")
-				
+					td(colspan=2) Services
+						+membershipControl(services.members, services.nonmembers, 'service', 'service_description')
 				tr
-					td Alias
-					td
-						input(type="text" name="alias")
+					td(colspan=2) Servicegroups
+						+membershipControl(servicegroups.members, servicegroups.nonmembers, 'servicegroup', 'servicegroup_name')
+
+				+textbox('Notes', 'notes')
+				+textbox('Notes URL', 'notes_url')
+				+textbox('Action URL', 'action_url')
 			
-			input(type="submit")
+			input(type="submit" onclick="selectAllOptions();")
