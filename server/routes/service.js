@@ -177,7 +177,6 @@ module.exports = function(app){
 				function(err,results){
 					if(err){console.log(err);}
 					
-					console.log(results.service);
 					res.render('service_form',
 					{
 						service: service,
@@ -193,10 +192,7 @@ module.exports = function(app){
 	});
 
 	app.post('/service/edit/:service_description', function(req,res){
-		console.log('***********************');
-		console.log(req.body);
-		console.log('***********************');
-		
+
 		Service.update({service_description: req.params.service_description}, parseRequestBody(req.body), function(err, serviceDoc){
 			if(err){ console.log(err);  }
 			res.redirect('/service');

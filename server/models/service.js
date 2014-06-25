@@ -1,6 +1,7 @@
 'use strict';
 /*jslint unparam: true, node: true */
 
+var async = require('async');
 var mongoose = require('mongoose');
 
 /*
@@ -114,5 +115,23 @@ var serviceSchema = new mongoose.Schema({
 	},
 	use: Array
 });
+
+serviceSchema.statics.getServicesByMembers = function(members, cb){
+	
+	var caller = this;
+	async.parallel({
+		members: function(callback){
+			caller.find({service_description: {$in: members}}, {_id:0, service_description:1}, callback);
+		},
+		nonmembers: function(callback){
+			caller.find({service_description: {$not: {$in: members}}}, {_id:0, service_description:1}, callback);
+		}
+	},
+		function(err,results){
+			if(err){ console.log(err); }
+			cb(err,results);
+		}
+	);
+};
 
 mongoose.model('Service', serviceSchema);
