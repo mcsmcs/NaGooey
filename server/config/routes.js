@@ -21,4 +21,4 @@ module.exports = function(app){
 	require('../routes/contact')(app);
 	require('../routes/timeperiod')(app);
 
-}
+};
