@@ -15,6 +15,10 @@ var Command = mongoose.model("Command");
 
 module.exports = function(app){
 
+
+	// #################################################
+	// #                    INDEX
+	// #################################################
 	app.get('/host', function(req,res){
 
 		Host.find(function(err, hostDocs){
@@ -29,6 +33,10 @@ module.exports = function(app){
 		res.redirect('/host');
 	});
 
+
+	// #################################################
+	// #                    ADD
+	// #################################################
 	app.get('/host/add', function(req,res){
 		
 		async.parallel(
@@ -41,14 +49,15 @@ module.exports = function(app){
 			// Do this after completion
 			function(err, results){
 				if(err){console.log(err);}
-				//console.log(results)
-				res.render('host_form', {hostgroups: results.hostgroups, check_commands: results.check_commands});
+				res.render('host_form', {
+					hostgroups: results.hostgroups, 
+					check_commands: results.check_commands
+				});
 			}
 		);
 	});
 	
 	app.post('/host/add', function(req,res){
-		//console.log(req.body);
 		
 		var newHost = new Host({
 			host_name: req.body.host_name,
@@ -63,6 +72,10 @@ module.exports = function(app){
 		});
 	});
 
+
+	// #################################################
+	// #                    EDIT
+	// #################################################
 	app.get('/host/edit/:host_name', function(req,res){
 
 		async.parallel(
@@ -74,23 +87,18 @@ module.exports = function(app){
 
 			function(err, results){
 				if(err){ console.log(err); }
-				//console.log(results.hostgroups);
-				res.render('host_form', {host: results.host, hostgroups: results.hostgroups, check_commands: results.check_commands});
+				res.render('host_form', {
+					host: results.host, 
+					hostgroups: results.hostgroups, 
+					check_commands: results.check_commands
+				});
 			}
 		);
 	});
 
 	app.post('/host/edit/:host_name', function(req,res){
-		
-		console.log("--------------------------------------");
-		console.log(req.body);
-		console.log("--------------------------------------");
 
 		var hostname = req.params.host_name;
-		/*var membership = {
-			isMember: req.body.isMember,
-			isNotMember: req.body.isNotMember
-		};*/
 
 		async.parallel(
 			{
@@ -117,6 +125,10 @@ module.exports = function(app){
 		); // End async.parallel
 	});
 
+
+	// #################################################
+	// #                    DELETE
+	// #################################################
 	app.get('/host/delete/:host_name', function(req,res){
 
 		var question = "Are you sure you want to delete host: " + req.params.host_name + "?";

@@ -45,6 +45,9 @@ var parseRequestBody = function(requestBody){
 
 module.exports = function(app){
 
+	// #################################################
+	// #                    INDEX
+	// #################################################
 	app.get('/contact', function(req,res){
 		
 		Contact.find(function(err, contactDocs){
@@ -59,6 +62,10 @@ module.exports = function(app){
 		res.redirect('/contact');
 	});
 
+
+	// #################################################
+	// #                    ADD
+	// #################################################
 	app.get('/contact/add', function(req,res){
 		
 		Contact.find(function(err, contactDocs){
@@ -78,6 +85,10 @@ module.exports = function(app){
 		});
 	});
 
+
+	// #################################################
+	// #                    EDIT
+	// #################################################
 	app.get('/contact/edit/:contact_name', function(req,res){
 
 		Contact.findOne({contact_name: req.params.contact_name}, function(err,contactDoc){
@@ -101,6 +112,10 @@ module.exports = function(app){
 		);
 	});
 
+
+	// #################################################
+	// #                    DELETE
+	// #################################################
 	app.get('/contact/delete/:contact_name', function(req,res){
 
 		var question = "Are you sure you want to delete contact: " + req.params.contact_name + "?";

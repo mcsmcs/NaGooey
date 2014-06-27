@@ -11,6 +11,10 @@ var Command = mongoose.model("Command");
 
 module.exports = function(app){
 
+
+	// #################################################
+	// #                    INDEX
+	// #################################################
 	app.get('/command', function(req,res){
 		
 		Command.find(function(err, commandDocs){
@@ -25,19 +29,20 @@ module.exports = function(app){
 		res.redirect('/command');
 	});
 
+
+	// #################################################
+	// #                    ADD
+	// #################################################
 	app.get('/command/add', function(req,res){
 		
 		Command.find(function(err, commandDocs){
 
 			if (err){ console.log('error finding commands'); }
-			else { console.log(commandDocs); }
-
 			res.render('command_form', {commands: commandDocs});
 		});
 	});
 	
 	app.post('/command/add', function(req,res){
-		// console.log(req.body);
 		
 		var newCommand = new Command({
 			command_name: req.body.command_name,
@@ -54,6 +59,10 @@ module.exports = function(app){
 		});
 	});
 
+
+	// #################################################
+	// #                    EDIT
+	// #################################################
 	app.get('/command/edit/:command_name', function(req,res){
 
 		Command.findOne({command_name: req.params.command_name}, function(err,commandDoc){
@@ -66,9 +75,6 @@ module.exports = function(app){
 	});
 
 	app.post('/command/edit/:command_name', function(req,res){
-		// console.log('**************');
-		// console.log(req.body);
-		// console.log('**************');
 
 		Command.findOne({command_name: req.params.command_name}, function(err, commandDoc){
 			if(err){ console.log(err); res.redirect('/'); }
@@ -85,6 +91,10 @@ module.exports = function(app){
 		});
 	});
 
+
+	// #################################################
+	// #                    DELETE
+	// #################################################
 	app.get('/command/delete/:command_name', function(req,res){
 
 		var question = "Are you sure you want to delete command: " + req.params.command_name + "?";
