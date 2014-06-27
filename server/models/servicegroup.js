@@ -39,4 +39,50 @@ serviceGroupSchema.statics.getServiceGroupsByMembers = function(members, cb){
 	);
 };
 
+
+serviceGroupSchema.statics.getNagiosData = function(cb){
+	var i,property;
+	var doc, docData;
+	var returnData = [];
+	var objCleanup = function(doc,ret,options){ delete ret._id; delete ret.__v; };
+
+	this.find({}, function(err, docs){
+
+		for (i=0; i<docs.length; i++){
+			doc = docs[i].toObject({transform: objCleanup});
+			// console.log(doc);
+
+			docData = [];
+			for (property in doc){
+				if(doc.hasOwnProperty(property)){
+					switch(property){
+						case 'needs_extra_processing':
+							//process some stuff here
+							break;
+						default:
+							if(doc[property] instanceof Array){
+								if(doc[property].length > 0){
+									docData.push({directive: property, value: doc[property].join(',')});
+								}
+							}
+							else if (doc[property] === true){ 
+									docData.push({directive: property, value: '1'});
+							}
+							else if (doc[property] === false){
+									docData.push({directive: property, value: '0'});
+							}
+							else {
+								docData.push({directive: property, value: doc[property]});
+							}
+							break;
+					}
+				}
+			}
+
+			returnData.push(docData);
+		}
+
+		cb(err,returnData);
+	});
+};
 mongoose.model('ServiceGroup', serviceGroupSchema);

@@ -41,4 +41,55 @@ commandSchema.statics.getCheckCommands = function(cb){
 	this.find({check_command: true}, cb);
 };
 
+commandSchema.statics.getNagiosData = function(cb){
+	
+	var i,property;
+	var doc, docData;
+	var returnData = [];
+	var objCleanup = function(doc,ret,options){ 
+		delete ret._id; 
+		delete ret.__v; 
+		delete ret.check_command;
+		delete ret.description;
+
+	};
+
+	this.find({}, function(err, docs){
+
+		for (i=0; i<docs.length; i++){
+			doc = docs[i].toObject({transform: objCleanup});
+
+			docData = [];
+			for (property in doc){
+				if(doc.hasOwnProperty(property)){
+					switch(property){
+						case 'extra_processing_neede':
+							break;
+						default:
+							if(doc[property] instanceof Array){
+								if(doc[property].length > 0){
+									docData.push({directive: property, value: doc[property].join(',')});
+								}
+							}
+							else if (doc[property] === true){ 
+									docData.push({directive: property, value: '1'});
+							}
+							else if (doc[property] === false){
+									docData.push({directive: property, value: '0'});
+							}
+							else {
+								docData.push({directive: property, value: doc[property]});
+							}
+							break;
+					}
+				}
+			}
+
+			returnData.push(docData);
+		}
+
+		cb(err,returnData);
+	});
+};
+
 mongoose.model('Command', commandSchema);

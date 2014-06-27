@@ -26,23 +26,59 @@ var hostSchema = new mongoose.Schema({
 		unique: true
 	},
 	
+	max_check_attempts: {
+		type: Number,
+		required: true,
+		default: 10
+	},
+
+	check_period: {
+		type: String,				// timeperiod_name
+		required: true,
+
+	},
+
+	contacts: {
+		type: Array,					// contacts
+		required: true
+	},
+
+	contact_groups: {
+		type: Array,				// contact_groups
+		required: true,
+		default: ['admins']
+	},
+
+	notification_interval: {
+		type: Number,
+		required: true,
+		default: 0
+	},
+
+	notification_period: {
+		type: String,		// timeperiod_name
+		required: true,
+		default: '24x7'
+	},
+
+
+
 	check_command: {
 		type: String,					// command_name
-		required: true,
+		default: 'check-host-alive'
 	},
 
 	display_name: String,				
 	parents: Array,						// host_names
 	hostgroups: Array,					// hostgroup_names
 	initial_state: String,				// [o,d,u]
-	check_period: String,				// timeperiod_name
+	notification_options: {
+		type: Array,
+		default: ['d','u','r'],		// [d,u,r,f,s]
+	},
+	stalking_options: String,			// [o,d,u]
 	event_handler: String,				// command_name
 	flap_detection_options: String,		// [o,d,u]
-	contacts: Array,					// contacts
-	contact_groups: Array,				// contact_groups
-	notification_period: String,		// timeperiod_name
-	notification_options: String,		// [d,u,r,f,s]
-	stalking_options: String,			// [o,d,u]
 	notes: String,						
 	notes_url: String,					// url
 	action_url: String,					// url
@@ -52,7 +88,6 @@ var hostSchema = new mongoose.Schema({
 	statusmap_image: String,			// image_file
 	twoD_coords: String,				// x_coord,y_coord
 	threeD_coords: String,				// x_coord,y_coord,z_coord
-	max_check_attempts: Number,
 	check_interval: Number,
 	retry_interval: Number,
 	active_checks_enabled: Boolean,
@@ -60,16 +95,33 @@ var hostSchema = new mongoose.Schema({
 	obsess_over_host: Boolean,
 	check_freshness: Boolean,
 	freshness_threshold: Number,
-	event_handler_enabled: Boolean,
+	event_handler_enabled: {
+		type: Boolean,
+		default: true
+	},
 	low_flap_threshold: Number,
 	high_flap_threshold: Number,
-	flap_detection_enabled: Boolean,
-	process_perf_data: Boolean,
-	retain_status_information: Boolean,
-	retain_nonstatus_information: Boolean,
-	notification_interval: Number,
+	flap_detection_enabled: {
+		type: Boolean,
+		default: true
+	},
+	process_perf_data:  {
+		type: Boolean,
+		default: true
+	},
+	retain_status_information: {
+		type: Boolean,
+		default: true
+	},
+	retain_nonstatus_information: {
+		type: Boolean,
+		default: true
+	},
 	first_notification_delay: Number,
-	notifications_enabled: Boolean,
+	notifications_enabled: {
+		type: Boolean,
+		default: true
+	}
 
 });
 
@@ -168,5 +220,52 @@ hostSchema.methods.addNotificationOptions = function(notificationoptions){
 // hostSchema.methods.addTemplate = function(template){
 // 	// needs to be an ordered set (no duplicates, and order matters)
 // };
+
+
+hostSchema.statics.getNagiosData = function(cb){
+	var i,property;
+	var doc, docData;
+	var returnData = [];
+	var objCleanup = function(doc,ret,options){ delete ret._id; delete ret.__v; };
+
+	this.find({}, function(err, docs){
+
+		for (i=0; i<docs.length; i++){
+			doc = docs[i].toObject({transform: objCleanup});
+			// console.log(doc);
+
+			docData = [];
+			for (property in doc){
+				if(doc.hasOwnProperty(property)){
+					switch(property){
+						case 'needs_extra_processing':
+							//process some stuff here
+							break;
+						default:
+							if(doc[property] instanceof Array){
+								if(doc[property].length > 0){
+									docData.push({directive: property, value: doc[property].join(',')});
+								}
+							}
+							else if (doc[property] === true){ 
+									docData.push({directive: property, value: '1'});
+							}
+							else if (doc[property] === false){
+									docData.push({directive: property, value: '0'});
+							}
+							else {
+								docData.push({directive: property, value: doc[property]});
+							}
+							break;
+					}
+				}
+			}
+
+			returnData.push(docData);
+		}
+
+		cb(err,returnData);
+	});
+};
 
 mongoose.model('Host', hostSchema);

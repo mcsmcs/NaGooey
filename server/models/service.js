@@ -52,6 +52,7 @@ define service{
 
 
 var serviceSchema = new mongoose.Schema({
+	
 	service_description: {
 		type: String,
 		unique: true,
@@ -64,17 +65,59 @@ var serviceSchema = new mongoose.Schema({
 	},
 
 	servicegroups: Array,
-	host_name: Array,
+	
+	host_name: {
+		type: Array,
+		required: true
+	},
+
 	hostgroup_name: Array,
-	check_interval: Number,
-	retry_interval: Number,
-	max_check_attempts: Number,
-	check_period: String,
-	contacts: Array,
-	contact_groups: Array,
+	
+	check_interval: {
+		type: Number,
+		required: true,
+		default: 5
+	},
+
+	retry_interval: {
+		type: Number,
+		required: true,
+		default: 1
+	},
+
+	max_check_attempts: {
+		type: Number,
+		required: true
+	},
+
+	check_period: {
+		type: String,
+		required: true,
+		default: '24x7'
+	},
+
+	contacts: {
+		type: Array,
+		required: true,
+		default: ['admin']
+	},
+
+	contact_groups: {
+		type: Array,
+		required: true,
+		default: ['admins']
+	},
+
 	first_notification_delay: Number,
-	notification_interval: Number,
+
+	notification_interval: {
+		type: Number,
+		required: true,
+		default: 5
+	},
+
 	notification_period: String,
+
 	notification_options: {
 
 		warning: {
@@ -113,6 +156,33 @@ var serviceSchema = new mongoose.Schema({
 			default: true
 		}
 	},
+
+
+	action_url: String,
+	active_checks_enabled: Boolean,
+	check_freshness: Boolean,
+	display_name: String,
+	event_handler: String, 	// command_name
+	event_handler_enabled: Boolean,
+	flap_detection_enabled: Boolean,
+	flap_detection_options: Array, // [owcu]
+	freshness_threshold: Number,
+	high_flap_threshold: Number,
+	icon_image: String,	// url
+	icon_image_alt: String,	// alt string
+	initial_state: String,	// [owuc]
+	is_volatile: Boolean,
+	low_flap_threshold: Number,
+	notes: String,
+	notes_url: String,
+	notifications_enabled: Boolean,
+	obsess_over_service: Boolean,
+	passive_checks_enabled: Boolean,
+	process_perf_data: Boolean,
+	retain_nonstatus_information: Boolean,
+	retain_status_information: Boolean,
+	stalking_options: Array,	// [owuc]
+
 	use: Array
 });
 
@@ -132,6 +202,57 @@ serviceSchema.statics.getServicesByMembers = function(members, cb){
 			cb(err,results);
 		}
 	);
+};
+
+
+serviceSchema.statics.getNagiosData = function(cb){
+	var i,property;
+	var doc, docData;
+	var returnData = [];
+	var objCleanup = function(doc,ret,options){ delete ret._id; delete ret.__v; };
+
+	this.find({}, function(err, docs){
+
+		for (i=0; i<docs.length; i++){
+			doc = docs[i].toObject({transform: objCleanup});
+			// console.log(doc);
+
+			docData = [];
+			for (property in doc){
+				if(doc.hasOwnProperty(property)){
+					switch(property){
+						case 'needs_extra_processing':
+							//process some stuff here
+							break;
+							
+						case 'notification_options':
+							//process some stuff here
+							break;
+						default:
+							if(doc[property] instanceof Array){
+								if(doc[property].length > 0){
+									docData.push({directive: property, value: doc[property].join(',')});
+								}
+							}
+							else if (doc[property] === true){ 
+									docData.push({directive: property, value: '1'});
+							}
+							else if (doc[property] === false){
+									docData.push({directive: property, value: '0'});
+							}
+							else {
+								docData.push({directive: property, value: doc[property]});
+							}
+							break;
+					}
+				}
+			}
+
+			returnData.push(docData);
+		}
+
+		cb(err,returnData);
+	});
 };
 
 mongoose.model('Service', serviceSchema);

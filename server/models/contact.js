@@ -13,8 +13,10 @@ var contactSchema = new mongoose.Schema({
 	},
 
 	alias: String,
+	contact_groups: Array,
 	email: String,
 	pager: String,
+	addressx: Array,		// Additional addresses?
 	
 	host_notifications_enabled: {
 		type: Boolean,
@@ -28,16 +30,17 @@ var contactSchema = new mongoose.Schema({
 		default: true
 	},
 
-
 	// Time Periods
 	host_notification_period: {
 		type: String,	// time_period
-		required: true
+		required: true,
+		default: '24x7'
 	},
 
 	service_notification_period: {
 		type: String,	// time_period
-		required: true
+		required: true,
+		default: '24x7'
 	},
 
 	host_notification_options: {
@@ -102,6 +105,12 @@ var contactSchema = new mongoose.Schema({
 			required: true,
 			default: true
 		},
+
+		scheduled: {
+			type: Boolean,
+			required: true,
+			default: true
+		},
 	},
 
 	host_notification_commands: {
@@ -118,12 +127,18 @@ var contactSchema = new mongoose.Schema({
 	
 	can_submit_commands: {
 		type: Boolean,
-		required: true,
 		default: true
 	},
 
-	retain_status_information: Boolean,
-	retain_nonstatus_information: Boolean
+	retain_status_information: {
+		type: Boolean,
+		default: true
+	},
+
+	retain_nonstatus_information: {
+		type: Boolean,
+		default: true
+	}
 
 });
 
@@ -148,6 +163,82 @@ contactSchema.statics.getContactsByMembers = function(members, cb){
 			cb(err,results);
 		}
 	);
+};
+
+
+var hostNotificationsToString = function(options){
+
+	var optionsString = [];
+
+	if(options.down){ optionsString.push('d'); }
+	if(options.up){ optionsString.push('u'); }
+	if(options.recoveries){ optionsString.push('r'); }
+	if(options.flapping){ optionsString.push('f'); }
+	if(options.scheduled){ optionsString.push('s'); }
+	
+	return '[' + optionsString.join(',') + ']';
+};
+
+var serviceNotificationsToString = function(options){
+
+	var optionsString = [];
+
+	if(options.warning){ optionsString.push('w'); }
+	if(options.unknown){ optionsString.push('u'); }
+	if(options.critical){ optionsString.push('c'); }
+	if(options.recoveries){ optionsString.push('r'); }
+	if(options.flapping){ optionsString.push('f'); }
+	
+	return '[' + optionsString.join(',') + ']';
+};
+
+contactSchema.statics.getNagiosData = function(cb){
+	
+	var i,property;
+	var doc, docData;
+	var returnData = [];
+	var objCleanup = function(doc,ret,options){ delete ret._id; delete ret.__v; };
+
+	this.find({}, function(err, docs){
+
+		for (i=0; i<docs.length; i++){
+			doc = docs[i].toObject({transform: objCleanup});
+
+			docData = [];
+			for (property in doc){
+				if(doc.hasOwnProperty(property)){
+					switch(property){
+						case 'host_notification_options':
+							docData.push({directive: 'host_notification_options', value: hostNotificationsToString(doc.host_notification_options)});
+							break;
+						case 'service_notification_options':
+							docData.push({directive: 'service_notification_options', value: serviceNotificationsToString(doc.service_notification_options)});
+							break;
+						default:
+							if(doc[property] instanceof Array){
+								if(doc[property].length > 0){
+									docData.push({directive: property, value: doc[property].join(',')});
+								}
+							}
+							else if (doc[property] === true){ 
+									docData.push({directive: property, value: '1'});
+							}
+							else if (doc[property] === false){
+									docData.push({directive: property, value: '0'});
+							}
+							else {
+								docData.push({directive: property, value: doc[property]});
+							}
+							break;
+					}
+				}
+			}
+
+			returnData.push(docData);
+		}
+
+		cb(err,returnData);
+	});
 };
 
 mongoose.model('Contact', contactSchema);

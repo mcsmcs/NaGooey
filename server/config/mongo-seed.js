@@ -6,11 +6,20 @@ var Command = mongoose.model("Command");
 var Host = mongoose.model("Host");
 var HostGroup = mongoose.model("HostGroup");
 var Contact = mongoose.model("Contact");
+var ContactGroup = mongoose.model("ContactGroup");
 var Service = mongoose.model("Service");
 var ServiceGroup = mongoose.model("ServiceGroup");
 var TimePeriod = mongoose.model("TimePeriod");
 
 module.exports = (function(){
+
+	//################### CONTACTGROUPS
+	ContactGroup.create({
+		contactgroup_name: 'nagooey',
+		alias: 'NaGooey Default',
+		members: ['nagooey'],
+	});
+
 
 	//################### SERVICES
 	Service.create({
@@ -31,12 +40,13 @@ module.exports = (function(){
                 recovery : true,
                 warning : true
         },
-        contact_groups: [],
+        contact_groups: ['nagooey'],
         contacts: ["contact_one"],
         hostgroup_name: ["hostgroup1"],
         host_name: ['host1'],
         servicegroups : [],
 	});
+
 
 	//################### SERVICEGROUPS
 	ServiceGroup.create({
@@ -67,7 +77,6 @@ module.exports = (function(){
 	});
 
 
-
 	//################### CONTACTS
 	Contact.create({
 		contact_name: "contact_one",
@@ -92,14 +101,34 @@ module.exports = (function(){
 			recoveries: true,
 			flapping: true
 		},
+	});
 
-		host_notification_commands: 'host_notification_command',
-		service_notification_commands: 'service_notification_commands',
-		can_submit_commands: 'can_submit_commands',
+	Contact.create({
+		contact_name: "nagooey",
+		alias: 'NaGooey Default Contact',
+		email: 'user@example.com',
+		pager: '1112223333',
+		host_notification_period: '24x7',
+		service_notification_period: '24x7',
+		
+		host_notification_options: {
+			down: true,
+			up: true,
+			recoveries: true,
+			flapping: true,
+			scheduled: true
+		},
+
+		service_notification_options: {
+			warning: true,
+			unknown: true,
+			critical: true,
+			recoveries: true,
+			flapping: true
+		},
 	});
 
 	
-
 	//################### COMMANDS
 	Command.create({
 		command_name: "check-host-alive-icmp",
@@ -122,7 +151,10 @@ module.exports = (function(){
 		alias: "Host One",
 		address: "111.111.111.111",
 		check_command: "check-host-alive-icmp",
-		hostgroups: ["hostgroup1", "hostgroupALL"]
+		hostgroups: ["hostgroup1", "hostgroupALL"],
+		check_period: '24x7',
+		contacts: ['nagooey']
+
 	});
 
 	Host.create({
@@ -130,7 +162,9 @@ module.exports = (function(){
 		alias: "Host One",
 		address: "222.222.222.222",
 		check_command: "check-host-alive-icmp",
-		hostgroups: ["hostgroup2", "hostgroupALL"]
+		hostgroups: ["hostgroup2", "hostgroupALL"],
+		check_period: '24x7',
+		contacts: ['nagooey']
 	});
 
 	Host.create({
@@ -138,7 +172,9 @@ module.exports = (function(){
 		alias: "Host One",
 		address: "333.333.333.333",
 		check_command: "check-host-alive-icmp",
-		hostgroups: ["hostgroup3", "hostgroupALL"]
+		hostgroups: ["hostgroup3", "hostgroupALL"],
+		check_period: '24x7',
+		contacts: ['nagooey']
 	});
 
 
@@ -146,24 +182,24 @@ module.exports = (function(){
 	HostGroup.create({
 		hostgroup_name: "hostgroup1",
 		alias: "Host Group 1",
-		members: ["host1"]
+		members: ["host1"],
 	});
 
 	HostGroup.create({
 		hostgroup_name: "hostgroup2",
 		alias: "Host Group 2",
-		members: ["host2"]
+		members: ["host2"],
 	});
 
 	HostGroup.create({
 		hostgroup_name: "hostgroup3",
 		alias: "Host Group 3",
-		members: ["host3"]
+		members: ["host3"],
 	});
 
 	HostGroup.create({
 		hostgroup_name: "hostgroupALL",
 		alias: "Host Group ALL",
-		members: ["host1", "host2", "host3"]
+		members: ["host1", "host2", "host3"],
 	});
 }());

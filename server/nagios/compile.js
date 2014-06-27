@@ -2,7 +2,29 @@
 /*jslint unparam: true, node: true */
 
 /*
- *	Creates Nagios configuration files from the MongoDB database
+ *	Creates Nagios configuration files from MongoDB data
+ *
+ *	Model.getNagiosData returns an array of Nagios Objects
+ *  each Nagios Object contains an array of objects {directive: <directive_name>, value: <value>}
+ *
+ *	Example:
+ *
+ *		[ 	
+ * 			// First Object
+ *			[	
+ * 				// Directives
+ *				{directive: 'command_name', value: 'check-icmp'},
+ *				{directive: 'command_line', value: 'check-icmp -H HOSTADDRESS'},
+ *			]
+ *
+ * 			// Second Object
+ *			[	
+ * 				// Directives
+ *				{directive: 'command_name', value: 'check-ping'},
+ *				{directive: 'command_line', value: 'check-ping -H HOSTADDRESS'},
+ *			]
+ *		]
+ *
  */
 
 var async = require('async');
@@ -17,42 +39,42 @@ var Host 		= mongoose.model("Host");
 var HostGroup	= mongoose.model("HostGroup");
 
 
-var compileCommands = function(){
+var compileNagiosObject = function(ObjectType, Model){
 
-	Command.find({}, function(err, commands){
-		if(err){ console.log(err); }
-		// console.log(commands);
+	var i, j;
+	var nagiosObject;
+	var definition;
+	var definitions = [];
 
-		var i, command;
-		var commandDefinition, fileContents = [];
+	Model.getNagiosData(function(err, nagiosObjects){
+		if(err){ console.log(err); }		
 
-		for (i=0; i<commands.length; i++){
-			command = commands[i];
+		for(i=0; i<nagiosObjects.length; i++){
+			nagiosObject = nagiosObjects[i];
 
-			commandDefinition = [];
-			commandDefinition.push('define command {');
+			definition = [];
+			definition.push('define ' + ObjectType + ' {');
+		
+			for(j=0; j<nagiosObject.length; j++){
+				definition.push('\t' + nagiosObject[j].directive + '\t\t' + nagiosObject[j].value);
+			}
 
-			commandDefinition.push("\tcommand_name\t\t" + command.command_name);
-			commandDefinition.push("\tcommand_line\t\t" + command.command_line);
-
-			commandDefinition.push('}');
-			commandDefinition.push('');
-			
-			fileContents.push(commandDefinition.join('\n'));
+			definition.push('}');
+			definition.push('');
+			definitions.push(definition.join('\n'));
 		}
 
-		fs.writeFile('./Commands', fileContents.join('\n'), function(err){
+		fs.writeFile('../../../sp-helper/nagui/' + ObjectType + 's', definitions.join('\n'), function(err){
 			if(err){ console.log(err); }
-			else { console.log('Commands file created'); }
+			else { console.log(ObjectType + 's file saved.'); }
 		});
+
 	});
 };
 
 
 
 
-
-/*
- * Compile the configuration files
- */
-compileCommands();
+compileNagiosObject('command', Command);
+compileNagiosObject('contact', Contact);
+compileNagiosObject('host', Host);
