@@ -8,6 +8,7 @@ var contactGroupSchema = new mongoose.Schema({
 	contactgroup_name: {
 		type: String,
 		required: true,
+		unique: true
 	},
 
 	alias: {

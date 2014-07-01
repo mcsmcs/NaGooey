@@ -28,7 +28,7 @@ module.exports = (function(){
         check_interval: 1,
         retry_interval: 1,
         max_check_attempts: 1,
-        check_period: "1",
+        check_period: "24x7",
         first_notification_delay: 1,
         notification_interval: 1,
         use: [],

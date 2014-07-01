@@ -116,13 +116,13 @@ var contactSchema = new mongoose.Schema({
 	host_notification_commands: {
 		type: String,
 		required: true,
-		default: 'notify-by-email'
+		default: 'notify-host-by-email'
 	},
 
 	service_notification_commands: {
 		type: String,
 		required: true,
-		default: 'notify-by-email'
+		default: 'notify-service-by-email'
 	},
 	
 	can_submit_commands: {
@@ -176,7 +176,7 @@ var hostNotificationsToString = function(options){
 	if(options.flapping){ optionsString.push('f'); }
 	if(options.scheduled){ optionsString.push('s'); }
 	
-	return '[' + optionsString.join(',') + ']';
+	return optionsString.join(',');
 };
 
 var serviceNotificationsToString = function(options){
@@ -189,7 +189,7 @@ var serviceNotificationsToString = function(options){
 	if(options.recoveries){ optionsString.push('r'); }
 	if(options.flapping){ optionsString.push('f'); }
 	
-	return '[' + optionsString.join(',') + ']';
+	return optionsString.join(',');
 };
 
 contactSchema.statics.getNagiosData = function(cb){
