@@ -66,7 +66,7 @@ var timePeriodSchema = new mongoose.Schema({
 });
 
 timePeriodSchema.statics.getNagiosData = function(cb){
-	var i,property;
+	var i,j,rule,property;
 	var doc, docData;
 	var returnData = [];
 	var objCleanup = function(doc,ret,options){ delete ret._id; delete ret.__v; };
@@ -83,6 +83,12 @@ timePeriodSchema.statics.getNagiosData = function(cb){
 					switch(property){
 						case 'needs_extra_processing':
 							//process some stuff here
+							break;
+						case 'rules':
+							for (j=0; j<doc.rules.length; j++){
+								rule = doc.rules[j].split(' ');
+								docData.push({directive: rule[0], value: rule[1]});
+							}
 							break;
 						default:
 							if(doc[property] instanceof Array){
