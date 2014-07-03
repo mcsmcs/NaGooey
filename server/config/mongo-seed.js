@@ -28,7 +28,7 @@ module.exports = (function(){
         check_interval: 1,
         retry_interval: 1,
         max_check_attempts: 1,
-        check_period: "1",
+        check_period: "24x7",
         first_notification_delay: 1,
         notification_interval: 1,
         use: [],
@@ -66,13 +66,13 @@ module.exports = (function(){
 		timeperiod_name: "24x7x365",
 		alias: "24/7 365 days a year",
 		rules: [
-			'monday		00:00-24:00',
-			'tuesday	00:00-24:00',
-			'wednesday	00:00-24:00',
-			'thursday	00:00-24:00',
-			'friday		00:00-24:00',
-			'saturday	00:00-24:00',
-			'sunday		00:00-24:00'
+			'monday 00:00-24:00',
+			'tuesday 00:00-24:00',
+			'wednesday 00:00-24:00',
+			'thursday 00:00-24:00',
+			'friday 00:00-24:00',
+			'saturday 00:00-24:00',
+			'sunday 00:00-24:00'
 		]
 	});
 

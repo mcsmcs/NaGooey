@@ -32,9 +32,11 @@ var fs    = require('fs');
 
 require('../config/mongoose')();
 var mongoose	= require('mongoose');
-var Service		= mongoose.model("Service");
-var Contact		= mongoose.model("Contact");
 var Command		= mongoose.model("Command");
+var Service		= mongoose.model("Service");
+var TimePeriod  = mongoose.model("TimePeriod");
+var Contact		= mongoose.model("Contact");
+var ContactGroup= mongoose.model("ContactGroup");
 var Host 		= mongoose.model("Host");
 var HostGroup	= mongoose.model("HostGroup");
 
@@ -64,7 +66,7 @@ var compileNagiosObject = function(ObjectType, Model){
 			definitions.push(definition.join('\n'));
 		}
 
-		fs.writeFile('../../../sp-helper/nagui/' + ObjectType + 's', definitions.join('\n'), function(err){
+		fs.writeFile('../../../sp-helper/nagooey/' + ObjectType + 's.cfg', definitions.join('\n'), function(err){
 			if(err){ console.log(err); }
 			else { console.log(ObjectType + 's file saved.'); }
 		});
@@ -77,4 +79,9 @@ var compileNagiosObject = function(ObjectType, Model){
 
 compileNagiosObject('command', Command);
 compileNagiosObject('contact', Contact);
+compileNagiosObject('contactgroup', ContactGroup);
 compileNagiosObject('host', Host);
+compileNagiosObject('hostgroup', HostGroup);
+compileNagiosObject('service', Service);
+compileNagiosObject('timeperiod', TimePeriod);
+
