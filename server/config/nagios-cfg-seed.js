@@ -22,13 +22,19 @@ var detectLinuxDistro = function(callback){
 	);
 };
 
-console.log('in here');
-
 detectLinuxDistro(function(err,distro){
+	var path = 'wtf';
 	if(distro === 'Ubuntu'){ path = '/etc/nagios3/nagios.cfg'; }
 	else if (distro === 'CentOS'){ path = '/etc/nagios/nagios.cfg'; }
 	
-	nagios = require('../nagios/nagiosParser')(path);
-});
+	require('../nagios/nagiosParser')(path, function(err,nagios){
+
+		// nagios.objects.contacts.forEach(function(contactDirectives){
+		// 	Contact.directivesToDocument(contactDirectives);	
+		// });
 		
+		
+	});
+});
+
 

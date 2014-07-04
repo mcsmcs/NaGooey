@@ -5,15 +5,15 @@ var exec = require('child_process').exec;
 var async = require('async');
 var fs = require('fs');
 
-module.exports = function(configPath){
+module.exports = function(configPath, callback){
 
 	var nagios = {};
 	nagios.cfg = {
-			path: configPath,
 			main: [],
 			dirs: [],
 			files: []
 	};
+	nagios.cfg.path = configPath;
 	nagios.objects = {
 			commands: [],
 			contacts: [],
@@ -25,9 +25,6 @@ module.exports = function(configPath){
 			servicegroups: [],
 			timeperiods: [],
 	};
-
-	console.log(nagios);
-
 
 	var detectNagiosCfgDirectives = function(cfgLine){
 		if (cfgLine.match(/^cfg_dir=/)){ nagios.cfg.dirs.push(cfgLine.split('=')[1]); }
@@ -135,9 +132,7 @@ module.exports = function(configPath){
 
 		function(err,results){
 			console.log('async callback');
+			callback(err,nagios);
 		}
 	);
-	
-	console.log(nagios);
-	return nagios;
 };
