@@ -1,6 +1,8 @@
 'use strict';
 /*jslint unparam: true, node: true */
 
+var async 		= require('async');
+
 require('../config/mongoose')();
 var mongoose	= require('mongoose');
 var Command		= mongoose.model("Command");
@@ -22,19 +24,62 @@ var detectLinuxDistro = function(callback){
 	);
 };
 
+var createDocuments = function(Model, objects, objKey, done){
+
+	var pending = objects.length;
+	var callback = function(err,docs){
+		if(--pending<=0){ done(err,docs); }
+	};
+
+	objects.forEach(function(object){
+
+		var query = {};
+		var obj = {};
+		object.forEach(function(directive){
+			obj[directive.directive] = directive.value;
+		});
+
+		query[objKey] = obj[objKey];
+		Model.update(
+			query,			// Query
+			obj,			// Update Object
+			{upsert: true},	// Create if DNE
+			callback		// Callback
+		);
+	});		
+};
+
 detectLinuxDistro(function(err,distro){
-	var path = 'wtf';
+
 	if(distro === 'Ubuntu'){ path = '/etc/nagios3/nagios.cfg'; }
 	else if (distro === 'CentOS'){ path = '/etc/nagios/nagios.cfg'; }
 	
+	// Parse Nagios Config Files
 	require('../nagios/nagiosParser')(path, function(err,nagios){
 
-		// nagios.objects.contacts.forEach(function(contactDirectives){
-		// 	Contact.directivesToDocument(contactDirectives);	
-		// });
-		
-		
+		// Add objects to MongoDB
+		async.parallel(
+			{
+				commands: function(callback){
+					createDocuments(Command, nagios.objects.commands, 'command_name', callback);
+				},
+				contacts: function(callback){
+					createDocuments(Contact, nagios.objects.contacts, 'contact_name', callback);
+				},
+				hosts: function(callback){
+					createDocuments(Host, nagios.objects.hosts, 'host_name', callback);
+				},
+				hostgroups: function(callback){
+					createDocuments(HostGroup, nagios.objects.hostgroups, 'hostgroup_name', callback);
+				},
+				services: function(callback){
+					createDocuments(Service, nagios.objects.services, 'service_description', callback);
+				},
+				timeperiods: function(callback){
+					createDocuments(TimePeriod, nagios.objects.timeperiods, 'timeperiod_name', callback);
+				},
+			}
+			//,function(err,results){}
+		);
 	});
 });
-
-

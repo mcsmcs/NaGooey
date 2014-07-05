@@ -38,7 +38,7 @@ module.exports = function(url){
 
 	// Load Defaults
 	if(url === undefined){ 
-		require('./mongo-testing-seed'); 
+		// require('./mongo-testing-seed'); 
 		require('./nagios-cfg-seed');
 	}
 	require('./nagios3_definitions');
