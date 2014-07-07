@@ -162,10 +162,10 @@ hostSchema.statics.getHostsByHostGroup = function(hostgroup, cb){
 	async.parallel(
 		{
 			members: function(callback){
-				caller.find({hostgroups: {$elemMatch: {$regex: reMatch}}}, {host_name:1, _id:0}, callback);
+				caller.find({$and: [{name: {$exists:false}},{hostgroups: {$elemMatch: {$regex: reMatch}}}]}, {host_name:1, _id:0}, callback);
 			},
 			nonmembers: function(callback){
-				caller.find({hostgroups: {$not: {$elemMatch: {$regex: reMatch}}}}, {host_name:1, _id:0}, callback);
+				caller.find({$and: [{name: {$exists:false}},{hostgroups: {$not: {$elemMatch: {$regex: reMatch}}}}]}, {host_name:1, _id:0}, callback);
 			},
 		},
 		

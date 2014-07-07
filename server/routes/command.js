@@ -63,8 +63,6 @@ module.exports = function(app){
 		Command.findOne({command_name: req.params.command_name}, function(err,commandDoc){
 
 			if(err){console.log(err);}
-			else {console.log(commandDoc);}
-
 			res.render('command_form', {command: commandDoc});
 		});
 	});

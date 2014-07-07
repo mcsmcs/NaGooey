@@ -28,7 +28,10 @@ module.exports = function(app){
 	// #                    INDEX
 	// #################################################
 	app.get('/timeperiod', function(req,res){
-		res.render('timeperiod_index');
+		TimePeriod.getRegisteredObjects(function(err,timeperiods){
+			res.render('timeperiod_index', {timeperiods:timeperiods});
+		});
+		
 	});
 
 	// Convenience Route
