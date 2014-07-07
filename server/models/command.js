@@ -104,4 +104,12 @@ commandSchema.statics.createFromConfig = function(obj,cb){
 	this.update(query, obj, {upsert:true}, cb);
 };
 
+commandSchema.statics.getTemplates = function(done){
+	this.find({$and: [{name: {$exists:true}}, {register: "0"}]}, done);
+};
+
+commandSchema.statics.getRegisteredObjects = function(done){
+	this.find({$and: [{name: {$exists:false}}, {register: {$exists:false}}]}, done);
+};
+
 mongoose.model('Command', commandSchema);

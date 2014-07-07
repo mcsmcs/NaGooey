@@ -268,4 +268,12 @@ serviceSchema.statics.createFromConfig = function(obj,cb){
 	this.update(query, obj, {upsert:true}, cb);
 };
 
+serviceSchema.statics.getTemplates = function(done){
+	this.find({$and: [{name: {$exists:true}}, {register: "0"}]}, done);
+};
+
+serviceSchema.statics.getRegisteredObjects = function(done){
+	this.find({$and: [{name: {$exists:false}}, {register: {$exists:false}}]}, done);
+};
+
 mongoose.model('Service', serviceSchema);

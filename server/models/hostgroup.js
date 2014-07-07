@@ -180,4 +180,12 @@ hostGroupSchema.statics.createFromConfig = function(obj,cb){
 	this.update(query, obj, {upsert:true}, cb);
 };
 
+hostGroupSchema.statics.getTemplates = function(done){
+	this.find({$and: [{name: {$exists:true}}, {register: "0"}]}, done);
+};
+
+hostGroupSchema.statics.getRegisteredObjects = function(done){
+	this.find({$and: [{name: {$exists:false}}, {register: {$exists:false}}]}, done);
+};
+
 mongoose.model('HostGroup', hostGroupSchema);

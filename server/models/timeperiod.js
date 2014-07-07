@@ -130,4 +130,12 @@ timePeriodSchema.statics.createFromConfig = function(obj,cb){
 	this.update(query, obj, {upsert:true}, cb);
 };
 
+timePeriodSchema.statics.getTemplates = function(done){
+	this.find({$and: [{name: {$exists:true}}, {register: "0"}]}, done);
+};
+
+timePeriodSchema.statics.getRegisteredObjects = function(done){
+	this.find({$and: [{name: {$exists:false}}, {register: {$exists:false}}]}, done);
+};
+
 mongoose.model('TimePeriod', timePeriodSchema);

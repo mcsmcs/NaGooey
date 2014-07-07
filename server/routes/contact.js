@@ -50,7 +50,7 @@ module.exports = function(app){
 	// #################################################
 	app.get('/contact', function(req,res){
 		
-		Contact.find(function(err, contactDocs){
+		Contact.getRegisteredObjects(function(err, contactDocs){
 
 			if (err){ console.log('error finding contacts'); }
 			res.render('contact_index', {contacts: contactDocs});

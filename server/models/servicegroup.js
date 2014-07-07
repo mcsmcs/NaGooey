@@ -100,4 +100,12 @@ serviceGroupSchema.statics.createFromConfig = function(obj,cb){
 	this.update(query, obj, {upsert:true}, cb);
 };
 
+serviceGroupSchema.statics.getTemplates = function(done){
+	this.find({$and: [{name: {$exists:true}}, {register: "0"}]}, done);
+};
+
+serviceGroupSchema.statics.getRegisteredObjects = function(done){
+	this.find({$and: [{name: {$exists:false}}, {register: {$exists:false}}]}, done);
+};
+
 mongoose.model('ServiceGroup', serviceGroupSchema);
