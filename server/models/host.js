@@ -135,10 +135,10 @@ hostSchema.statics.getHostsByMembers = function(members, cb){
 	var caller = this;
 	async.parallel({
 		members: function(callback){
-			caller.find({host_name: {$in: members}}, {_id:0, host_name:1}, callback);
+			caller.find({$and: [{name: {$exists:false}},{host_name: {$in: members}}]}, {_id:0, host_name:1}, callback);
 		},
 		nonmembers: function(callback){
-			caller.find({host_name: {$not: {$in: members}}}, {_id:0, host_name:1}, callback);
+			caller.find({$and: [{name: {$exists:false}},{host_name: {$not: {$in: members}}}]}, {_id:0, host_name:1}, callback);
 		}
 	},
 		function(err,results){

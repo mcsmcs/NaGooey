@@ -125,10 +125,10 @@ contactSchema.statics.getContactsByMembers = function(members, cb){
 	var caller = this;
 	async.parallel({
 		members: function(callback){
-			caller.find({contact_name: {$in: members}}, {_id:0, contact_name:1}, callback);
+			caller.find({$and: [{name: {$exists:false}},{contact_name: {$in: members}}]}, {_id:0, contact_name:1}, callback);
 		},
 		nonmembers: function(callback){
-			caller.find({contact_name: {$not: {$in: members}}}, {_id:0, contact_name:1}, callback);
+			caller.find({$and: [{name: {$exists:false}},{contact_name: {$not: {$in: members}}}]}, {_id:0, contact_name:1}, callback);
 		}
 	},
 		function(err,results){

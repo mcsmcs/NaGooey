@@ -67,14 +67,7 @@ module.exports = function(app){
 	// #                    ADD
 	// #################################################
 	app.get('/contact/add', function(req,res){
-		
-		Contact.find(function(err, contactDocs){
-			if (err){ console.log('error finding contacts'); }
-			
-			res.render('contact_form', {
-				time_periods: [{timeperiod_name: "timeperiod1"}]
-			});
-		});
+		res.render('contact_form');
 	});
 	
 	app.post('/contact/add', function(req,res){

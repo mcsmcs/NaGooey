@@ -21,7 +21,7 @@ module.exports = function(app){
 	// #################################################
 	app.get('/host', function(req,res){
 
-		Host.find(function(err, hostDocs){
+		Host.getRegisteredObjects(function(err, hostDocs){
 			if (err){ console.log('error finding hosts'); }
 			res.render('host_index', {hosts: hostDocs});
 		});
@@ -42,7 +42,7 @@ module.exports = function(app){
 		async.parallel(
 			{	// Run these in parallel
 				// callback = function(err, result){}
-				hostgroups: function(callback){ HostGroup.find(callback); },
+				hostgroups: function(callback){ HostGroup.getRegisteredObjects(callback); },
 				check_commands: function(callback){	Command.getCheckCommands(callback); },
 			}, 
 

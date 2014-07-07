@@ -29,7 +29,7 @@ module.exports = function(app){
 	// #################################################
 	app.get('/hostgroup', function(req,res){
 		
-		HostGroup.find(function(err, hostgroupDocs){
+		HostGroup.getRegisteredObjects(function(err, hostgroupDocs){
 			if (err){ console.log('error finding hostgroups'); }
 			res.render('hostgroup_index', {hostgroups: hostgroupDocs});
 		});
@@ -46,7 +46,7 @@ module.exports = function(app){
 	// #################################################
 	app.get('/hostgroup/add', function(req,res){
 
-		Host.find({}, {host_name: 1, _id:0}, function(err,hosts){
+		Host.getRegisteredObjects(function(err,hosts){
 			if(err){console.log(err);}
 			
 			var membership = {

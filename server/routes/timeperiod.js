@@ -28,12 +28,7 @@ module.exports = function(app){
 	// #                    INDEX
 	// #################################################
 	app.get('/timeperiod', function(req,res){
-		
-		TimePeriod.find(function(err, timeperiodDocs){
-
-			if (err){ console.log('error finding timeperiods'); }
-			res.render('timeperiod_index', {timeperiods: timeperiodDocs});
-		});
+		res.render('timeperiod_index');
 	});
 
 	// Convenience Route
@@ -46,7 +41,7 @@ module.exports = function(app){
 	// #                    ADD
 	// #################################################
 	app.get('/timeperiod/add', function(req,res){
-			res.render('timeperiod_form');
+		res.render('timeperiod_form');
 	});
 	
 	app.post('/timeperiod/add', function(req,res){

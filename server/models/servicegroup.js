@@ -32,10 +32,10 @@ serviceGroupSchema.statics.getServiceGroupsByMembers = function(members, cb){
 	var caller = this;
 	async.parallel({
 		members: function(callback){
-			caller.find({servicegroup_name: {$in: members}}, {_id:0, servicegroup_name:1}, callback);
+			caller.find({$and: [{name: {$exists:false}},{servicegroup_name: {$in: members}}]}, {_id:0, servicegroup_name:1}, callback);
 		},
 		nonmembers: function(callback){
-			caller.find({servicegroup_name: {$not: {$in: members}}}, {_id:0, servicegroup_name:1}, callback);
+			caller.find({$and: [{name: {$exists:false}},{servicegroup_name: {$not: {$in: members}}}]}, {_id:0, servicegroup_name:1}, callback);
 		}
 	},
 		function(err,results){

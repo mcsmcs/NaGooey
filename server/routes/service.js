@@ -67,7 +67,7 @@ module.exports = function(app){
 	// #################################################
 	app.get('/service', function(req,res){
 		
-		Service.find(function(err, serviceDocs){
+		Service.getRegisteredObjects(function(err, serviceDocs){
 
 			if (err){ console.log('error finding services'); }
 
@@ -89,7 +89,7 @@ module.exports = function(app){
 		async.parallel(
 			{
 				contacts: function(callback){
-				 	Contact.find({}, {_id:0, contact_name:1}, callback);
+				 	Contact.getRegisteredObjects(callback);
 				},
 
 				// contactgroups: function(callback){
@@ -97,15 +97,15 @@ module.exports = function(app){
 				// },
 
 				commands: function(callback){
-					Command.find({}, {_id:0, command_name:1}, callback);
+					Command.getRegisteredObjects(callback);
 				},
 				
 				hosts: function(callback){
-				 	Host.find({}, {_id:0, host_name:1}, callback);
+				 	Host.getRegisteredObjects(callback);
 				},
 				
 				hostgroups: function(callback){
-				 	HostGroup.find({}, {_id:0, hostgroup_name:1}, callback);
+				 	HostGroup.getRegisteredObjects(callback);
 				},
 
 				// servicegroups: function(callback){
@@ -158,7 +158,7 @@ module.exports = function(app){
 					// },
 
 					commands: function(callback){
-						Command.find({}, {_id:0, command_name:1}, callback);
+						Command.getRegisteredObjects(callback);
 					},
 					
 					hosts: function(callback){

@@ -17,7 +17,7 @@ module.exports = function(app){
 	// #################################################
 	app.get('/command', function(req,res){
 		
-		Command.find(function(err, commandDocs){
+		Command.getRegisteredObjects(function(err, commandDocs){
 
 			if (err){ console.log('error finding commands'); }
 			res.render('command_index', {commands: commandDocs});
@@ -34,12 +34,7 @@ module.exports = function(app){
 	// #                    ADD
 	// #################################################
 	app.get('/command/add', function(req,res){
-		
-		Command.find(function(err, commandDocs){
-
-			if (err){ console.log('error finding commands'); }
-			res.render('command_form', {commands: commandDocs});
-		});
+		res.render('command_form');
 	});
 	
 	app.post('/command/add', function(req,res){

@@ -51,10 +51,10 @@ hostGroupSchema.statics.getHostGroupsByMembers = function(members, cb){
 	var caller = this;
 	async.parallel({
 		members: function(callback){
-			caller.find({hostgroup_name: {$in: members}}, {_id:0, hostgroup_name:1}, callback);
+			caller.find({$and: [{name: {$exists:false}},{hostgroup_name: {$in: members}}]}, {_id:0, hostgroup_name:1}, callback);
 		},
 		nonmembers: function(callback){
-			caller.find({hostgroup_name: {$not: {$in: members}}}, {_id:0, hostgroup_name:1}, callback);
+			caller.find({$and: [{name: {$exists:false}},{hostgroup_name: {$not: {$in: members}}}]}, {_id:0, hostgroup_name:1}, callback);
 		}
 	},
 		function(err,results){

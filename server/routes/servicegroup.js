@@ -42,7 +42,7 @@ module.exports = function(app){
 	// #################################################
 	app.get('/servicegroup', function(req,res){
 		
-		ServiceGroup.find(function(err, servicegroupDocs){
+		ServiceGroup.getRegisteredObjects(function(err, servicegroupDocs){
 
 			if (err){ console.log('error finding servicegroups'); }
 			res.render('servicegroup_index', {servicegroups: servicegroupDocs});
