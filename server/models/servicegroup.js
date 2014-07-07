@@ -17,8 +17,14 @@ var serviceGroupSchema = new mongoose.Schema({
 	servicegroup_members: Array,// service groups
 	notes: String,				// notes pertaining to the service group
 	notes_url: String,			// a url for additional notes
-	action_url: String			// a url providing additional actions on the service group
-	
+	action_url: String,			// a url providing additional actions on the service group
+
+	register: {
+		type: Boolean,
+		default: true
+	},
+	use: String,		// use [Template]
+	name: String, 		// Template Name
 });
 
 serviceGroupSchema.statics.getServiceGroupsByMembers = function(members, cb){

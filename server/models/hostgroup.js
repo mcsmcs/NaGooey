@@ -24,6 +24,14 @@ var hostGroupSchema = new mongoose.Schema({
 	notes: String,				// note_string
 	notes_url: String,			// url
 	action_url: String,			// url
+
+
+	register: {
+		type: Boolean,
+		default: true
+	},
+	use: String,		// use [Template]
+	name: String, 		// Template Name
 });
 
 

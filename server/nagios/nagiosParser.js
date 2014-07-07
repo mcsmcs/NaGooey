@@ -116,7 +116,7 @@ module.exports = function(configPath, callback){
 								}
 								else { newObject.push({			// Object Directives
 										directive: reDirectives.exec(line)[1],
-										value: reDirectives.exec(line)[2]
+										value: reDirectives.exec(line)[2].trim()
 									});
 								}
 							}

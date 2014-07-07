@@ -183,7 +183,12 @@ var serviceSchema = new mongoose.Schema({
 	retain_status_information: Boolean,
 	stalking_options: Array,	// [owuc]
 
-	use: Array
+	register: {
+		type: Boolean,
+		default: true
+	},
+	use: String,		// use [Template]
+	name: String, 		// Template Name
 });
 
 serviceSchema.statics.getServicesByMembers = function(members, cb){

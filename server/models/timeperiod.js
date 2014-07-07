@@ -48,20 +48,24 @@ var timePeriodSchema = new mongoose.Schema({
 	},
 
 	rules: Array,
-	use: Array,
-	exclude: Array
+	exclude: Array,
 
-	// weekdays: {
-	// 	monday: Array,
-	// 	tuesday: Array,
-	// 	wednesday: Array,
-	// 	thursday: Array,
-	// 	friday: Array,
-	// 	saturday: Array,
-	// 	sunday: Array		
-	// },
+	monday: Array,
+	tuesday: Array,
+	wednesday: Array,
+	thursday: Array,
+	friday: Array,
+	saturday: Array,
+	sunday: Array,
 
 	// exceptions: [exceptionSchema]
+
+	register: {
+		type: Boolean,
+		default: true
+	},
+	use: String,		// use [Template]
+	name: String, 		// Template Name
 
 });
 

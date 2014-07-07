@@ -17,7 +17,14 @@ var contactGroupSchema = new mongoose.Schema({
 	},
 
 	members: Array,					// contacts
-	contactgroup_members: Array		//contact_groups
+	contactgroup_members: Array,	//contact_groups
+
+	register: {
+		type: Boolean,
+		default: true
+	},
+	use: String,		// use [Template]
+	name: String 		// Template Name
 });
 
 

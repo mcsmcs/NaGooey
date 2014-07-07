@@ -34,7 +34,14 @@ var commandSchema = new mongoose.Schema({
 	// the command does.
 	description: {
 		type: String,
-	}
+	},
+
+		register: {
+		type: Boolean,
+		default: true
+	},
+	use: String,		// use [Template]
+	name: String 		// Template Name
 });
 
 commandSchema.statics.getCheckCommands = function(cb){

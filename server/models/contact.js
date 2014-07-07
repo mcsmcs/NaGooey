@@ -20,108 +20,76 @@ var contactSchema = new mongoose.Schema({
 	
 	host_notifications_enabled: {
 		type: Boolean,
-		required: true,
-		default: true,
 	},
 
 	service_notifications_enabled: {
 		type: Boolean,
-		required: true,
-		default: true
 	},
 
 	// Time Periods
 	host_notification_period: {
 		type: String,	// time_period
-		required: true,
-		default: '24x7'
 	},
 
 	service_notification_period: {
 		type: String,	// time_period
-		required: true,
-		default: '24x7'
 	},
 
 	host_notification_options: {
 		down: {
 			type: Boolean,
-			required: true,
-			default: true
 		},
 
 		up: {
 			type: Boolean,
-			required: true,
-			default: true
 		},
 
 		recoveries: {
 			type: Boolean,
-			required: true,
-			default: true
 		},
 
 		flapping: {
 			type: Boolean,
-			required: true,
-			default: true
 		},
 
 		scheduled: {
 			type: Boolean,
-			required: true,
-			default: true
 		},
 	},
 
 	service_notification_options: {
 		warning: {
 			type: Boolean,
-			required: true,
-			default: true
 		},
 
 		unknown: {
 			type: Boolean,
-			required: true,
-			default: true
 		},
 
 		critical: {
 			type: Boolean,
-			required: true,
-			default: true
 		},
 
 		recoveries: {
 			type: Boolean,
-			required: true,
-			default: true
 		},
 
 		flapping: {
 			type: Boolean,
-			required: true,
-			default: true
 		},
 
 		scheduled: {
 			type: Boolean,
-			required: true,
-			default: true
 		},
 	},
 
 	host_notification_commands: {
 		type: String,
-		required: true,
 		default: 'notify-host-by-email'
 	},
 
 	service_notification_commands: {
 		type: String,
-		required: true,
 		default: 'notify-service-by-email'
 	},
 	
@@ -138,7 +106,12 @@ var contactSchema = new mongoose.Schema({
 	retain_nonstatus_information: {
 		type: Boolean,
 		default: true
-	}
+	},
+
+	register: String,
+	use: String,		// use [Template]
+	name: String 		// Template Name
+
 
 });
 
@@ -239,6 +212,16 @@ contactSchema.statics.getNagiosData = function(cb){
 
 		cb(err,returnData);
 	});
+};
+
+
+contactSchema.statics.createFromConfig = function(obj,cb){
+	this.update(
+		{$or: [{contact_name: obj.contact_name },{ name: obj.name }]},
+		obj,
+		{upsert:true},
+		cb
+	);
 };
 
 mongoose.model('Contact', contactSchema);

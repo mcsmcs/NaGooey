@@ -121,7 +121,14 @@ var hostSchema = new mongoose.Schema({
 	notifications_enabled: {
 		type: Boolean,
 		default: true
-	}
+	},
+
+	register: {
+		type: Boolean,
+		default: true
+	},
+	use: String,		// use [Template]
+	name: String 		// Template Name
 
 });
 
