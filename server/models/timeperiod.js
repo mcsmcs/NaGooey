@@ -121,4 +121,13 @@ timePeriodSchema.statics.getNagiosData = function(cb){
 	});
 };
 
+
+timePeriodSchema.statics.createFromConfig = function(obj,cb){
+	var query;
+	if(obj.name){ query = {name: obj.name}; }			// Template
+	else { query = {timeperiod_name: obj.timeperiod_name}; }	// Object
+
+	this.update(query, obj, {upsert:true}, cb);
+};
+
 mongoose.model('TimePeriod', timePeriodSchema);

@@ -123,12 +123,9 @@ var hostSchema = new mongoose.Schema({
 		default: true
 	},
 
-	register: {
-		type: Boolean,
-		default: true
-	},
+	register: String,
 	use: String,		// use [Template]
-	name: String 		// Template Name
+	name: String, 		// Template Name
 
 });
 
@@ -273,6 +270,14 @@ hostSchema.statics.getNagiosData = function(cb){
 
 		cb(err,returnData);
 	});
+};
+
+hostSchema.statics.createFromConfig = function(obj,cb){
+	var query;
+	if(obj.name){ query = {name: obj.name}; }			// Template
+	else { query = {host_name: obj.host_name}; }	// Object
+
+	this.update(query, obj, {upsert:true}, cb);
 };
 
 mongoose.model('Host', hostSchema);

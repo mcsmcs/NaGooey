@@ -216,12 +216,11 @@ contactSchema.statics.getNagiosData = function(cb){
 
 
 contactSchema.statics.createFromConfig = function(obj,cb){
-	this.update(
-		{$or: [{contact_name: obj.contact_name },{ name: obj.name }]},
-		obj,
-		{upsert:true},
-		cb
-	);
+	var query;
+	if(obj.name){ query = {name: obj.name}; }			// Template
+	else { query = {contact_name: obj.contact_name}; }	// Object
+
+	this.update(query, obj, {upsert:true}, cb);
 };
 
 mongoose.model('Contact', contactSchema);

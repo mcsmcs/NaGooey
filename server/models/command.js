@@ -36,10 +36,7 @@ var commandSchema = new mongoose.Schema({
 		type: String,
 	},
 
-		register: {
-		type: Boolean,
-		default: true
-	},
+	register: String,
 	use: String,		// use [Template]
 	name: String 		// Template Name
 });
@@ -97,6 +94,14 @@ commandSchema.statics.getNagiosData = function(cb){
 
 		cb(err,returnData);
 	});
+};
+
+commandSchema.statics.createFromConfig = function(obj,cb){
+	var query;
+	if(obj.name){ query = {name: obj.name}; }			// Template
+	else { query = {command_name: obj.command_name}; }	// Object
+
+	this.update(query, obj, {upsert:true}, cb);
 };
 
 mongoose.model('Command', commandSchema);

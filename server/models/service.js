@@ -260,4 +260,12 @@ serviceSchema.statics.getNagiosData = function(cb){
 	});
 };
 
+serviceSchema.statics.createFromConfig = function(obj,cb){
+	var query;
+	if(obj.name){ query = {name: obj.name}; }			// Template
+	else { query = {service_description: obj.service_description}; }	// Object
+
+	this.update(query, obj, {upsert:true}, cb);
+};
+
 mongoose.model('Service', serviceSchema);

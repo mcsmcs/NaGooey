@@ -53,24 +53,24 @@ detectLinuxDistro(function(err,distro){
 		// Add objects to MongoDB
 		async.parallel(
 			{
-				// commands: function(callback){
-				// 	createDocuments(Command, nagios.objects.commands, 'command_name', callback);
-				// },
+				commands: function(callback){
+					createDocuments(Command, nagios.objects.commands, callback);
+				},
 				contacts: function(callback){
 					createDocuments(Contact, nagios.objects.contacts, callback);
 				},
-				// hosts: function(callback){
-				// 	createDocuments(Host, nagios.objects.hosts, 'host_name', callback);
-				// },
-				// hostgroups: function(callback){
-				// 	createDocuments(HostGroup, nagios.objects.hostgroups, 'hostgroup_name', callback);
-				// },
-				// services: function(callback){
-				// 	createDocuments(Service, nagios.objects.services, 'service_description', callback);
-				// },
-				// timeperiods: function(callback){
-				// 	createDocuments(TimePeriod, nagios.objects.timeperiods, 'timeperiod_name', callback);
-				// },
+				hosts: function(callback){
+					createDocuments(Host, nagios.objects.hosts, callback);
+				},
+				hostgroups: function(callback){
+					createDocuments(HostGroup, nagios.objects.hostgroups, callback);
+				},
+				services: function(callback){
+					createDocuments(Service, nagios.objects.services, callback);
+				},
+				timeperiods: function(callback){
+					createDocuments(TimePeriod, nagios.objects.timeperiods, callback);
+				},
 			}
 			//,function(err,results){}
 		);

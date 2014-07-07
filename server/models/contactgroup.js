@@ -73,4 +73,13 @@ contactGroupSchema.statics.getNagiosData = function(cb){
 		cb(err,returnData);
 	});
 };
+
+contactGroupSchema.statics.createFromConfig = function(obj,cb){
+	var query;
+	if(obj.name){ query = {name: obj.name}; }			// Template
+	else { query = {contactgroup_name: obj.contactgroup_name}; }	// Object
+
+	this.update(query, obj, {upsert:true}, cb);
+};
+
 mongoose.model('ContactGroup', contactGroupSchema);

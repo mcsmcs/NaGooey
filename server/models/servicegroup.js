@@ -91,4 +91,13 @@ serviceGroupSchema.statics.getNagiosData = function(cb){
 		cb(err,returnData);
 	});
 };
+
+serviceGroupSchema.statics.createFromConfig = function(obj,cb){
+	var query;
+	if(obj.name){ query = {name: obj.name}; }			// Template
+	else { query = {servicegroup_name: obj.servicegroup_name}; }	// Object
+
+	this.update(query, obj, {upsert:true}, cb);
+};
+
 mongoose.model('ServiceGroup', serviceGroupSchema);
