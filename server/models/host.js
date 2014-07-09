@@ -9,63 +9,37 @@ var hostSchema = new mongoose.Schema({
 	// Host Directives
 	// http://nagios.sourceforge.net/docs/nagioscore/3/en/objectdefinitions.html#host
 
-	host_name: {
-		type: String,
-		required: true,
-		unique: true
-	},
+	host_name: String,
+	alias: String,	
+	address: String,
 
-	alias: {
-		type: String,
-		required: true
-	},
-	
-	address: {
-		type: String,
-		required: true,
-		unique: true
-	},
-	
 	max_check_attempts: {
 		type: Number,
-		required: true,
-		default: 10
 	},
 
 	check_period: {
 		type: String,				// timeperiod_name
-		required: true,
-
 	},
 
 	contacts: {
 		type: Array,					// contacts
-		required: true
+		
 	},
 
 	contact_groups: {
 		type: Array,				// contact_groups
-		required: true,
-		default: ['admins']
 	},
 
 	notification_interval: {
 		type: Number,
-		required: true,
-		default: 0
 	},
 
 	notification_period: {
 		type: String,		// timeperiod_name
-		required: true,
-		default: '24x7'
 	},
-
-
 
 	check_command: {
 		type: String,					// command_name
-		default: 'check-host-alive'
 	},
 
 	display_name: String,				
@@ -74,7 +48,6 @@ var hostSchema = new mongoose.Schema({
 	initial_state: String,				// [o,d,u]
 	notification_options: {
 		type: Array,
-		default: ['d','u','r'],		// [d,u,r,f,s]
 	},
 	stalking_options: String,			// [o,d,u]
 	event_handler: String,				// command_name
@@ -97,30 +70,24 @@ var hostSchema = new mongoose.Schema({
 	freshness_threshold: Number,
 	event_handler_enabled: {
 		type: Boolean,
-		default: true
 	},
 	low_flap_threshold: Number,
 	high_flap_threshold: Number,
 	flap_detection_enabled: {
 		type: Boolean,
-		default: true
 	},
 	process_perf_data:  {
 		type: Boolean,
-		default: true
 	},
 	retain_status_information: {
 		type: Boolean,
-		default: true
 	},
 	retain_nonstatus_information: {
 		type: Boolean,
-		default: true
 	},
 	first_notification_delay: Number,
 	notifications_enabled: {
 		type: Boolean,
-		default: true
 	},
 
 	register: String,
@@ -277,7 +244,17 @@ hostSchema.statics.createFromConfig = function(obj,cb){
 	if(obj.name){ query = {name: obj.name}; }			// Template
 	else { query = {host_name: obj.host_name}; }	// Object
 
-	this.update(query, obj, {upsert:true}, cb);
+	this.removeThenSave(query,obj,cb);
+};
+
+hostSchema.statics.removeThenSave = function(query,obj,cb){
+	var Model = this;
+	console.log(obj);
+	Model.remove(query, function(err){
+		if(err){ console.log(err); }
+		var doc = new Model(obj);
+		doc.save(cb);
+	});
 };
 
 hostSchema.statics.getTemplates = function(done){

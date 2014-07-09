@@ -127,7 +127,17 @@ timePeriodSchema.statics.createFromConfig = function(obj,cb){
 	if(obj.name){ query = {name: obj.name}; }			// Template
 	else { query = {timeperiod_name: obj.timeperiod_name}; }	// Object
 
-	this.update(query, obj, {upsert:true}, cb);
+	this.removeThenSave(query,obj,cb);
+};
+
+timePeriodSchema.statics.removeThenSave = function(query,obj,cb){
+	var Model = this;
+	console.log(obj);
+	Model.remove(query, function(err){
+		if(err){ console.log(err); }
+		var doc = new Model(obj);
+		doc.save(cb);
+	});
 };
 
 timePeriodSchema.statics.getTemplates = function(done){

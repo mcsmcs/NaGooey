@@ -265,7 +265,17 @@ serviceSchema.statics.createFromConfig = function(obj,cb){
 	if(obj.name){ query = {name: obj.name}; }			// Template
 	else { query = {service_description: obj.service_description}; }	// Object
 
-	this.update(query, obj, {upsert:true}, cb);
+	this.removeThenSave(query,obj,cb);
+};
+
+serviceSchema.statics.removeThenSave = function(query,obj,cb){
+	var Model = this;
+	console.log(obj);
+	Model.remove(query, function(err){
+		if(err){ console.log(err); }
+		var doc = new Model(obj);
+		doc.save(cb);
+	});
 };
 
 serviceSchema.statics.getTemplates = function(done){

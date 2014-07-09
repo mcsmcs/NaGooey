@@ -79,9 +79,18 @@ contactGroupSchema.statics.createFromConfig = function(obj,cb){
 	if(obj.name){ query = {name: obj.name}; }			// Template
 	else { query = {contactgroup_name: obj.contactgroup_name}; }	// Object
 
-	this.update(query, obj, {upsert:true}, cb);
+	this.removeThenSave(query,obj,cb);
 };
 
+contactGroupSchema.statics.removeThenSave = function(query,obj,cb){
+	var Model = this;
+	console.log(obj);
+	Model.remove(query, function(err){
+		if(err){ console.log(err); }
+		var doc = new Model(obj);
+		doc.save(cb);
+	});
+};
 contactGroupSchema.statics.getTemplates = function(done){
 	this.find({$and: [{name: {$exists:true}}, {register: "0"}]}, done);
 };

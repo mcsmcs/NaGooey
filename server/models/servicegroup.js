@@ -97,7 +97,18 @@ serviceGroupSchema.statics.createFromConfig = function(obj,cb){
 	if(obj.name){ query = {name: obj.name}; }			// Template
 	else { query = {servicegroup_name: obj.servicegroup_name}; }	// Object
 
-	this.update(query, obj, {upsert:true}, cb);
+	this.removeThenSave(query,obj,cb);
+};
+
+serviceGroupSchema.statics.removeThenSave = function(query,obj,cb){
+	var doc;
+	var Model = this;
+
+	Model.remove(query, function(err){
+		if(err){ console.log(err); }
+		doc = new Model(obj);
+		doc.save(cb);		
+	});
 };
 
 serviceGroupSchema.statics.getTemplates = function(done){

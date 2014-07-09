@@ -101,7 +101,18 @@ commandSchema.statics.createFromConfig = function(obj,cb){
 	if(obj.name){ query = {name: obj.name}; }			// Template
 	else { query = {command_name: obj.command_name}; }	// Object
 
-	this.update(query, obj, {upsert:true}, cb);
+	// Remove and re-add (clear stale values, fire pre-save)
+	this.removeThenSave(query,obj,cb);
+};
+
+commandSchema.statics.removeThenSave = function(query,obj,cb){
+	var Model = this;
+	console.log(obj);
+	Model.remove(query, function(err){
+		if(err){ console.log(err); }
+		var doc = new Model(obj);
+		doc.save(cb);
+	});
 };
 
 commandSchema.statics.getTemplates = function(done){
