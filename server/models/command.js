@@ -7,16 +7,12 @@ var commandSchema = new mongoose.Schema({
 
 	// http://nagios.sourceforge.net/docs/nagioscore/3/en/objectdefinitions.html#command
 	
-	// Command Name 
-	// Examples: "check_ping", "check_something_other_descriptors"
 	command_name: {
 		type: String,
 		required: true,
 		unique: true
 	},
 
-	// Command Line: executable and arguments 
-	// Examples: "/usr/local/nagios/libexec/check_pop -H $HOSTADDRESS$"
 	command_line: {
 		type: String,
 		required: true
@@ -55,7 +51,7 @@ var arrayToString = function(property){
 
 var virtualArray = function(schema, virtualName){
 	schema.virtual(virtualName).set(stringToArray('_' + virtualName));
-	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
+	schema.virtual(virtualName).get(arrayToString('_' + virtualName));
 };
 
 virtualArray(commandSchema, 'use');

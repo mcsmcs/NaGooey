@@ -31,7 +31,7 @@ var arrayToString = function(property){
 
 var virtualArray = function(schema, virtualName){
 	schema.virtual(virtualName).set(stringToArray('_' + virtualName));
-	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
+	schema.virtual(virtualName).get(arrayToString('_' + virtualName));
 };
 
 virtualArray(contactGroupSchema, 'use');

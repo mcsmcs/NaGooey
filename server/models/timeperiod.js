@@ -54,15 +54,6 @@ var timePeriodSchema = new mongoose.Schema({
 	_exclude: Array,	// Virtual: exclude [timeperiod_name]
 	
 	exceptions: [exceptionSchema],
-	/*
-	*	Exception Stuff
-	*	
-	* 	/(.*?)(\d\d:\d\d-\d\d:\d\d.*?);/.exec(exception_line)
-	*
-	*	result[1] = directive (dates)
-	*	result[2] = times hh:mm-hh:mm,hh:mm....
-	*/
-
 
 	/**************** Templates ****************/
 	name: String, 			// Template Name
@@ -83,7 +74,7 @@ var arrayToString = function(property){
 
 var virtualArray = function(schema, virtualName){
 	schema.virtual(virtualName).set(stringToArray('_' + virtualName));
-	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
+	schema.virtual(virtualName).get(arrayToString('_' + virtualName));
 };
 
 virtualArray(exceptionSchema, 'times');
@@ -163,8 +154,9 @@ timePeriodSchema.statics.getNagiosData = function(cb){
 timePeriodSchema.statics.createFromConfig = function(obj,cb){
 	var exceptions = [];
 	var paths = {};
-	var property;
-	var query;
+	var property, query;
+
+	// Build query for update 
 	if(obj.name){ query = {name: obj.name}; }					// Template
 	else { query = {timeperiod_name: obj.timeperiod_name}; }	// Object
 
