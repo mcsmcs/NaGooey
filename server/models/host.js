@@ -10,48 +10,63 @@ var hostSchema = new mongoose.Schema({
 	// http://nagios.sourceforge.net/docs/nagioscore/3/en/objectdefinitions.html#host
 
 	host_name: String,
+	display_name: String,
 	alias: String,	
 	address: String,
 
-	max_check_attempts: {
-		type: Number,
-	},
+	_parents: Array,					// host_names
+	_hostgroups: Array,					// hostgroup_names
 
-	check_period: {
-		type: String,				// timeperiod_name
-	},
+	check_command: String,				// command_name
+	initial_state: String,				// <o,d,u>
+	check_period: String,				// timeperiod_name
+	check_interval: Number,	
+	retry_interval: Number,
+	max_check_attempts: Number,
+	active_checks_enabled: Boolean,
+	passive_checks_enabled: Boolean,
 
-	contacts: {
-		type: Array,					// contacts
-		
-	},
+	_contacts: Array,					// contacts
+	_contact_groups: Array,				// contact_groups
+	
+	notifications_enabled: Boolean,
+	first_notification_delay: Number,
+	notification_interval: Number,
+	notification_period: String,		// timeperiod_name
+	
+	// Virtual: 'notification_options' [d,u,r,f,s]
+	notification_options_down: Boolean,			// 'd'
+	notification_options_up: Boolean,			// 'u'
+	notification_options_recovery: Boolean,		// 'r'
+	notification_options_flapping: Boolean,		// 'f'
+	notification_options_scheduled: Boolean,	// 's'
+	
+	// Virtual: 'stalking_options'  [o,d,u]
+	stalking_options_up: Boolean,				// 'o'
+	stalking_options_down: Boolean,				// 'd'
+	stalking_options_unreachable: Boolean,		// 'u'
+	
+	obsess_over_host: Boolean,
 
-	contact_groups: {
-		type: Array,				// contact_groups
-	},
-
-	notification_interval: {
-		type: Number,
-	},
-
-	notification_period: {
-		type: String,		// timeperiod_name
-	},
-
-	check_command: {
-		type: String,					// command_name
-	},
-
-	display_name: String,				
-	parents: Array,						// host_names
-	hostgroups: Array,					// hostgroup_names
-	initial_state: String,				// [o,d,u]
-	notification_options: {
-		type: Array,
-	},
-	stalking_options: String,			// [o,d,u]
+	event_handler_enabled: Boolean,
 	event_handler: String,				// command_name
-	flap_detection_options: String,		// [o,d,u]
+	
+	flap_detection_enabled: Boolean,
+	low_flap_threshold: Number,
+	high_flap_threshold: Number,
+	
+	// Virtual: 'flap_detection_options ' [o,d,u]
+	flap_detection_options_up: Boolean,				// 'o'
+	flap_detection_options_down: Boolean,			// 'd'
+	flap_detection_options_unreachable: Boolean,	// 'u'
+	
+	check_freshness: Boolean,
+	freshness_threshold: Number,
+
+	process_perf_data: Boolean,
+	retain_status_information: Boolean,
+	retain_nonstatus_information: Boolean,
+	
 	notes: String,						
 	notes_url: String,					// url
 	action_url: String,					// url
@@ -61,67 +76,90 @@ var hostSchema = new mongoose.Schema({
 	statusmap_image: String,			// image_file
 	twoD_coords: String,				// x_coord,y_coord
 	threeD_coords: String,				// x_coord,y_coord,z_coord
-	check_interval: Number,
-	retry_interval: Number,
-	active_checks_enabled: Boolean,
-	passive_checks_enabled: Boolean,
-	obsess_over_host: Boolean,
-	check_freshness: Boolean,
-	freshness_threshold: Number,
-	event_handler_enabled: {
-		type: Boolean,
-	},
-	low_flap_threshold: Number,
-	high_flap_threshold: Number,
-	flap_detection_enabled: {
-		type: Boolean,
-	},
-	process_perf_data:  {
-		type: Boolean,
-	},
-	retain_status_information: {
-		type: Boolean,
-	},
-	retain_nonstatus_information: {
-		type: Boolean,
-	},
-	first_notification_delay: Number,
-	notifications_enabled: {
-		type: Boolean,
-	},
-
 	
-
-	// Template directives
-	templates: Array,		// use [Template]
-	registered: Boolean,
-	name: String, 		// Template Name
-
+	/**************** Templates ****************/
+	name: String, 			// Template Name
+	_use: Array,			// Virtual: 'use'
+	_register: Boolean,		// Virtual: 'register'
 });
 
 
 // #################################################
 // #                    Virtuals
 // #################################################
+var stringToArray = function(property){
+	return function(value){ this[property] = value.split(','); };
+};
+var arrayToString = function(property){
+	return function(){ this[property].join(','); };
+};
+
+var virtualArray = function(schema, virtualName){
+	schema.virtual(virtualName).set(stringToArray('_' + virtualName));
+	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
+};
+
+virtualArray(hostSchema, 'use');
+virtualArray(hostSchema, 'parents');
+virtualArray(hostSchema, 'hostgroups');
+virtualArray(hostSchema, 'contacts');
+virtualArray(hostSchema, 'contact_groups');
+
 hostSchema.virtual('register').set(function(value){
-	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
-	else { this.registered = true; }
+	if(value === '0' || value === false || value === 'false'){ this._register = false; }
 });
+hostSchema.virtual('register').get(function(){ return this._register; });
 
-hostSchema.virtual('register').get(function(){
-	if(this.registered === true){ return true; }
-	if(this.registered === false){ return false; }
-});
-
-hostSchema.virtual('use').set(function(value){
+hostSchema.virtual('stalking_options').set(function(value){
+	var i;
 	var split = value.split(',');
-	this.templates = split;
+
+	this.stalking_options_up = this.stalking_options_down = this.stalking_options_unreachable = false;
+	for (i=0;i<split.length;i++){
+		switch(split[i]){
+			case 'o': this.stalking_options_up = true; break;
+			case 'd': this.stalking_options_down = true; break;
+			case 'u': this.stalking_options_unreachable = true; break;
+			default: break;
+		}
+	}
 });
 
-hostSchema.virtual('use').get(function(){
-	return this.templates.join(',');
+hostSchema.virtual('flap_detection_options').set(function(value){
+	var i;
+	var split = value.split(',');
+
+	this.flap_detection_options_up = this.flap_detection_options_down = this.flap_detection_options_unreachable = false;
+	for (i=0;i<split.length;i++){
+		switch(split[i]){
+			case 'o': this.flap_detection_options_up = true; break;
+			case 'd': this.flap_detection_options_down = true; break;
+			case 'u': this.flap_detection_options_unreachable = true; break;
+			default: break;
+		}
+	}
 });
 
+hostSchema.virtual('notification_options').set(function(value){
+	var i;
+	var split = value.split(',');
+
+	this.notification_options_down = this.notification_options_up = this.notification_options_recovery = this.notification_options_flapping = this.notification_options_scheduled = false;
+	for (i=0;i<split.length;i++){
+		switch(split[i]){
+			case 'd': this.notification_options_down = true; break;
+			case 'u': this.notification_options_up = true; break;
+			case 'r': this.notification_options_recovery = true; break;
+			case 'f': this.notification_options_flapping = true; break;
+			case 's': this.notification_options_scheduled = true; break;
+			default: break;
+		}
+	}
+});
+
+// #################################################
+// #                    Statics
+// #################################################
 hostSchema.statics.getHostsByMembers = function(members, cb){
 	
 	var caller = this;

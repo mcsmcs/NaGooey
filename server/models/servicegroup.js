@@ -6,48 +6,50 @@ var mongoose = require('mongoose');
 
 var serviceGroupSchema = new mongoose.Schema({
 	
-	servicegroup_name: {
-		type: String,
-	},
-
+	servicegroup_name: String,
 	alias: String,
-	members: Array,				// services
-	servicegroup_members: Array,// service groups
+	_members: Array,				// Virtual members [services]
+	_servicegroup_members: Array,	// Virtual servicegroup_members [servicegroups]
+	
 	notes: String,				// notes pertaining to the service group
 	notes_url: String,			// a url for additional notes
 	action_url: String,			// a url providing additional actions on the service group
 
-	// Template directives
-	templates: Array,		// use [Template]
-	registered: Boolean,
-	name: String, 		// Template Name
-
+	/**************** Templates ****************/
+	name: String, 			// Template Name
+	_use: Array,			// Virtual: 'use'
+	_register: Boolean,		// Virtual: 'register'
 });
 
 
 // #################################################
 // #                    Virtuals
 // #################################################
+var stringToArray = function(property){
+	return function(value){ this[property] = value.split(','); };
+};
+var arrayToString = function(property){
+	return function(){ this[property].join(','); };
+};
+
+var virtualArray = function(schema, virtualName){
+	schema.virtual(virtualName).set(stringToArray('_' + virtualName));
+	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
+};
+
+virtualArray(serviceGroupSchema, 'use');
+virtualArray(serviceGroupSchema, 'members');
+virtualArray(serviceGroupSchema, 'servicegroup_members');
+
 serviceGroupSchema.virtual('register').set(function(value){
-	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
-	else { this.registered = true; }
+	if(value === '0' || value === false || value === 'false'){ this._register = false; }
 });
-
-serviceGroupSchema.virtual('register').get(function(){
-	if(this.registered === true){ return true; }
-	if(this.registered === false){ return false; }
-});
-
-serviceGroupSchema.virtual('use').set(function(value){
-	var split = value.split(',');
-	this.templates = split;
-});
-
-serviceGroupSchema.virtual('use').get(function(){
-	return this.templates.join(',');
-});
+serviceGroupSchema.virtual('register').get(function(){ return this._register; });
 
 
+// #################################################
+// #                    Statics
+// #################################################
 serviceGroupSchema.statics.getServiceGroupsByMembers = function(members, cb){
 	
 	var caller = this;

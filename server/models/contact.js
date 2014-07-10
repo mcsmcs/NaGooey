@@ -8,10 +8,10 @@ var contactSchema = new mongoose.Schema({
 	
 	contact_name: String,
 	alias: String,
-	contact_groups: Array,
 	email: String,
 	pager: String,
-	addressx: Array,		// Additional addresses?
+	_contact_groups: Array,
+	_addressx: Array,		// Additional addresses?
 
 	can_submit_commands: Boolean,
 	retain_status_information: Boolean,
@@ -23,7 +23,7 @@ var contactSchema = new mongoose.Schema({
 	host_notification_period: String,	// time_period
 	host_notification_commands: String,
 
-	// Virtual 'host_notification_options'
+	// Virtual: 'host_notification_options'
 	host_notification_up: Boolean,
 	host_notification_down: Boolean,
 	host_notification_recovery: Boolean,
@@ -36,7 +36,7 @@ var contactSchema = new mongoose.Schema({
 	service_notification_period: String,	// time_period
 	service_notification_commands: String,
 
-	// Virtual 'service_notification_options'
+	// Virtual: 'service_notification_options'
 	service_notification_warning: Boolean,
 	service_notification_unknown: Boolean,
 	service_notification_critical: Boolean,
@@ -47,30 +47,34 @@ var contactSchema = new mongoose.Schema({
 
 	/**************** Templates ****************/
 	name: String, 			// Template Name
-	templates: Array,		// Virtual: 'use'
-	registered: Boolean,	// Virtual: 'register'
+	_use: Array,			// Virtual: 'use'
+	_register: Boolean,		// Virtual: 'register'
 });
 
 
 // #################################################
 // #                    Virtuals
 // #################################################
-contactSchema.virtual('register').set(function(value){
-	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
-	else { this.registered = true; }
-});
-contactSchema.virtual('register').get(function(){
-	if(this.registered === true){ return true; }
-	if(this.registered === false){ return false; }
-});
+var stringToArray = function(property){
+	return function(value){ this[property] = value.split(','); };
+};
+var arrayToString = function(property){
+	return function(){ this[property].join(','); };
+};
 
-contactSchema.virtual('use').set(function(value){
-	var split = value.split(',');
-	this.templates = split;
+var virtualArray = function(schema, virtualName){
+	schema.virtual(virtualName).set(stringToArray('_' + virtualName));
+	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
+};
+
+virtualArray(contactSchema, 'use');
+virtualArray(contactSchema, 'addressx');
+virtualArray(contactSchema, 'contact_groups');
+
+contactSchema.virtual('register').set(function(value){
+	if(value === '0' || value === false || value === 'false'){ this._register = false; }
 });
-contactSchema.virtual('use').get(function(){
-	return this.templates.join(',');
-});
+contactSchema.virtual('register').get(function(){ return this._register; });
 
 contactSchema.virtual('host_notification_options').set(function(value){
 	var i;
@@ -87,17 +91,14 @@ contactSchema.virtual('host_notification_options').set(function(value){
 			default: break;
 		}
 	}
-
 });
 contactSchema.virtual('host_notification_options').get(function(){
 	var returnValue = "";
-
 	if(this.host_notification_up === 'true'){ returnValue = returnValue + 'u,'; }
 	if(this.host_notification_down === 'true'){ returnValue = returnValue + 'd,'; }
 	if(this.host_notification_recovery === 'true'){ returnValue = returnValue + 'r,'; }
 	if(this.host_notification_flapping === 'true'){ returnValue = returnValue + 'f,'; }
 	if(this.host_notification_scheduled === 'true'){ returnValue = returnValue + 's'; }
-	
 	return returnValue.replace(/,$/, '');
 });
 
@@ -155,7 +156,6 @@ contactSchema.statics.getContactsByMembers = function(members, cb){
 		}
 	);
 };
-
 
 var hostNotificationsToString = function(options){
 

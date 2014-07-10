@@ -35,62 +35,65 @@ http://nagios.sourceforge.net/docs/3_0/oncallrotation.html
 
 var timePeriodSchema = new mongoose.Schema({
 	
-	timeperiod_name: {
-		type: String,
-		required: true,
-		unique: true
-	},
+	timeperiod_name: String,
+	alias: String,
 
-	alias: {
-		type: String,
-		required: true,
-		unique: true
-	},
+	_monday: Array,		// Virtual: monday [00:00-24:00,05:00-12:00]
+	_tuesday: Array,	// Virtual: tuesday
+	_wednesday: Array,	// Virtual: wednesday
+	_thursday: Array,	// Virtual: thursday
+	_friday: Array,		// Virtual: friday
+	_saturday: Array,	// Virtual: saturday
+	_sunday: Array,		// Virtual: sunday
 
-	rules: Array,
-	exclude: Array,
+	_exclude: Array,	// Virtual: exclude [timeperiod_name]
+	
+	// exceptions: [exceptionSchema],
 
-	monday: Array,
-	tuesday: Array,
-	wednesday: Array,
-	thursday: Array,
-	friday: Array,
-	saturday: Array,
-	sunday: Array,
 
-	// exceptions: [exceptionSchema]
-
-	// Template directives
-	templates: Array,		// use [Template]
-	registered: Boolean,
-	name: String, 		// Template Name
-
+	/**************** Templates ****************/
+	name: String, 			// Template Name
+	_use: Array,			// Virtual: 'use'
+	_register: Boolean,		// Virtual: 'register'
 });
 
 
 // #################################################
 // #                    Virtuals
 // #################################################
+var stringToArray = function(property){
+	return function(value){ this[property] = value.split(','); };
+};
+var arrayToString = function(property){
+	return function(){ this[property].join(','); };
+};
+
+var virtualArray = function(schema, virtualName){
+	schema.virtual(virtualName).set(stringToArray('_' + virtualName));
+	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
+};
+
+
+
+virtualArray(timePeriodSchema, 'use');
+virtualArray(timePeriodSchema, 'monday');
+virtualArray(timePeriodSchema, 'tuesday');
+virtualArray(timePeriodSchema, 'wednesday');
+virtualArray(timePeriodSchema, 'thursday');
+virtualArray(timePeriodSchema, 'friday');
+virtualArray(timePeriodSchema, 'saturday');
+virtualArray(timePeriodSchema, 'sunday');
+virtualArray(timePeriodSchema, 'exclude');
+
 timePeriodSchema.virtual('register').set(function(value){
-	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
-	else { this.registered = true; }
+	if(value === '0' || value === false || value === 'false'){ this._register = false; }
 });
-
-timePeriodSchema.virtual('register').get(function(){
-	if(this.registered === true){ return true; }
-	if(this.registered === false){ return false; }
-});
-
-timePeriodSchema.virtual('use').set(function(value){
-	var split = value.split(',');
-	this.templates = split;
-});
-
-timePeriodSchema.virtual('use').get(function(){
-	return this.templates.join(',');
-});
+timePeriodSchema.virtual('register').get(function(){ return this._register; });
 
 
+// #################################################
+// #                    Statics
+// #################################################
 timePeriodSchema.statics.getNagiosData = function(cb){
 	var i,j,rule,property;
 	var doc, docData;
@@ -146,7 +149,7 @@ timePeriodSchema.statics.getNagiosData = function(cb){
 
 timePeriodSchema.statics.createFromConfig = function(obj,cb){
 	var query;
-	if(obj.name){ query = {name: obj.name}; }			// Template
+	if(obj.name){ query = {name: obj.name}; }					// Template
 	else { query = {timeperiod_name: obj.timeperiod_name}; }	// Object
 
 	this.removeThenSave(query,obj,cb);

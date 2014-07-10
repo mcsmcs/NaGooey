@@ -36,33 +36,34 @@ var commandSchema = new mongoose.Schema({
 		type: String,
 	},
 
-	registered: { type: Boolean, default: true },
-	templates: Array,		// use [Template]
-	name: String 		// Template Name
+	/**************** Templates ****************/
+	name: String, 			// Template Name
+	_use: Array,			// Virtual: 'use'
+	_register: Boolean,		// Virtual: 'register'
 });
 
 
 // #################################################
 // #                    Virtuals
 // #################################################
+var stringToArray = function(property){
+	return function(value){ this[property] = value.split(','); };
+};
+var arrayToString = function(property){
+	return function(){ this[property].join(','); };
+};
+
+var virtualArray = function(schema, virtualName){
+	schema.virtual(virtualName).set(stringToArray('_' + virtualName));
+	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
+};
+
+virtualArray(commandSchema, 'use');
+
 commandSchema.virtual('register').set(function(value){
-	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
-	else { this.registered = true; }
+	if(value === '0' || value === false || value === 'false'){ this._register = false; }
 });
-
-commandSchema.virtual('register').get(function(){
-	if(this.registered === true){ return true; }
-	if(this.registered === false){ return false; }
-});
-
-commandSchema.virtual('use').get(function(value){
-	var split = value.split(',');
-	this.templates = split;
-});
-
-commandSchema.virtual('use').set(function(){
-	return this.templates.join(',');
-});
+commandSchema.virtual('register').get(function(){ return this._register; });
 
 
 // #################################################

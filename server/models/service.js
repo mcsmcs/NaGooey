@@ -53,151 +53,114 @@ define service{
 
 var serviceSchema = new mongoose.Schema({
 	
-	service_description: {
-		type: String,
-	},
-
-	check_command: {
-		type: String,
-	},
-
-	servicegroups: Array,
+	service_description: String,
+	display_name: String,
 	
-	host_name: {
-		type: Array,
-	},
-
-	hostgroup_name: Array,
+	_servicegroups: Array,		// Virtual: servicegroups
+	_host_name: Array,			// Virtual: host_name
+	_hostgroup_name: Array,		// Virtual: hostgroup_name
 	
-	check_interval: {
-		type: Number,
-		default: 5
-	},
+	_contacts: Array,			// Virtual: contacts
+	_contact_groups: Array,		// Virtual: contact_groups
 
-	retry_interval: {
-		type: Number,
-		default: 1
-	},
+	check_command: String,
+	initial_state: String,		// [owuc]
+	check_interval: Number,
+	retry_interval: Number,
+	max_check_attempts: Number,
+	check_period: String,
+	active_checks_enabled: Boolean,
+	
+	passive_checks_enabled: Boolean,
+	check_freshness: Boolean,
+	freshness_threshold: Number,
 
-	max_check_attempts: {
-		type: Number,
-
-	},
-
-	check_period: {
-		type: String,
-		default: '24x7'
-	},
-
-	contacts: {
-		type: Array,
-		default: ['admin']
-	},
-
-	contact_groups: {
-		type: Array,
-		default: ['admins']
-	},
-
+	/**************** Notifications ****************/
+	notifications_enabled: Boolean,
 	first_notification_delay: Number,
-
-	notification_interval: {
-		type: Number,
-		default: 5
-	},
-
+	notification_interval: Number,
 	notification_period: String,
 
-	notification_options: {
-
-		warning: {
-			type: Boolean,
-			default: true
-		},
-
-		recovery: {
-			type: Boolean,
-			default: true
-		},
-
-		unknown: {
-			type: Boolean,
-			default: true
-		},
-
-		flapping: {
-			type: Boolean,
-			default: true
-		},
-
-		critical: {
-			type: Boolean,
-			default: true
-		},
-
-		scheduled: {
-			type: Boolean,
-			default: true
-		}
-	},
+	// Virtual: 'notification_options' // [w,r,u,f,c,s]
+	notification_options_warning: Boolean,
+	notification_options_recovery: Boolean,
+	notification_options_unknown: Boolean,
+	notification_options_flapping: Boolean,
+	notification_options_critical: Boolean,
+	notification_options_scheduled: Boolean,
 
 
-	action_url: String,
-	active_checks_enabled: Boolean,
-	check_freshness: Boolean,
-	display_name: String,
-	event_handler: String, 	// command_name
-	event_handler_enabled: Boolean,
+	/**************** Flapping ****************/
 	flap_detection_enabled: Boolean,
-	flap_detection_options: Array, // [owcu]
-	freshness_threshold: Number,
 	high_flap_threshold: Number,
-	icon_image: String,	// url
-	icon_image_alt: String,	// alt string
-	initial_state: String,	// [owuc]
-	is_volatile: Boolean,
 	low_flap_threshold: Number,
-	notes: String,
-	notes_url: String,
-	notifications_enabled: Boolean,
+	
+	// Virtual: 'flap_detection_options' [o,w,c,u]
+	flap_detection_options_up: Boolean,				// 'o'
+	flap_detection_options_warning: Boolean,		// 'w'
+	flap_detection_options_critical: Boolean,		// 'c'
+	flap_detection_options_unreachable: Boolean,	// 'u'
+	
+
+	// Virtual: 'stalking_options' [o,w,u,c]
+	stalking_options_up: Boolean,			// 'o'
+	stalking_options_warning: Boolean,		// 'w'
+	stalking_options_unreachable: Boolean,	// 'u'
+	stalking_options_critical: Boolean,		// 'c'
+
+	is_volatile: Boolean,
+	event_handler: String, 			// command_name
+	event_handler_enabled: Boolean,
 	obsess_over_service: Boolean,
-	passive_checks_enabled: Boolean,
+
 	process_perf_data: Boolean,
 	retain_nonstatus_information: Boolean,
 	retain_status_information: Boolean,
-	stalking_options: Array,	// [owuc]
 
-	// Template directives
-	templates: Array,		// use [Template]
-	registered: Boolean,
-	name: String, 		// Template Name
+	notes: String,
+	notes_url: String,
+	action_url: String,
+	icon_image: String,		// url
+	icon_image_alt: String,	// alt string
 
+	/**************** Templates ****************/
+	name: String, 			// Template Name
+	_use: Array,			// Virtual: 'use'
+	_register: Boolean,		// Virtual: 'register'
 });
 
 
 // #################################################
 // #                    Virtuals
 // #################################################
+var stringToArray = function(property){
+	return function(value){ this[property] = value.split(','); };
+};
+var arrayToString = function(property){
+	return function(){ this[property].join(','); };
+};
+
+var virtualArray = function(schema, virtualName){
+	schema.virtual(virtualName).set(stringToArray('_' + virtualName));
+	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
+};
+
+virtualArray(serviceSchema, 'use');
+virtualArray(serviceSchema, 'servicegroups');
+virtualArray(serviceSchema, 'host_name');
+virtualArray(serviceSchema, 'hostgroup_name');
+virtualArray(serviceSchema, 'contacts');
+virtualArray(serviceSchema, 'contact_groups');
+
 serviceSchema.virtual('register').set(function(value){
-	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
-	else { this.registered = true; }
+	if(value === '0' || value === false || value === 'false'){ this._register = false; }
 });
-
-serviceSchema.virtual('register').get(function(){
-	if(this.registered === true){ return true; }
-	if(this.registered === false){ return false; }
-});
-
-serviceSchema.virtual('use').set(function(value){
-	var split = value.split(',');
-	this.templates = split;
-});
-
-serviceSchema.virtual('use').get(function(){
-	return this.templates.join(',');
-});
+serviceSchema.virtual('register').get(function(){ return this._register; });
 
 
+// #################################################
+// #                    Statics
+// #################################################
 serviceSchema.statics.getServicesByMembers = function(members, cb){
 	
 	var caller = this;

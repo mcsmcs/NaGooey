@@ -6,60 +6,52 @@ var async = require('async');
 
 var hostGroupSchema = new mongoose.Schema({
 	
-	hostgroup_name: {
-		type: String,
-		unique: true,
-		required: true
-	},
+	hostgroup_name: String,
+	alias: String,
 
-	alias: {
-		type: String,
-		unique: true,
-		required: true
-	},
-
-	members: Array,				// hosts
-	hostgroup_members: Array,	// hostgroups
+	_members: Array,			// hosts
+	_hostgroup_members: Array,	// hostgroups
 	
 	notes: String,				// note_string
 	notes_url: String,			// url
 	action_url: String,			// url
 
 
-	// Template directives
-	templates: Array,		// use [Template]
-	registered: Boolean,
-	name: String, 		// Template Name
-
+	/**************** Templates ****************/
+	name: String, 			// Template Name
+	_use: Array,			// Virtual: 'use'
+	_register: Boolean,		// Virtual: 'register'
 });
 
 
 // #################################################
 // #                    Virtuals
 // #################################################
+var stringToArray = function(property){
+	return function(value){ this[property] = value.split(','); };
+};
+var arrayToString = function(property){
+	return function(){ this[property].join(','); };
+};
+
+var virtualArray = function(schema, virtualName){
+	schema.virtual(virtualName).set(stringToArray('_' + virtualName));
+	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
+};
+
+virtualArray(hostGroupSchema, 'use');
+virtualArray(hostGroupSchema, 'members');
+virtualArray(hostGroupSchema, 'hostgroup_members');
+
 hostGroupSchema.virtual('register').set(function(value){
-	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
-	else { this.registered = true; }
+	if(value === '0' || value === false || value === 'false'){ this._register = false; }
 });
-
-hostGroupSchema.virtual('register').get(function(){
-	if(this.registered === true){ return true; }
-	if(this.registered === false){ return false; }
-});
-
-hostGroupSchema.virtual('use').set(function(value){
-	var split = value.split(',');
-	this.templates = split;
-});
-
-hostGroupSchema.virtual('use').get(function(){
-	return this.templates.join(',');
-});
+hostGroupSchema.virtual('register').get(function(){ return this._register; });
 
 
-/***
- *	Collection Methods
- ***/
+// #################################################
+// #                    Statics
+// #################################################
 hostGroupSchema.statics.isMember = function(host, callback){
 	this.find({members: {$elemMatch: {$in: [host]}}}, {hostgroup_name:1, alias:1, _id:0}, callback);
 };

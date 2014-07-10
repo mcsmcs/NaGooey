@@ -5,50 +5,48 @@ var mongoose = require('mongoose');
 
 
 var contactGroupSchema = new mongoose.Schema({
-	contactgroup_name: {
-		type: String,
-		required: true,
-		unique: true
-	},
 
-	alias: {
-		type: String,
-		required: true
-	},
+	contactgroup_name: { type: String, required: true, unique: true	},
+	alias: { type: String, required: true },
 
-	members: Array,					// contacts
-	contactgroup_members: Array,	//contact_groups
+	_members: Array,				// Virtual: 'members'
+	_contactgroup_members: Array,	// Virtual: 'contactgroup_members'
 
-	// Template directives
-	templates: Array,		// use [Template]
-	registered: Boolean,
-	name: String, 		// Template Name
-
+	/**************** Templates ****************/
+	name: String, 			// Template Name
+	_use: Array,			// Virtual: 'use'
+	_register: Boolean,		// Virtual: 'register'
 });
 
 
 // #################################################
 // #                    Virtuals
 // #################################################
+var stringToArray = function(property){
+	return function(value){ this[property] = value.split(','); };
+};
+var arrayToString = function(property){
+	return function(){ this[property].join(','); };
+};
+
+var virtualArray = function(schema, virtualName){
+	schema.virtual(virtualName).set(stringToArray('_' + virtualName));
+	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
+};
+
+virtualArray(contactGroupSchema, 'use');
+virtualArray(contactGroupSchema, 'members');
+virtualArray(contactGroupSchema, 'contactgroup_members');
+
 contactGroupSchema.virtual('register').set(function(value){
-	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
-	else { this.registered = true; }
+	if(value === '0' || value === false || value === 'false'){ this._register = false; }
 });
+contactGroupSchema.virtual('register').get(function(){ return this._register; });
 
-contactGroupSchema.virtual('register').get(function(){
-	if(this.registered === true){ return true; }
-	if(this.registered === false){ return false; }
-});
 
-contactGroupSchema.virtual('use').set(function(value){
-	var split = value.split(',');
-	this.templates = split;
-});
-
-contactGroupSchema.virtual('use').get(function(){
-	return this.templates.join(',');
-});
-
+// #################################################
+// #                    Statics
+// #################################################
 contactGroupSchema.statics.getNagiosData = function(cb){
 	
 	var i,property;
