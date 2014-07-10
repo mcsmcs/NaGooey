@@ -19,14 +19,35 @@ var contactGroupSchema = new mongoose.Schema({
 	members: Array,					// contacts
 	contactgroup_members: Array,	//contact_groups
 
-	register: {
-		type: Boolean,
-		default: true
-	},
-	use: String,		// use [Template]
-	name: String 		// Template Name
+	// Template directives
+	templates: Array,		// use [Template]
+	registered: Boolean,
+	name: String, 		// Template Name
+
 });
 
+
+// #################################################
+// #                    Virtuals
+// #################################################
+contactGroupSchema.virtual('register').set(function(value){
+	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
+	else { this.registered = true; }
+});
+
+contactGroupSchema.virtual('register').get(function(){
+	if(this.registered === true){ return true; }
+	if(this.registered === false){ return false; }
+});
+
+contactGroupSchema.virtual('use').set(function(value){
+	var split = value.split(',');
+	this.templates = split;
+});
+
+contactGroupSchema.virtual('use').get(function(){
+	return this.templates.join(',');
+});
 
 contactGroupSchema.statics.getNagiosData = function(cb){
 	
@@ -84,7 +105,6 @@ contactGroupSchema.statics.createFromConfig = function(obj,cb){
 
 contactGroupSchema.statics.removeThenSave = function(query,obj,cb){
 	var Model = this;
-	console.log(obj);
 	Model.remove(query, function(err){
 		if(err){ console.log(err); }
 		var doc = new Model(obj);

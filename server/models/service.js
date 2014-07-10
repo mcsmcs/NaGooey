@@ -55,56 +55,47 @@ var serviceSchema = new mongoose.Schema({
 	
 	service_description: {
 		type: String,
-		unique: true,
-		required: true
 	},
 
 	check_command: {
 		type: String,
-		required: true
 	},
 
 	servicegroups: Array,
 	
 	host_name: {
 		type: Array,
-		required: true
 	},
 
 	hostgroup_name: Array,
 	
 	check_interval: {
 		type: Number,
-		required: true,
 		default: 5
 	},
 
 	retry_interval: {
 		type: Number,
-		required: true,
 		default: 1
 	},
 
 	max_check_attempts: {
 		type: Number,
-		required: true
+
 	},
 
 	check_period: {
 		type: String,
-		required: true,
 		default: '24x7'
 	},
 
 	contacts: {
 		type: Array,
-		required: true,
 		default: ['admin']
 	},
 
 	contact_groups: {
 		type: Array,
-		required: true,
 		default: ['admins']
 	},
 
@@ -112,7 +103,6 @@ var serviceSchema = new mongoose.Schema({
 
 	notification_interval: {
 		type: Number,
-		required: true,
 		default: 5
 	},
 
@@ -122,37 +112,31 @@ var serviceSchema = new mongoose.Schema({
 
 		warning: {
 			type: Boolean,
-			required: true,
 			default: true
 		},
 
 		recovery: {
 			type: Boolean,
-			required: true,
 			default: true
 		},
 
 		unknown: {
 			type: Boolean,
-			required: true,
 			default: true
 		},
 
 		flapping: {
 			type: Boolean,
-			required: true,
 			default: true
 		},
 
 		critical: {
 			type: Boolean,
-			required: true,
 			default: true
 		},
 
 		scheduled: {
 			type: Boolean,
-			required: true,
 			default: true
 		}
 	},
@@ -183,13 +167,36 @@ var serviceSchema = new mongoose.Schema({
 	retain_status_information: Boolean,
 	stalking_options: Array,	// [owuc]
 
-	register: {
-		type: Boolean,
-		default: true
-	},
-	use: String,		// use [Template]
+	// Template directives
+	templates: Array,		// use [Template]
+	registered: Boolean,
 	name: String, 		// Template Name
+
 });
+
+
+// #################################################
+// #                    Virtuals
+// #################################################
+serviceSchema.virtual('register').set(function(value){
+	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
+	else { this.registered = true; }
+});
+
+serviceSchema.virtual('register').get(function(){
+	if(this.registered === true){ return true; }
+	if(this.registered === false){ return false; }
+});
+
+serviceSchema.virtual('use').set(function(value){
+	var split = value.split(',');
+	this.templates = split;
+});
+
+serviceSchema.virtual('use').get(function(){
+	return this.templates.join(',');
+});
+
 
 serviceSchema.statics.getServicesByMembers = function(members, cb){
 	
@@ -270,7 +277,6 @@ serviceSchema.statics.createFromConfig = function(obj,cb){
 
 serviceSchema.statics.removeThenSave = function(query,obj,cb){
 	var Model = this;
-	console.log(obj);
 	Model.remove(query, function(err){
 		if(err){ console.log(err); }
 		var doc = new Model(obj);

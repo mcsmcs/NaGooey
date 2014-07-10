@@ -26,12 +26,34 @@ var hostGroupSchema = new mongoose.Schema({
 	action_url: String,			// url
 
 
-	register: {
-		type: Boolean,
-		default: true
-	},
-	use: String,		// use [Template]
+	// Template directives
+	templates: Array,		// use [Template]
+	registered: Boolean,
 	name: String, 		// Template Name
+
+});
+
+
+// #################################################
+// #                    Virtuals
+// #################################################
+hostGroupSchema.virtual('register').set(function(value){
+	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
+	else { this.registered = true; }
+});
+
+hostGroupSchema.virtual('register').get(function(){
+	if(this.registered === true){ return true; }
+	if(this.registered === false){ return false; }
+});
+
+hostGroupSchema.virtual('use').set(function(value){
+	var split = value.split(',');
+	this.templates = split;
+});
+
+hostGroupSchema.virtual('use').get(function(){
+	return this.templates.join(',');
 });
 
 
@@ -182,7 +204,6 @@ hostGroupSchema.statics.createFromConfig = function(obj,cb){
 
 hostGroupSchema.statics.removeThenSave = function(query,obj,cb){
 	var Model = this;
-	console.log(obj);
 	Model.remove(query, function(err){
 		if(err){ console.log(err); }
 		var doc = new Model(obj);

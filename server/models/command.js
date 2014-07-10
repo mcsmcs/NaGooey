@@ -36,10 +36,38 @@ var commandSchema = new mongoose.Schema({
 		type: String,
 	},
 
-	register: String,
-	use: String,		// use [Template]
+	registered: { type: Boolean, default: true },
+	templates: Array,		// use [Template]
 	name: String 		// Template Name
 });
+
+
+// #################################################
+// #                    Virtuals
+// #################################################
+commandSchema.virtual('register').set(function(value){
+	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
+	else { this.registered = true; }
+});
+
+commandSchema.virtual('register').get(function(){
+	if(this.registered === true){ return true; }
+	if(this.registered === false){ return false; }
+});
+
+commandSchema.virtual('use').get(function(value){
+	var split = value.split(',');
+	this.templates = split;
+});
+
+commandSchema.virtual('use').set(function(){
+	return this.templates.join(',');
+});
+
+
+// #################################################
+// #                    Statics (model)
+// #################################################
 
 commandSchema.statics.getCheckCommands = function(cb){
 	this.find({check_command: true}, cb);
@@ -107,7 +135,6 @@ commandSchema.statics.createFromConfig = function(obj,cb){
 
 commandSchema.statics.removeThenSave = function(query,obj,cb){
 	var Model = this;
-	console.log(obj);
 	Model.remove(query, function(err){
 		if(err){ console.log(err); }
 		var doc = new Model(obj);

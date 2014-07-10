@@ -90,12 +90,37 @@ var hostSchema = new mongoose.Schema({
 		type: Boolean,
 	},
 
-	register: String,
-	use: String,		// use [Template]
+	
+
+	// Template directives
+	templates: Array,		// use [Template]
+	registered: Boolean,
 	name: String, 		// Template Name
 
 });
 
+
+// #################################################
+// #                    Virtuals
+// #################################################
+hostSchema.virtual('register').set(function(value){
+	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
+	else { this.registered = true; }
+});
+
+hostSchema.virtual('register').get(function(){
+	if(this.registered === true){ return true; }
+	if(this.registered === false){ return false; }
+});
+
+hostSchema.virtual('use').set(function(value){
+	var split = value.split(',');
+	this.templates = split;
+});
+
+hostSchema.virtual('use').get(function(){
+	return this.templates.join(',');
+});
 
 hostSchema.statics.getHostsByMembers = function(members, cb){
 	
@@ -192,6 +217,14 @@ hostSchema.methods.addNotificationOptions = function(notificationoptions){
 // 	// needs to be an ordered set (no duplicates, and order matters)
 // };
 
+hostSchema.methods.isTemplate = function(){
+	if (this.register === 'false' && this.name){
+		return true;
+	} else {
+		return false;
+	}
+};
+
 
 hostSchema.statics.getNagiosData = function(cb){
 	var i,property;
@@ -243,13 +276,11 @@ hostSchema.statics.createFromConfig = function(obj,cb){
 	var query;
 	if(obj.name){ query = {name: obj.name}; }			// Template
 	else { query = {host_name: obj.host_name}; }	// Object
-
 	this.removeThenSave(query,obj,cb);
 };
 
 hostSchema.statics.removeThenSave = function(query,obj,cb){
 	var Model = this;
-	console.log(obj);
 	Model.remove(query, function(err){
 		if(err){ console.log(err); }
 		var doc = new Model(obj);

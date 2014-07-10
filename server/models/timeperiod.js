@@ -60,14 +60,36 @@ var timePeriodSchema = new mongoose.Schema({
 
 	// exceptions: [exceptionSchema]
 
-	register: {
-		type: Boolean,
-		default: true
-	},
-	use: String,		// use [Template]
+	// Template directives
+	templates: Array,		// use [Template]
+	registered: Boolean,
 	name: String, 		// Template Name
 
 });
+
+
+// #################################################
+// #                    Virtuals
+// #################################################
+timePeriodSchema.virtual('register').set(function(value){
+	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
+	else { this.registered = true; }
+});
+
+timePeriodSchema.virtual('register').get(function(){
+	if(this.registered === true){ return true; }
+	if(this.registered === false){ return false; }
+});
+
+timePeriodSchema.virtual('use').set(function(value){
+	var split = value.split(',');
+	this.templates = split;
+});
+
+timePeriodSchema.virtual('use').get(function(){
+	return this.templates.join(',');
+});
+
 
 timePeriodSchema.statics.getNagiosData = function(cb){
 	var i,j,rule,property;
@@ -132,7 +154,6 @@ timePeriodSchema.statics.createFromConfig = function(obj,cb){
 
 timePeriodSchema.statics.removeThenSave = function(query,obj,cb){
 	var Model = this;
-	console.log(obj);
 	Model.remove(query, function(err){
 		if(err){ console.log(err); }
 		var doc = new Model(obj);

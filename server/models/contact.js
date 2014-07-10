@@ -6,116 +6,134 @@ var mongoose = require('mongoose');
 
 var contactSchema = new mongoose.Schema({
 	
-	contact_name: {
-		type: String,
-		required: true,
-		unique: true,
-	},
-
+	contact_name: String,
 	alias: String,
 	contact_groups: Array,
 	email: String,
 	pager: String,
 	addressx: Array,		// Additional addresses?
+
+	can_submit_commands: Boolean,
+	retain_status_information: Boolean,
+	retain_nonstatus_information: Boolean,
 	
-	host_notifications_enabled: {
-		type: Boolean,
-	},
 
-	service_notifications_enabled: {
-		type: Boolean,
-	},
+	/**************** Hosts ****************/
+	host_notifications_enabled: Boolean,
+	host_notification_period: String,	// time_period
+	host_notification_commands: String,
 
-	// Time Periods
-	host_notification_period: {
-		type: String,	// time_period
-	},
+	// Virtual 'host_notification_options'
+	host_notification_up: Boolean,
+	host_notification_down: Boolean,
+	host_notification_recovery: Boolean,
+	host_notification_flapping: Boolean,
+	host_notification_scheduled: Boolean,
 
-	service_notification_period: {
-		type: String,	// time_period
-	},
-
-	host_notification_options: {
-		down: {
-			type: Boolean,
-		},
-
-		up: {
-			type: Boolean,
-		},
-
-		recoveries: {
-			type: Boolean,
-		},
-
-		flapping: {
-			type: Boolean,
-		},
-
-		scheduled: {
-			type: Boolean,
-		},
-	},
-
-	service_notification_options: {
-		warning: {
-			type: Boolean,
-		},
-
-		unknown: {
-			type: Boolean,
-		},
-
-		critical: {
-			type: Boolean,
-		},
-
-		recoveries: {
-			type: Boolean,
-		},
-
-		flapping: {
-			type: Boolean,
-		},
-
-		scheduled: {
-			type: Boolean,
-		},
-	},
-
-	host_notification_commands: {
-		type: String,
-		default: 'notify-host-by-email'
-	},
-
-	service_notification_commands: {
-		type: String,
-		default: 'notify-service-by-email'
-	},
 	
-	can_submit_commands: {
-		type: Boolean,
-		default: true
-	},
+	/**************** Services ****************/
+	service_notifications_enabled: Boolean,
+	service_notification_period: String,	// time_period
+	service_notification_commands: String,
 
-	retain_status_information: {
-		type: Boolean,
-		default: true
-	},
-
-	retain_nonstatus_information: {
-		type: Boolean,
-		default: true
-	},
-
-	register: String,
-	use: String,		// use [Template]
-	name: String 		// Template Name
+	// Virtual 'service_notification_options'
+	service_notification_warning: Boolean,
+	service_notification_unknown: Boolean,
+	service_notification_critical: Boolean,
+	service_notification_recovery: Boolean,
+	service_notification_flapping: Boolean,
+	service_notification_scheduled: Boolean,
 
 
+	/**************** Templates ****************/
+	name: String, 			// Template Name
+	templates: Array,		// Virtual: 'use'
+	registered: Boolean,	// Virtual: 'register'
 });
 
 
+// #################################################
+// #                    Virtuals
+// #################################################
+contactSchema.virtual('register').set(function(value){
+	if(value === '0' || value === false || value === 'false'){ this.registered = false; }
+	else { this.registered = true; }
+});
+contactSchema.virtual('register').get(function(){
+	if(this.registered === true){ return true; }
+	if(this.registered === false){ return false; }
+});
+
+contactSchema.virtual('use').set(function(value){
+	var split = value.split(',');
+	this.templates = split;
+});
+contactSchema.virtual('use').get(function(){
+	return this.templates.join(',');
+});
+
+contactSchema.virtual('host_notification_options').set(function(value){
+	var i;
+	var split = value.split(',');
+	this.host_notification_up = this.host_notification_down = this.host_notification_recovery = this.host_notification_flapping = this.host_notification_scheduled = false;
+
+	for (i=0;i<split.length;i++){
+		switch(split[i]){
+			case 'u': this.host_notification_up = true; break;
+			case 'd': this.host_notification_down = true; break;
+			case 'r': this.host_notification_recovery = true; break;
+			case 'f': this.host_notification_flapping = true; break;
+			case 's': this.host_notification_scheduled = true; break;
+			default: break;
+		}
+	}
+
+});
+contactSchema.virtual('host_notification_options').get(function(){
+	var returnValue = "";
+
+	if(this.host_notification_up === 'true'){ returnValue = returnValue + 'u,'; }
+	if(this.host_notification_down === 'true'){ returnValue = returnValue + 'd,'; }
+	if(this.host_notification_recovery === 'true'){ returnValue = returnValue + 'r,'; }
+	if(this.host_notification_flapping === 'true'){ returnValue = returnValue + 'f,'; }
+	if(this.host_notification_scheduled === 'true'){ returnValue = returnValue + 's'; }
+	
+	return returnValue.replace(/,$/, '');
+});
+
+contactSchema.virtual('service_notification_options').set(function(value){
+	var i;
+	var split = value.split(',');
+	
+	this.service_notification_warning = this.service_notification_unknown = this.service_notification_critical = this.service_notification_recovery = this.service_notification_flapping = this.service_notification_scheduled = false;
+	for (i=0;i<split.length;i++){
+		switch(split[i]){
+			case 'w': this.service_notification_warning = true; break;
+			case 'u': this.service_notification_unknown = true; break;
+			case 'c': this.service_notification_critical = true; break;
+			case 'r': this.service_notification_recovery = true; break;
+			case 'f': this.service_notification_flapping = true; break;
+			case 's': this.service_notification_scheduled = true; break;
+			default: break;
+		}
+	}
+
+});
+contactSchema.virtual('service_notification_options').get(function(){
+	var returnValue = "";
+	if(this.service_notification_warning === 'true'){ returnValue = returnValue + 'w,'; }
+	if(this.service_notification_unknown === 'true'){ returnValue = returnValue + 'u,'; }
+	if(this.service_notification_critical === 'true'){ returnValue = returnValue + 'c,'; }
+	if(this.service_notification_recovery === 'true'){ returnValue = returnValue + 'r,'; }
+	if(this.service_notification_flapping === 'true'){ returnValue = returnValue + 'f,'; }
+	if(this.service_notification_scheduled === 'true'){ returnValue = returnValue + 's'; }
+	return returnValue.replace(/,$/, '');
+});
+
+
+// #################################################
+// #                    Statics
+// #################################################
 contactSchema.statics.getContactsExcept = function(contacts, cb){
 	this.find({contact_name: {$not: {$in: contacts}}}, {_id:0, contact_name:1}, cb);
 };
@@ -225,7 +243,6 @@ contactSchema.statics.createFromConfig = function(obj,cb){
 
 contactSchema.statics.removeThenSave = function(query,obj,cb){
 	var Model = this;
-	console.log(obj);
 	Model.remove(query, function(err){
 		if(err){ console.log(err); }
 		var doc = new Model(obj);
