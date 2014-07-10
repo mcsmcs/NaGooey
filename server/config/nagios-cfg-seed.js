@@ -50,6 +50,8 @@ detectLinuxDistro(function(err,distro){
 	// Parse Nagios Config Files
 	require('../nagios/nagiosParser')(path, function(err,nagios){
 
+		// console.log(nagios.objects.timeperiods);
+		
 		// Add objects to MongoDB
 		async.parallel(
 			{

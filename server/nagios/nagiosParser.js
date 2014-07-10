@@ -100,8 +100,11 @@ module.exports = function(configPath, callback){
 						var newObject, objectType, inObjectDefn = false;
 						var reDefinition = /\s*define\s*(\w*)\s*\{/;
 						var reDirectives = /\s*(\w*)\s*([^;]*)/;
+						var reTimeDirectives = /(.*?)(\d\d:\d\d-\d\d:\d\d.*?);?/;
 
 						lines.forEach(function(line){
+							var directives, timeDirectives;
+
 							if(line.match(/^#/)){ null; }		// Comments
 							else if(line.match(/^$/)){ null; }	// Blank Lines
 							else if(reDefinition.exec(line)){	// Object Defn
@@ -109,14 +112,40 @@ module.exports = function(configPath, callback){
 								newObject = [];
 								objectType = reDefinition.exec(line)[1] + 's';
 							}
+							else if (inObjectDefn === true && objectType === 'timeperiods'){
+								
+								if(line.match(/\}/)){ 			// End of Object Defn
+									inObjectDefn = false;
+									nagios.objects[objectType].push(newObject);
+								}
+								else { 
+
+									directives = reDirectives.exec(line);
+									timeDirectives = reTimeDirectives.exec(line);
+
+									if (timeDirectives){
+										newObject.push({
+											directive: timeDirectives[1].trim(),
+											value: timeDirectives[2].trim()
+										});
+									} else {
+										newObject.push({
+											directive: directives[1].trim(),
+											value: directives[2].trim()
+										});
+									}
+								}
+							}
 							else if (inObjectDefn === true){	// In Object Defn
+								directives = reDirectives.exec(line);
+
 								if(line.match(/\}/)){ 			// End of Object Defn
 									inObjectDefn = false;
 									nagios.objects[objectType].push(newObject);
 								}
 								else { newObject.push({			// Object Directives
-										directive: reDirectives.exec(line)[1],
-										value: reDirectives.exec(line)[2].trim()
+										directive: directives[1].trim(),
+										value: directives[2].trim()
 									});
 								}
 							}

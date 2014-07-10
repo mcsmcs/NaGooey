@@ -230,7 +230,6 @@ hostSchema.statics.updateHostgroupMembership = function(hostgroup, members, cb){
 	);
 };
 
-
 hostSchema.methods.addHostGroup = function(hostgroup){
 	this.host_groups.addToSet(hostgroup);
 	this.save();

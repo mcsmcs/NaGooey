@@ -33,6 +33,11 @@ july 10 - 15 / 2 		""				Every other day between july10-july15
 http://nagios.sourceforge.net/docs/3_0/oncallrotation.html
 */
 
+var exceptionSchema = new mongoose.Schema({
+	exception: String,
+	_times: Array,		// Virtual: times [hh:mm-hh:mm]
+});
+
 var timePeriodSchema = new mongoose.Schema({
 	
 	timeperiod_name: String,
@@ -48,7 +53,15 @@ var timePeriodSchema = new mongoose.Schema({
 
 	_exclude: Array,	// Virtual: exclude [timeperiod_name]
 	
-	// exceptions: [exceptionSchema],
+	exceptions: [exceptionSchema],
+	/*
+	*	Exception Stuff
+	*	
+	* 	/(.*?)(\d\d:\d\d-\d\d:\d\d.*?);/.exec(exception_line)
+	*
+	*	result[1] = directive (dates)
+	*	result[2] = times hh:mm-hh:mm,hh:mm....
+	*/
 
 
 	/**************** Templates ****************/
@@ -73,7 +86,7 @@ var virtualArray = function(schema, virtualName){
 	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
 };
 
-
+virtualArray(exceptionSchema, 'times');
 
 virtualArray(timePeriodSchema, 'use');
 virtualArray(timePeriodSchema, 'monday');
@@ -148,10 +161,24 @@ timePeriodSchema.statics.getNagiosData = function(cb){
 
 
 timePeriodSchema.statics.createFromConfig = function(obj,cb){
+	var exceptions = [];
+	var paths = {};
+	var property;
 	var query;
 	if(obj.name){ query = {name: obj.name}; }					// Template
 	else { query = {timeperiod_name: obj.timeperiod_name}; }	// Object
 
+	// Parse for "exceptions"
+	this.schema.eachPath(function(value){ paths[value.replace(/^_/,'')] = true; });
+	for (property in obj){
+		if (obj.hasOwnProperty(property)){
+			if (!paths[property]){
+				exceptions.push({ exception: property, times: obj[property] });
+			}
+		}
+	}
+
+	obj.exceptions = exceptions;
 	this.removeThenSave(query,obj,cb);
 };
 
