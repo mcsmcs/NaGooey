@@ -69,7 +69,7 @@ var stringToArray = function(property){
 	return function(value){ this[property] = value.split(','); };
 };
 var arrayToString = function(property){
-	return function(){ this[property].join(','); };
+	return function(){ return this[property].join(','); };
 };
 
 var virtualArray = function(schema, virtualName){
@@ -102,12 +102,26 @@ timePeriodSchema.statics.getNagiosData = function(cb){
 	var i,j,rule,property;
 	var doc, docData;
 	var returnData = [];
-	var objCleanup = function(doc,ret,options){ delete ret._id; delete ret.__v; };
+	var Model = this;
+
+	var objCleanup = function(doc,ret,options){ 
+		delete ret.id;
+
+		// Remove internal properties
+		Model.schema.eachPath(function(path){ if (/^_/.exec(path)){ delete ret[path]; }});
+
+		// Remove empty properties
+		for (property in ret){
+			if (ret.hasOwnProperty(property)){
+				if (ret[property] === undefined || ret[property] === ''){ delete ret[property]; }
+			}
+		}
+	};
 
 	this.find({}, function(err, docs){
 
 		for (i=0; i<docs.length; i++){
-			doc = docs[i].toObject({transform: objCleanup});
+			doc = docs[i].toObject({virtuals: true, transform: objCleanup});
 			// console.log(doc);
 
 			docData = [];
@@ -116,6 +130,11 @@ timePeriodSchema.statics.getNagiosData = function(cb){
 					switch(property){
 						case 'needs_extra_processing':
 							//process some stuff here
+							break;
+						case 'exceptions':
+							for (j=0; j<doc.exceptions.length; j++){
+								docData.push({ directive: doc.exceptions[j].exception, value: doc.exceptions[j]._times.join(',')});
+							}
 							break;
 						case 'rules':
 							for (j=0; j<doc.rules.length; j++){
@@ -161,7 +180,7 @@ timePeriodSchema.statics.createFromConfig = function(obj,cb){
 	else { query = {timeperiod_name: obj.timeperiod_name}; }	// Object
 
 	// Parse for "exceptions"
-	this.schema.eachPath(function(value){ paths[value.replace(/^_/,'')] = true; });
+	this.schema.eachPath(function(path){ paths[path.replace(/^_/,'')] = true; });
 	for (property in obj){
 		if (obj.hasOwnProperty(property)){
 			if (!paths[property]){

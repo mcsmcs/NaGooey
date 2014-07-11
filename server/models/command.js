@@ -46,7 +46,7 @@ var stringToArray = function(property){
 	return function(value){ this[property] = value.split(','); };
 };
 var arrayToString = function(property){
-	return function(){ this[property].join(','); };
+	return function(){ return this[property].join(','); };
 };
 
 var virtualArray = function(schema, virtualName){
@@ -65,7 +65,6 @@ commandSchema.virtual('register').get(function(){ return this._register; });
 // #################################################
 // #                    Statics (model)
 // #################################################
-
 commandSchema.statics.getCheckCommands = function(cb){
 	this.find({check_command: true}, cb);
 };
@@ -75,18 +74,26 @@ commandSchema.statics.getNagiosData = function(cb){
 	var i,property;
 	var doc, docData;
 	var returnData = [];
-	var objCleanup = function(doc,ret,options){ 
-		delete ret._id; 
-		delete ret.__v; 
-		delete ret.check_command;
-		delete ret.description;
+	var Model = this;
 
+	var objCleanup = function(doc,ret,options){ 
+		delete ret.id;
+
+		// Remove internal properties
+		Model.schema.eachPath(function(path){ if (/^_/.exec(path)){ delete ret[path]; }});
+
+		// Remove empty properties
+		for (property in ret){
+			if (ret.hasOwnProperty(property)){
+				if (ret[property] === undefined || ret[property] === ''){ delete ret[property]; }
+			}
+		}
 	};
 
 	this.find({}, function(err, docs){
 
 		for (i=0; i<docs.length; i++){
-			doc = docs[i].toObject({transform: objCleanup});
+			doc = docs[i].toObject({virtuals: true, transform: objCleanup});
 
 			docData = [];
 			for (property in doc){

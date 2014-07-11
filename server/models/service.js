@@ -82,12 +82,12 @@ var serviceSchema = new mongoose.Schema({
 	notification_period: String,
 
 	// Virtual: 'notification_options' // [w,r,u,f,c,s]
-	notification_options_warning: Boolean,
-	notification_options_recovery: Boolean,
-	notification_options_unknown: Boolean,
-	notification_options_flapping: Boolean,
-	notification_options_critical: Boolean,
-	notification_options_scheduled: Boolean,
+	_notification_options_warning: Boolean,
+	_notification_options_recovery: Boolean,
+	_notification_options_unknown: Boolean,
+	_notification_options_flapping: Boolean,
+	_notification_options_critical: Boolean,
+	_notification_options_scheduled: Boolean,
 
 
 	/**************** Flapping ****************/
@@ -96,17 +96,17 @@ var serviceSchema = new mongoose.Schema({
 	low_flap_threshold: Number,
 	
 	// Virtual: 'flap_detection_options' [o,w,c,u]
-	flap_detection_options_up: Boolean,				// 'o'
-	flap_detection_options_warning: Boolean,		// 'w'
-	flap_detection_options_critical: Boolean,		// 'c'
-	flap_detection_options_unreachable: Boolean,	// 'u'
+	_flap_detection_options_up: Boolean,			// 'o'
+	_flap_detection_options_warning: Boolean,		// 'w'
+	_flap_detection_options_critical: Boolean,		// 'c'
+	_flap_detection_options_unreachable: Boolean,	// 'u'
 	
 
 	// Virtual: 'stalking_options' [o,w,u,c]
-	stalking_options_up: Boolean,			// 'o'
-	stalking_options_warning: Boolean,		// 'w'
-	stalking_options_unreachable: Boolean,	// 'u'
-	stalking_options_critical: Boolean,		// 'c'
+	_stalking_options_up: Boolean,			// 'o'
+	_stalking_options_warning: Boolean,		// 'w'
+	_stalking_options_unreachable: Boolean,	// 'u'
+	_stalking_options_critical: Boolean,	// 'c'
 
 	is_volatile: Boolean,
 	event_handler: String, 			// command_name
@@ -137,7 +137,7 @@ var stringToArray = function(property){
 	return function(value){ this[property] = value.split(','); };
 };
 var arrayToString = function(property){
-	return function(){ this[property].join(','); };
+	return function(){ return this[property].join(','); };
 };
 
 var virtualArray = function(schema, virtualName){
@@ -156,6 +156,87 @@ serviceSchema.virtual('register').set(function(value){
 	if(value === '0' || value === false || value === 'false'){ this._register = false; }
 });
 serviceSchema.virtual('register').get(function(){ return this._register; });
+
+
+serviceSchema.virtual('notification_options').set(function(value){
+	var i;
+	var split = value.split(',');
+
+	this._notification_options_warning = this._notification_options_recovery = this._notification_options_unknown = false;
+	this._notification_options_flapping = this._notification_options_critical = this._notification_options_scheduled = false;
+
+	for (i=0;i<split.length;i++){
+		switch(split[i]){
+			case 'w': this._notification_options_warning = true; break;
+			case 'r': this._notification_options_recovery = true; break;
+			case 'u': this._notification_options_unknown = true; break;
+			case 'f': this._notification_options_flapping = true; break;
+			case 'c': this._notification_options_critical = true; break;
+			case 's': this._notification_options_scheduled = true; break;
+			default: break;
+		}
+	}
+});
+serviceSchema.virtual('notification_options').get(function(){
+	var returnValue = '';
+	if (this._notification_options_warning){ returnValue += 'w,'; }
+	if (this._notification_options_recovery){ returnValue += 'r,'; }
+	if (this._notification_options_unknown){ returnValue += 'u,'; }
+	if (this._notification_options_flapping){ returnValue += 'f,'; }
+	if (this._notification_options_critical){ returnValue += 'c,'; }
+	if (this._notification_options_scheduled){ returnValue += 's'; }
+	return returnValue.replace(/,$/, '');
+});
+
+serviceSchema.virtual('flap_detection_options').set(function(value){
+	var i;
+	var split = value.split(',');
+
+	this._flap_detection_options_up = this._flap_detection_options_warning = this._flap_detection_options_critical = this._flap_detection_options_unreachable = false;
+
+	for (i=0;i<split.length;i++){
+		switch(split[i]){
+			case 'o': this._flap_detection_options_up = true; break;
+			case 'w': this._flap_detection_options_warning = true; break;
+			case 'c': this._flap_detection_options_critical = true; break;
+			case 'u': this._flap_detection_options_unreachable = true; break;
+			default: break;
+		}
+	}
+});
+serviceSchema.virtual('flap_detection_options').get(function(){
+	var returnValue = '';
+	if (this._flap_detection_options_up){ returnValue += 'o,'; }
+	if (this._flap_detection_options_warning){ returnValue += 'w,'; }
+	if (this._flap_detection_options_critical){ returnValue += 'c,'; }
+	if (this._flap_detection_options_unreachable){ returnValue += 'u'; }
+	return returnValue.replace(/,$/, '');
+});
+
+serviceSchema.virtual('stalking_options').set(function(value){
+	var i;
+	var split = value.split(',');
+
+	this._stalking_options_up = this._stalking_options_warning = this._stalking_options_critical = this._stalking_options_unreachable = false;
+
+	for (i=0;i<split.length;i++){
+		switch(split[i]){
+			case 'o': this._stalking_options_up = true; break;
+			case 'w': this._stalking_options_warning = true; break;
+			case 'c': this._stalking_options_critical = true; break;
+			case 'u': this._stalking_options_unreachable = true; break;
+			default: break;
+		}
+	}
+});
+serviceSchema.virtual('stalking_options').get(function(){
+	var returnValue = '';
+	if (this._stalking_options_up){ returnValue += 'o,'; }
+	if (this._stalking_options_warning){ returnValue += 'w,'; }
+	if (this._stalking_options_critical){ returnValue += 'c,'; }
+	if (this._stalking_options_unreachable){ returnValue += 'u'; }
+	return returnValue.replace(/,$/, '');
+});
 
 
 // #################################################
@@ -184,23 +265,32 @@ serviceSchema.statics.getNagiosData = function(cb){
 	var i,property;
 	var doc, docData;
 	var returnData = [];
-	var objCleanup = function(doc,ret,options){ delete ret._id; delete ret.__v; };
+	var Model = this;
+
+	var objCleanup = function(doc,ret,options){ 
+		delete ret.id;
+
+		// Remove internal properties
+		Model.schema.eachPath(function(path){ if (/^_/.exec(path)){ delete ret[path]; }});
+
+		// Remove empty properties
+		for (property in ret){
+			if (ret.hasOwnProperty(property)){
+				if (ret[property] === undefined || ret[property] === ''){ delete ret[property]; }
+			}
+		}
+	};
 
 	this.find({}, function(err, docs){
 
 		for (i=0; i<docs.length; i++){
-			doc = docs[i].toObject({transform: objCleanup});
-			// console.log(doc);
+			doc = docs[i].toObject({virtuals: true, transform: objCleanup});
 
 			docData = [];
 			for (property in doc){
 				if(doc.hasOwnProperty(property)){
 					switch(property){
 						case 'needs_extra_processing':
-							//process some stuff here
-							break;
-							
-						case 'notification_options':
 							//process some stuff here
 							break;
 						default:

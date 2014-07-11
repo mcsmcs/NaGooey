@@ -66,7 +66,7 @@ var compileNagiosObject = function(ObjectType, Model){
 			definitions.push(definition.join('\n'));
 		}
 
-		fs.writeFile('../../../sp-helper/nagooey/' + ObjectType + 's.cfg', definitions.join('\n'), function(err){
+		fs.writeFile('../../../test2/' + ObjectType + 's.cfg', definitions.join('\n'), function(err){
 			if(err){ console.log(err); }
 			else { console.log(ObjectType + 's file saved.'); }
 		});

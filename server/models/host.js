@@ -35,16 +35,16 @@ var hostSchema = new mongoose.Schema({
 	notification_period: String,		// timeperiod_name
 	
 	// Virtual: 'notification_options' [d,u,r,f,s]
-	notification_options_down: Boolean,			// 'd'
-	notification_options_up: Boolean,			// 'u'
-	notification_options_recovery: Boolean,		// 'r'
-	notification_options_flapping: Boolean,		// 'f'
-	notification_options_scheduled: Boolean,	// 's'
+	_notification_options_down: Boolean,		// 'd'
+	_notification_options_up: Boolean,			// 'u'
+	_notification_options_recovery: Boolean,	// 'r'
+	_notification_options_flapping: Boolean,	// 'f'
+	_notification_options_scheduled: Boolean,	// 's'
 	
 	// Virtual: 'stalking_options'  [o,d,u]
-	stalking_options_up: Boolean,				// 'o'
-	stalking_options_down: Boolean,				// 'd'
-	stalking_options_unreachable: Boolean,		// 'u'
+	_stalking_options_up: Boolean,				// 'o'
+	_stalking_options_down: Boolean,			// 'd'
+	_stalking_options_unreachable: Boolean,		// 'u'
 	
 	obsess_over_host: Boolean,
 
@@ -56,9 +56,9 @@ var hostSchema = new mongoose.Schema({
 	high_flap_threshold: Number,
 	
 	// Virtual: 'flap_detection_options ' [o,d,u]
-	flap_detection_options_up: Boolean,				// 'o'
-	flap_detection_options_down: Boolean,			// 'd'
-	flap_detection_options_unreachable: Boolean,	// 'u'
+	_flap_detection_options_up: Boolean,			// 'o'
+	_flap_detection_options_down: Boolean,			// 'd'
+	_flap_detection_options_unreachable: Boolean,	// 'u'
 	
 	check_freshness: Boolean,
 	freshness_threshold: Number,
@@ -91,7 +91,7 @@ var stringToArray = function(property){
 	return function(value){ this[property] = value.split(','); };
 };
 var arrayToString = function(property){
-	return function(){ this[property].join(','); };
+	return function(){ return this[property].join(','); };
 };
 
 var virtualArray = function(schema, virtualName){
@@ -114,47 +114,71 @@ hostSchema.virtual('stalking_options').set(function(value){
 	var i;
 	var split = value.split(',');
 
-	this.stalking_options_up = this.stalking_options_down = this.stalking_options_unreachable = false;
+	this._stalking_options_up = this._stalking_options_down = this._stalking_options_unreachable = false;
 	for (i=0;i<split.length;i++){
 		switch(split[i]){
-			case 'o': this.stalking_options_up = true; break;
-			case 'd': this.stalking_options_down = true; break;
-			case 'u': this.stalking_options_unreachable = true; break;
+			case 'o': this._stalking_options_up = true; break;
+			case 'd': this._stalking_options_down = true; break;
+			case 'u': this._stalking_options_unreachable = true; break;
 			default: break;
 		}
 	}
+});
+hostSchema.virtual('stalking_options').get(function(){
+	var returnValue = '';
+	if (this._stalking_options_up){ returnValue += 'o,'; }
+	if (this._stalking_options_down){ returnValue += 'd,'; }
+	if (this._stalking_options_unreachable){ returnValue += 'u'; }
+	return returnValue.replace(/,$/, '');
 });
 
 hostSchema.virtual('flap_detection_options').set(function(value){
 	var i;
 	var split = value.split(',');
 
-	this.flap_detection_options_up = this.flap_detection_options_down = this.flap_detection_options_unreachable = false;
+	this._flap_detection_options_up = this._flap_detection_options_down = this._flap_detection_options_unreachable = false;
 	for (i=0;i<split.length;i++){
 		switch(split[i]){
-			case 'o': this.flap_detection_options_up = true; break;
-			case 'd': this.flap_detection_options_down = true; break;
-			case 'u': this.flap_detection_options_unreachable = true; break;
+			case 'o': this._flap_detection_options_up = true; break;
+			case 'd': this._flap_detection_options_down = true; break;
+			case 'u': this._flap_detection_options_unreachable = true; break;
 			default: break;
 		}
 	}
 });
+hostSchema.virtual('flap_detection_options').get(function(){
+	var returnValue = '';
+	if (this._flap_detection_options_up){ returnValue += 'o'; }
+	if (this._flap_detection_options_down){ returnValue += ',d'; }
+	if (this._flap_detection_options_unreachable){ returnValue += ',u'; }
+	return returnValue.replace(/,$/, '');
+});
+
 
 hostSchema.virtual('notification_options').set(function(value){
 	var i;
 	var split = value.split(',');
 
-	this.notification_options_down = this.notification_options_up = this.notification_options_recovery = this.notification_options_flapping = this.notification_options_scheduled = false;
+	this._notification_options_down = this._notification_options_up = this._notification_options_recovery = this._notification_options_flapping = this._notification_options_scheduled = false;
 	for (i=0;i<split.length;i++){
 		switch(split[i]){
-			case 'd': this.notification_options_down = true; break;
-			case 'u': this.notification_options_up = true; break;
-			case 'r': this.notification_options_recovery = true; break;
-			case 'f': this.notification_options_flapping = true; break;
-			case 's': this.notification_options_scheduled = true; break;
+			case 'd': this._notification_options_down = true; break;
+			case 'u': this._notification_options_up = true; break;
+			case 'r': this._notification_options_recovery = true; break;
+			case 'f': this._notification_options_flapping = true; break;
+			case 's': this._notification_options_scheduled = true; break;
 			default: break;
 		}
 	}
+});
+hostSchema.virtual('notification_options').get(function(){
+	var returnValue = '';
+	if (this._notification_options_down){ returnValue += 'd,'; }
+	if (this._notification_options_up){ returnValue += 'u,'; }
+	if (this._notification_options_recovery){ returnValue += 'r,'; }
+	if (this._notification_options_flapping){ returnValue += 'f,'; }
+	if (this._notification_options_scheduled){ returnValue += 's'; }
+	return returnValue.replace(/,$/, '');
 });
 
 // #################################################
@@ -267,13 +291,26 @@ hostSchema.statics.getNagiosData = function(cb){
 	var i,property;
 	var doc, docData;
 	var returnData = [];
-	var objCleanup = function(doc,ret,options){ delete ret._id; delete ret.__v; };
+	var Model = this;
+
+	var objCleanup = function(doc,ret,options){ 
+		delete ret.id;
+
+		// Remove internal properties
+		Model.schema.eachPath(function(path){ if (/^_/.exec(path)){ delete ret[path]; }});
+
+		// Remove empty properties
+		for (property in ret){
+			if (ret.hasOwnProperty(property)){
+				if (ret[property] === undefined || ret[property] === ''){ delete ret[property]; }
+			}
+		}
+	};
 
 	this.find({}, function(err, docs){
 
 		for (i=0; i<docs.length; i++){
-			doc = docs[i].toObject({transform: objCleanup});
-			// console.log(doc);
+			doc = docs[i].toObject({virtuals: true, transform: objCleanup});
 
 			docData = [];
 			for (property in doc){

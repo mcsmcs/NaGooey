@@ -24,11 +24,11 @@ var contactSchema = new mongoose.Schema({
 	host_notification_commands: String,
 
 	// Virtual: 'host_notification_options'
-	host_notification_up: Boolean,
-	host_notification_down: Boolean,
-	host_notification_recovery: Boolean,
-	host_notification_flapping: Boolean,
-	host_notification_scheduled: Boolean,
+	_host_notification_up: Boolean,
+	_host_notification_down: Boolean,
+	_host_notification_recovery: Boolean,
+	_host_notification_flapping: Boolean,
+	_host_notification_scheduled: Boolean,
 
 	
 	/**************** Services ****************/
@@ -37,12 +37,12 @@ var contactSchema = new mongoose.Schema({
 	service_notification_commands: String,
 
 	// Virtual: 'service_notification_options'
-	service_notification_warning: Boolean,
-	service_notification_unknown: Boolean,
-	service_notification_critical: Boolean,
-	service_notification_recovery: Boolean,
-	service_notification_flapping: Boolean,
-	service_notification_scheduled: Boolean,
+	_service_notification_warning: Boolean,
+	_service_notification_unknown: Boolean,
+	_service_notification_critical: Boolean,
+	_service_notification_recovery: Boolean,
+	_service_notification_flapping: Boolean,
+	_service_notification_scheduled: Boolean,
 
 
 	/**************** Templates ****************/
@@ -59,12 +59,12 @@ var stringToArray = function(property){
 	return function(value){ this[property] = value.split(','); };
 };
 var arrayToString = function(property){
-	return function(){ this[property].join(','); };
+	return function(){ return this[property].join(','); };
 };
 
 var virtualArray = function(schema, virtualName){
 	schema.virtual(virtualName).set(stringToArray('_' + virtualName));
-	schema.virtual(virtualName).get(stringToArray('_' + virtualName));
+	schema.virtual(virtualName).get(arrayToString('_' + virtualName));
 };
 
 virtualArray(contactSchema, 'use');
@@ -79,26 +79,26 @@ contactSchema.virtual('register').get(function(){ return this._register; });
 contactSchema.virtual('host_notification_options').set(function(value){
 	var i;
 	var split = value.split(',');
-	this.host_notification_up = this.host_notification_down = this.host_notification_recovery = this.host_notification_flapping = this.host_notification_scheduled = false;
 
+	this._host_notification_up = this._host_notification_down = this._host_notification_recovery = this._host_notification_flapping = this._host_notification_scheduled = false;
 	for (i=0;i<split.length;i++){
 		switch(split[i]){
-			case 'u': this.host_notification_up = true; break;
-			case 'd': this.host_notification_down = true; break;
-			case 'r': this.host_notification_recovery = true; break;
-			case 'f': this.host_notification_flapping = true; break;
-			case 's': this.host_notification_scheduled = true; break;
+			case 'u': this._host_notification_up = true; break;
+			case 'd': this._host_notification_down = true; break;
+			case 'r': this._host_notification_recovery = true; break;
+			case 'f': this._host_notification_flapping = true; break;
+			case 's': this._host_notification_scheduled = true; break;
 			default: break;
 		}
 	}
 });
 contactSchema.virtual('host_notification_options').get(function(){
 	var returnValue = "";
-	if(this.host_notification_up === 'true'){ returnValue = returnValue + 'u,'; }
-	if(this.host_notification_down === 'true'){ returnValue = returnValue + 'd,'; }
-	if(this.host_notification_recovery === 'true'){ returnValue = returnValue + 'r,'; }
-	if(this.host_notification_flapping === 'true'){ returnValue = returnValue + 'f,'; }
-	if(this.host_notification_scheduled === 'true'){ returnValue = returnValue + 's'; }
+	if(this._host_notification_up === true){ returnValue +=  'u,'; }
+	if(this._host_notification_down === true){ returnValue +=  'd,'; }
+	if(this._host_notification_recovery === true){ returnValue +=  'r,'; }
+	if(this._host_notification_flapping === true){ returnValue +=  'f,'; }
+	if(this._host_notification_scheduled === true){ returnValue +=  's'; }
 	return returnValue.replace(/,$/, '');
 });
 
@@ -106,15 +106,15 @@ contactSchema.virtual('service_notification_options').set(function(value){
 	var i;
 	var split = value.split(',');
 	
-	this.service_notification_warning = this.service_notification_unknown = this.service_notification_critical = this.service_notification_recovery = this.service_notification_flapping = this.service_notification_scheduled = false;
+	this._service_notification_warning = this._service_notification_unknown = this._service_notification_critical = this._service_notification_recovery = this._service_notification_flapping = this._service_notification_scheduled = false;
 	for (i=0;i<split.length;i++){
 		switch(split[i]){
-			case 'w': this.service_notification_warning = true; break;
-			case 'u': this.service_notification_unknown = true; break;
-			case 'c': this.service_notification_critical = true; break;
-			case 'r': this.service_notification_recovery = true; break;
-			case 'f': this.service_notification_flapping = true; break;
-			case 's': this.service_notification_scheduled = true; break;
+			case 'w': this._service_notification_warning = true; break;
+			case 'u': this._service_notification_unknown = true; break;
+			case 'c': this._service_notification_critical = true; break;
+			case 'r': this._service_notification_recovery = true; break;
+			case 'f': this._service_notification_flapping = true; break;
+			case 's': this._service_notification_scheduled = true; break;
 			default: break;
 		}
 	}
@@ -122,12 +122,12 @@ contactSchema.virtual('service_notification_options').set(function(value){
 });
 contactSchema.virtual('service_notification_options').get(function(){
 	var returnValue = "";
-	if(this.service_notification_warning === 'true'){ returnValue = returnValue + 'w,'; }
-	if(this.service_notification_unknown === 'true'){ returnValue = returnValue + 'u,'; }
-	if(this.service_notification_critical === 'true'){ returnValue = returnValue + 'c,'; }
-	if(this.service_notification_recovery === 'true'){ returnValue = returnValue + 'r,'; }
-	if(this.service_notification_flapping === 'true'){ returnValue = returnValue + 'f,'; }
-	if(this.service_notification_scheduled === 'true'){ returnValue = returnValue + 's'; }
+	if(this._service_notification_warning === true){ returnValue +=  'w,'; }
+	if(this._service_notification_unknown === true){ returnValue +=  'u,'; }
+	if(this._service_notification_critical === true){ returnValue +=  'c,'; }
+	if(this._service_notification_recovery === true){ returnValue +=  'r,'; }
+	if(this._service_notification_flapping === true){ returnValue +=  'f,'; }
+	if(this._service_notification_scheduled === true){ returnValue +=  's'; }
 	return returnValue.replace(/,$/, '');
 });
 
@@ -188,23 +188,32 @@ contactSchema.statics.getNagiosData = function(cb){
 	var i,property;
 	var doc, docData;
 	var returnData = [];
-	var objCleanup = function(doc,ret,options){ delete ret._id; delete ret.__v; };
+	var Model = this;
+
+	var objCleanup = function(doc,ret,options){ 
+		delete ret.id;
+
+		// Remove internal properties
+		Model.schema.eachPath(function(path){ if (/^_/.exec(path)){ delete ret[path]; }});
+
+		// Remove empty properties
+		for (property in ret){
+			if (ret.hasOwnProperty(property)){
+				if (ret[property] === undefined || ret[property] === ''){ delete ret[property]; }
+			}
+		}
+	};
 
 	this.find({}, function(err, docs){
 
 		for (i=0; i<docs.length; i++){
-			doc = docs[i].toObject({transform: objCleanup});
+			doc = docs[i].toObject({virtuals: true, transform: objCleanup});
 
 			docData = [];
 			for (property in doc){
 				if(doc.hasOwnProperty(property)){
 					switch(property){
-						case 'host_notification_options':
-							docData.push({directive: 'host_notification_options', value: hostNotificationsToString(doc.host_notification_options)});
-							break;
-						case 'service_notification_options':
-							docData.push({directive: 'service_notification_options', value: serviceNotificationsToString(doc.service_notification_options)});
-							break;
+						case 'extra processing needed': break;
 						default:
 							if(doc[property] instanceof Array){
 								if(doc[property].length > 0){
