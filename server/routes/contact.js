@@ -6,8 +6,10 @@
  *	Basic CRUD
  */
 
+var async = require('async');
 var mongoose = require('mongoose');
 var Contact = mongoose.model("Contact");
+var TimePeriod = mongoose.model("TimePeriod");
 
 var isPresent = function(formFieldData){
 	return (formFieldData ? true : false);
@@ -21,25 +23,25 @@ var parseRequestBody = function(requestBody){
 			email: requestBody.email,
 			pager: requestBody.pager,
 			
+			can_submit_commands: isPresent(requestBody.can_submit_commands),
+			retain_status_information: isPresent(requestBody.retain_status_information),
+			retain_nonstatus_information: isPresent(requestBody.retain_nonstatus_information),
+
 			host_notifications_enabled: isPresent(requestBody.host_notifications_enabled),
 			host_notification_period: requestBody.host_notification_period,
-			host_notification_options: {
-				up: 		isPresent(requestBody.host_notification_up),
-				flapping: 	isPresent(requestBody.host_notification_flapping),
-				down: 		isPresent(requestBody.host_notification_down),
-				scheduled: 	isPresent(requestBody.host_notification_scheduled),
-				recoveries: isPresent(requestBody.host_notification_recoveries),
-			},
+			_host_notification_up: isPresent(requestBody.host_notification_up),
+			_host_notification_flapping: isPresent(requestBody.host_notification_flapping),
+			_host_notification_flappingdown: isPresent(requestBody.host_notification_down),
+			_host_notification_flappingscheduled: isPresent(requestBody.host_notification_scheduled),
+			_host_notification_flappingrecoveries: isPresent(requestBody.host_notification_recoveries),
 			
 			service_notifications_enabled: isPresent(requestBody.service_notifications_enabled),
 			service_notification_period: requestBody.service_notification_period,
-			service_notification_options: {
-				warning: 	isPresent(requestBody.service_notification_warning),
-				unknown: 	isPresent(requestBody.service_notification_unknown),
-				critical: 	isPresent(requestBody.service_notification_critical),
-				flapping: 	isPresent(requestBody.service_notification_flapping),
-				recoveries: isPresent(requestBody.service_notification_recoveries)
-			}
+			_service_notification_warning: isPresent(requestBody.service_notification_warning),
+			_service_notification_unknown: isPresent(requestBody.service_notification_unknown),
+			_service_notification_critical: isPresent(requestBody.service_notification_critical),
+			_service_notification_flapping: isPresent(requestBody.service_notification_flapping),
+			_service_notification_recoveries: isPresent(requestBody.service_notification_recoveries)
 	};
 };
 
@@ -67,7 +69,13 @@ module.exports = function(app){
 	// #                    ADD
 	// #################################################
 	app.get('/contact/add', function(req,res){
-		res.render('contact_form');
+		TimePeriod.find({},{timeperiod_name:1, _id:0}, function(err,timeperiods){
+			res.render('contact_form',
+			{
+				timeperiods: timeperiods
+			});	
+		});
+		
 	});
 	
 	app.post('/contact/add', function(req,res){
@@ -84,11 +92,22 @@ module.exports = function(app){
 	// #################################################
 	app.get('/contact/edit/:contact_name', function(req,res){
 
-		Contact.findOne({contact_name: req.params.contact_name}, function(err,contactDoc){
-			if(err){console.log(err);}
+		async.parallel(
+		{
+			contact: function(callback){
+				Contact.findOne({contact_name: req.params.contact_name}, callback);
+			},
+			timeperiods: function(callback){
+				TimePeriod.find({}, {timeperiod_name:1, _id:0}, callback);
+			},
+		},
+		
+		function(err,results){
+			if(err){ console.log(err); }
+			console.log(results.contact);
 			res.render('contact_form', {
-				contact: contactDoc,
-				time_periods: [{timeperiod_name: "timeperiod1"}]
+				contact: results.contact,
+				timeperiods: results.timeperiods
 			});
 		});
 	});

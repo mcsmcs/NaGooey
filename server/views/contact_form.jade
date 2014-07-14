@@ -1,181 +1,104 @@
 extends layout
 //- Mixins included in layout.jade
 block content
-
 	.contacts
-
 		h1 Contacts
 
 		if contact
+			-var action = '/contact/edit/' + contact.contact_name
 			h4= "Editing: " + contact.contact_name
-
-		//- Set the form action based on edit or add
-		- var action = (contact ? '/contact/edit/' + contact.contact_name : '/contact/add')
-
-		if contact
-
-			//- EDIT existing contact (prefill fields)
-			form(name="contact_options" action=action method="post")
-				table
-					+textbox('Contact Name','contact_name',contact.contact_name)
-					+textbox('Alias','alias',contact.alias)
-					+textbox('Email Address','email',contact.email)
-					+textbox('Pager','pager',contact.pager)
-
-
-					//-*********** HOSTS ***********//
-					tr
-						td
-							h4 Host Notifications
-
-					+checkboxTR('Host Notifications Enabled','host_notifications_enabled',contact.host_notifications_enabled)
-
-					tr
-						td Host Notification Period
-						td
-							select.width200(name="host_notification_period")
-								each timeperiod in time_periods
-									if timeperiod.timeperiod_name == contact.host_notification_period
-										option(value=timeperiod.timeperiod_name selected)= timeperiod.timeperiod_name
-									else
-										option(value=timeperiod.timeperiod_name)= timeperiod.timeperiod_name
-							
-					tr 
-						td Send notifications on these events
-						td
-							table
-								tr
-									td
-										+checkbox('UP','host_notification_up',contact.host_notification_options.up)
-									td
-										+checkbox('FLAPPING','host_notification_flapping',contact.host_notification_options.up)
-								tr
-									td
-										+checkbox('DOWN','host_notification_down',contact.host_notification_options.down)
-									td
-										+checkbox('SCHEDULED','host_notification_scheduled',contact.host_notification_options.up)
-								tr
-									td
-										+checkbox('RECOVERY','host_notification_recoveries',contact.host_notification_options.up)
-					
-
-
-					//-*********** SERVICES ***********//
-					tr
-						td
-							h4 Service Notifications
-					
-					+checkboxTR('Enable Service Notifications','service_notifications_enabled',contact.service_notifications_enabled)
-	
-					tr
-						td Service Notification Period
-						td
-							select.width200(name="service_notification_period")
-								each timeperiod in time_periods
-									if timeperiod.timeperiod_name == contact.service_notification_period
-										option(value=timeperiod.timeperiod_name selected)= timeperiod.timeperiod_name
-									else
-										option(value=timeperiod.timeperiod_name)= timeperiod.timeperiod_name
-
-					tr 
-						td Send notifications on these events
-						td
-							table
-								tr
-									td
-										+checkbox('WARNING','service_notification_warning',contact.service_notification_options.warning)
-									td
-										+checkbox('UNKNOWN','service_notification_unknown',contact.service_notification_options.unknown)
-								tr
-									td
-										+checkbox('CRITICAL','service_notification_critical',contact.service_notification_options.critical)
-									td
-										+checkbox('FLAPPING','service_notification_flapping',contact.service_notification_options.flapping)
-								tr
-									td
-										+checkbox('RECOVERY','service_notification_recoveries',contact.service_notification_options.recoveries)
-					tr
-						td
-							input(type="submit")
-
 		else
-			//- ADD new contact
-			form(name="contact_options" action=action method="post")
-				table
-					tr
-						td 
-							h4 Contact Information
+			-var action = '/contact/add'
+			-contact = {}
 
-					+textbox('Contact Name','contact_name')
-					+textbox('Alias','alias')
-					+textbox('Email','email')
-					+textbox('Pager','pager')
 
-					//-*********** HOSTS ***********//
-					tr
-						td
-							h4 Host Notifications
-					
-					+checkboxTR('Enable Host Notifications','host_notifications_enabled')
-					
-					tr
-						td Host Notification Period
-						td
-							select.width200(name="host_notification_period")
-								each timeperiod in time_periods
+		form(name="contact_options" action=action method="post")
+			table
+				+textbox('Contact Name','contact_name',contact.contact_name)
+				+textbox('Alias','alias',contact.alias)
+				+textbox('Email Address','email',contact.email)
+				+textbox('Pager','pager',contact.pager)
+
+				//- tr
+				//- 	td(colspan=2) Contact Groups
+				//- 		+membershipControl(contactgroups.members, contactgroups.nonmembers, 'contactgroups', 'contactgroups_name')
+
+
+				+checkboxTR('Can submit commands','can_submit_commands',contact.can_submit_commands)
+				+checkboxTR('Retain status information','retain_status_information',contact.retain_status_information)
+				+checkboxTR('Retain non-status information','retain_nonstatus_information',contact.retain_nonstatus_information)
+				
+				//-*********** HOSTS ***********//
+				tr
+					td
+						h4 Host Notifications
+
+				+checkboxTR('Host Notifications Enabled','host_notifications_enabled',contact.host_notifications_enabled)
+
+				tr
+					td Host Notification Period
+					td
+						select.width200(name="host_notification_period")
+							each timeperiod in timeperiods
+								if timeperiod.timeperiod_name == contact.host_notification_period
+									option(value=timeperiod.timeperiod_name selected)= timeperiod.timeperiod_name
+								else
+									option(value=timeperiod.timeperiod_name)= timeperiod.timeperiod_name
+						
+				tr 
+					td Send notifications on these events
+					td
+						table
+							tr
+								td
+									+checkbox('UP','host_notification_up',contact._host_notification_up)
+								td
+									+checkbox('FLAPPING','host_notification_flapping',contact._host_notification_up)
+							tr
+								td
+									+checkbox('DOWN','host_notification_down',contact._host_notification_down)
+								td
+									+checkbox('SCHEDULED','host_notification_scheduled',contact._host_notification_up)
+							tr
+								td
+									+checkbox('RECOVERY','host_notification_recoveries',contact._host_notification_up)
+				
+
+
+				//-*********** SERVICES ***********//
+				tr
+					td
+						h4 Service Notifications
+				
+				+checkboxTR('Enable Service Notifications','service_notifications_enabled',contact.service_notifications_enabled)
+
+				tr
+					td Service Notification Period
+					td
+						select.width200(name="service_notification_period")
+							each timeperiod in timeperiods
+								if timeperiod.timeperiod_name == contact.service_notification_period
+									option(value=timeperiod.timeperiod_name selected)= timeperiod.timeperiod_name
+								else
 									option(value=timeperiod.timeperiod_name)= timeperiod.timeperiod_name
 
-					tr 
-						td Send notifications on these
-						td
-							table
-								tr
-									td
-										+checkbox('UP','host_notification_up')
-									td
-										+checkbox('FLAPPING','host_notification_flapping')
-								tr
-									td
-										+checkbox('DOWN','host_notification_down')
-
-									td
-										+checkbox('SCHEDULED','host_notification_scheduled')
-								tr
-									td
-										+checkbox('RECOVERY','host_notification_recoveries')
-
-
-					//-*********** SERVICES ***********//
-					tr
-						td
-							h4 Service Notifications
-					
-					+checkboxTR('Enable Service Notifications','service_notifications_enabled')
-					
-					tr
-						td Service Notification Period
-						td
-							select.width200(name="service_notification_period")
-								each timeperiod in time_periods
-									option(value=timeperiod.timeperiod_name)= timeperiod.timeperiod_name
-
-					tr 
-						td Send notifications on these
-						td
-							table
-								tr
-									td
-										+checkbox('WARNING','service_notification_warning')
-									td
-										+checkbox('UNKNOWN','service_notification_unknown')
-								tr
-									td
-										+checkbox('CRITICAL','service_notification_critical')
-
-									td
-										+checkbox('FLAPPING','service_notification_flapping')
-								tr
-									td
-										+checkbox('RECOVERY','service_notification_recoveries')
-
-				input(type="submit")
+				tr 
+					td Send notifications on these events
+					td
+						table
+							tr
+								td
+									+checkbox('WARNING','service_notification_warning',contact._service_notification_warning)
+								td
+									+checkbox('UNKNOWN','service_notification_unknown',contact._service_notification_unknown)
+							tr
+								td
+									+checkbox('CRITICAL','service_notification_critical',contact._service_notification_critical)
+								td
+									+checkbox('FLAPPING','service_notification_flapping',contact._service_notification_flapping)
+							tr
+								td
+									+checkbox('RECOVERY','service_notification_recoveries',contact._service_notification_recoveries)
+				tr
+					td
+						input(type="submit")
